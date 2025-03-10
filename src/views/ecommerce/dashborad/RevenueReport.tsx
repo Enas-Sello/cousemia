@@ -274,7 +274,7 @@ const RevenueReport = () => {
                 <span className='font-medium text-textPrimary'>Budget: </span>56,800
               </Typography>
             </div>
-            <AppReactApexCharts type='line' height={80} width='100%' series={lineSeries} options={lineOptions} />
+            <AppReactApexCharts type='line' height={80} width='60%' series={lineSeries} options={lineOptions} />
             <Button variant='contained'>Increase Budget</Button>
           </CardContent>
         </Grid>

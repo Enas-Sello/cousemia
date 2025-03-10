@@ -1,5 +1,6 @@
 // Next Imports
-import { Montserrat } from 'next/font/google'
+// import { Montserrat } from 'next/font/google'
+import { Public_Sans } from 'next/font/google'
 
 // MUI Imports
 import type { Theme } from '@mui/material/styles'
@@ -16,7 +17,7 @@ import shadows from './shadows'
 import customShadows from './customShadows'
 import typography from './typography'
 
-const public_sans = Montserrat({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800', '900'] })
+const public_sans = Public_Sans({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800', '900'] })
 
 const theme = (settings: Settings, mode: SystemMode, direction: Theme['direction']): Theme => {
   return {

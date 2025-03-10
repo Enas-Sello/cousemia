@@ -8,6 +8,8 @@ import LineChartProfit from '@/views/ecommerce/dashborad/LineChartProfit'
 import RadialBarChart from '@/views/ecommerce/dashborad/RadialBarChart'
 import DonutChartGeneratedLeads from '@/views/ecommerce/dashborad/DonutChartGeneratedLeads'
 import RevenueReport from '@/views/ecommerce/dashborad/RevenueReport'
+import BrowserStates from '@/views/ecommerce/dashborad/BrowserStates'
+import Transactions from '@/views/ecommerce/dashborad/Transactions'
 
 const EcommerceDashboard = () => {
   return (
@@ -31,10 +33,16 @@ const EcommerceDashboard = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid size={{ xs: 12, xl: 8 }}>{<RevenueReport /> }</Grid>
-      <Grid size={{ xs: 12, sm: 6, lg: 4 }}>{/* <EarningReports /> */}</Grid>
-      <Grid size={{ xs: 12, sm: 6, lg: 4 }}>{/* <PopularProducts /> */}</Grid>
+      <Grid size={{ xs: 12, xl: 8 }}>{<RevenueReport />}</Grid>
+      {/* ............. */}
+      <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+        <BrowserStates />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+        <Transactions />
+      </Grid>
       <Grid size={{ xs: 12, sm: 6, lg: 4 }}>{/* <Orders /> */}</Grid>
+      {/* ........... */}
       <Grid size={{ xs: 12, sm: 6, lg: 4 }}>{/* <Transactions /> */}</Grid>
       <Grid size={{ xs: 12, lg: 8 }}>{/* <InvoiceListTable invoiceData={invoiceData} /> */}</Grid>
     </Grid>
