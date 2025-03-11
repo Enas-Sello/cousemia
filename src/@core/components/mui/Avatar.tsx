@@ -37,7 +37,9 @@ const Avatar = styled(MuiAvatar)<CustomAvatarProps>(({ skin, color, size, theme 
     ...(size && {
       height: size,
       width: size
-    })
+    }),
+
+    borderRadius: '.357rem !important' // Override the default circular border radius
   }
 })
 

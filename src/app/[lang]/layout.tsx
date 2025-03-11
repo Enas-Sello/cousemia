@@ -1,3 +1,4 @@
+
 // Next Imports
 import { headers } from 'next/headers'
 
@@ -24,6 +25,7 @@ import { i18n } from '@configs/i18n'
 import { getSystemMode } from '@core/utils/serverHelpers'
 
 // Style Imports
+import 'animate.css'
 import '@/app/globals.css'
 
 // Generated Icon CSS Imports

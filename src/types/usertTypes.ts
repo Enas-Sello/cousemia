@@ -1,4 +1,4 @@
-import { CourseType } from './courseType'
+import type { CourseType } from './courseType'
 
 export type UserType = {
   id: number

@@ -25,6 +25,7 @@
     "@mui/material-nextjs": "^6.2.1",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/react-table": "^8.20.1",
+    "animate.css": "^4.1.1",
     "apexcharts": "^4.5.0",
     "axios": "^1.7.4",
     "classnames": "2.5.1",

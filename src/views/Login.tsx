@@ -121,7 +121,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
 
       if (res?.ok) {
         toast.success('Logged in successfully')
-        router.push('/dashboard')
+        router.push('/dashboards/ecommerce')
       }
 
       if (!res?.ok) {

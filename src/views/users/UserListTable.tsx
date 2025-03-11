@@ -1,7 +1,8 @@
 'use client'
 
 // React Imports
-import { ChangeEvent, useMemo } from 'react'
+import type { ChangeEvent } from 'react'
+import { useMemo } from 'react'
 
 // MUI Imports
 import Link from 'next/link'
@@ -10,7 +11,8 @@ import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
-import { Autocomplete, CardContent, Chip, Grid, Typography } from '@mui/material'
+import { Autocomplete, CardContent, Chip, Typography } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 
 // Third-party Imports
 import classnames from 'classnames'
@@ -22,7 +24,10 @@ import {
   getSortedRowModel,
   getFilteredRowModel
 } from '@tanstack/react-table'
-import type { ColumnDef, FilterFn, Row } from '@tanstack/react-table'
+import { rankItem } from '@tanstack/match-sorter-utils'
+import type { ColumnDef, FilterFn } from '@tanstack/react-table'
+
+import { useTheme } from '@mui/material/styles'
 
 import type { UserType } from '@/types/usertTypes'
 
@@ -72,13 +77,16 @@ const UserListTable = ({
   setPerPage,
   page,
   setPage,
-  setSortBy,
-  setSortDesc,
+
+  // setSortBy,
+  // setSortDesc,
   setStatus,
   setVerified,
   setSearch
 }: UserListTableProps) => {
   const data = useMemo(() => tableData, [tableData])
+
+  const theme = useTheme()
 
   const columns: ColumnDef<UserType>[] = [
     {
@@ -161,6 +169,19 @@ const UserListTable = ({
     }
   ]
 
+  const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+    // Rank the item
+    const itemRank = rankItem(row.getValue(columnId), value)
+
+    // Store the itemRank info
+    addMeta({
+      itemRank
+    })
+
+    // Return if the item should be filtered in/out
+    return itemRank.passed
+  }
+
   const table = useReactTable({
     data,
     columns,
@@ -177,112 +198,147 @@ const UserListTable = ({
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true, // Enable manual pagination for server-side handling
     manualFiltering: true,
-    filterFns: undefined
+
+    // filterFns: undefined
+    filterFns: {
+      fuzzy: fuzzyFilter
+    }
   })
 
   return (
-    <Card>
-      <CardHeader title='Users' className='pbe-4' />
-      <CardContent>
-        <Grid container spacing={6}>
-          <Grid item xs={12} sm={6}>
-            <Autocomplete
-              id='status'
-              options={verfiedList}
-              onChange={(event: ChangeEvent<{}>, newValue) => setVerified(newValue?.value ?? '')}
-              renderTags={(tagValue, getTagProps) => {
-                return tagValue.map((option: FilterItemType, index) => (
-                  <Chip {...getTagProps({ index })} key={index} label={option.title} />
-                ))
-              }}
-              getOptionLabel={option => option.title || ''}
-              renderInput={params => (
-                <CustomTextField {...params} key={params.id} placeholder='Select' label='Verified' />
-              )}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Autocomplete
-              id='status'
-              options={statusList}
-              onChange={(event: ChangeEvent<{}>, newValue) => setStatus(newValue?.value ?? '')}
-              renderTags={(tagValue, getTagProps) => {
-                return tagValue.map((option: FilterItemType, index) => (
-                  <Chip {...getTagProps({ index })} key={index} label={option.title} />
-                ))
-              }}
-              getOptionLabel={option => option.title || ''}
-              renderInput={params => (
-                <CustomTextField {...params} key={params.id} placeholder='Select status' label='Status' />
-              )}
-            />
-          </Grid>
-        </Grid>
-      </CardContent>
-      <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
-        <CustomTextField
-          select
-          value={perPage}
-          onChange={e => setPerPage(Number(e.target.value))}
-          className='is-[80px]'
-        >
-          <MenuItem value='10'>10</MenuItem>
-          <MenuItem value='25'>25</MenuItem>
-          <MenuItem value='50'>50</MenuItem>
-          <MenuItem value='100'>100</MenuItem>
-        </CustomTextField>
-        <CustomTextField placeholder='Search...' className='is-[300px]' onChange={e => setSearch(e.target.value)} />
-      </div>
-      <div className='overflow-x-auto'>
-        <table className={tableStyles.table}>
-          <thead>
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <div
-                        className={classnames({
-                          'flex items-center': header.column.getIsSorted(),
-                          'cursor-pointer select-none': header.column.getCanSort()
-                        })}
-                        onClick={header.column.getToggleSortingHandler()}
+    <Grid container spacing={6}>
+      <Grid size={{ xs: 12 }}>
+        <Card>
+          <CardHeader title='Filters' className='pbe-4' />
+          <CardContent>
+            <Grid container spacing={6}>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <Autocomplete
+                  id='status'
+                  options={verfiedList}
+                  onChange={(event: ChangeEvent<{}>, newValue) => setVerified(newValue?.value ?? '')}
+                  renderTags={(tagValue, getTagProps) => {
+                    return tagValue.map((option: FilterItemType, index) => (
+                      <Chip {...getTagProps({ index })} key={index} label={option.title} />
+                    ))
+                  }}
+                  getOptionLabel={option => option.title || ''}
+                  renderInput={params => (
+                    <CustomTextField {...params} key={params.id} placeholder='Select' label='Verified' />
+                  )}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <Autocomplete
+                  id='status'
+                  options={statusList}
+                  onChange={(event: ChangeEvent<{}>, newValue) => setStatus(newValue?.value ?? '')}
+                  renderTags={(tagValue, getTagProps) => {
+                    return tagValue.map((option: FilterItemType, index) => (
+                      <Chip {...getTagProps({ index })} key={index} label={option.title} />
+                    ))
+                  }}
+                  getOptionLabel={option => option.title || ''}
+                  renderInput={params => (
+                    <CustomTextField {...params} key={params.id} placeholder='Select' label='Status' />
+                  )}
+                />
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <Card>
+          <CardContent>
+            <Grid container spacing={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <div className='flex gap-2 items-center'>
+                  <p className='text-sm'>show</p>
+                  <CustomTextField
+                    select
+                    value={perPage}
+                    onChange={e => setPerPage(Number(e.target.value))}
+                    className='is-[80px]'
+                  >
+                    <MenuItem value='10'>10</MenuItem>
+                    <MenuItem value='25'>25</MenuItem>
+                    <MenuItem value='50'>50</MenuItem>
+                    <MenuItem value='100'>100</MenuItem>
+                  </CustomTextField>
+                  <p className='text-sm'>entries</p>
+                </div>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  placeholder='Search...'
+                  className='is-[300px]'
+                  onChange={e => setSearch(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+          </CardContent>
+          <div className='overflow-x-auto'>
+            <table className={tableStyles.table}>
+              <thead>
+                {table.getHeaderGroups().map(headerGroup => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map(header => (
+                      <th
+                        key={header.id}
+                        style={{
+                          backgroundColor: theme.palette.secondary.light,
+                          color: theme.palette.secondary.main
+                        }}
                       >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {{
-                          asc: <i className='tabler-chevron-up text-xl' />,
-                          desc: <i className='tabler-chevron-down text-xl' />
-                        }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                      </div>
-                    )}
-                  </th>
+                        {' '}
+                        {header.isPlaceholder ? null : (
+                          <div
+                            className={classnames({
+                              'flex items-center': header.column.getIsSorted(),
+                              'cursor-pointer select-none': header.column.getCanSort()
+                            })}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{
+                              asc: <i className='tabler-chevron-up text-xl' />,
+                              desc: <i className='tabler-chevron-down text-xl' />
+                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                          </div>
+                        )}
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </thead>
-          {table.getRowModel().rows.length === 0 ? (
-            <tbody>
-              <tr>
-                <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                  No data available
-                </td>
-              </tr>
-            </tbody>
-          ) : (
-            <tbody>
-              {table.getRowModel().rows.map(row => (
-                <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
-                  {row.getVisibleCells().map(cell => (
-                    <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+              </thead>
+              {table.getRowModel().rows.length === 0 ? (
+                <tbody>
+                  <tr>
+                    <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
+                      No data available
+                    </td>
+                  </tr>
+                </tbody>
+              ) : (
+                <tbody>
+                  {table.getRowModel().rows.map(row => (
+                    <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
+                      {row.getVisibleCells().map(cell => (
+                        <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                      ))}
+                    </tr>
                   ))}
-                </tr>
-              ))}
-            </tbody>
-          )}
-        </table>
-      </div>
-      <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
-    </Card>
+                </tbody>
+              )}
+            </table>
+          </div>
+        <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
+        </Card>
+
+      </Grid>
+    </Grid>
   )
 }
 

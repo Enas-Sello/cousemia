@@ -3,7 +3,6 @@ import CredentialProvider from 'next-auth/providers/credentials'
 
 import type { JWT } from 'next-auth/jwt'
 
-import AxiosRequest from './axios.config'
 import { API_LOGIN } from '@/configs/api'
 
 export interface LoginSession {
@@ -18,21 +17,23 @@ export type LoggedInUser = {
   email?: string | null
   avatar?: string | null
   role?: string | null
-  ability?: [string] | []
+  ability?: { action: string; subject: string }[] | []
   token?: string | null
 }
 
 export const ApiAuthOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
+      
       if (user) {
         token.user = user
       }
 
       return token
     },
-    async session({ session, token, user }: { session: LoginSession; token: JWT; user: LoggedInUser }) {
+    async session({ session, token }: { session: LoginSession; token: JWT; user: LoggedInUser }) {
       session.user = token.user as LoggedInUser
+
 
       return session
     }
@@ -45,6 +46,7 @@ export const ApiAuthOptions: NextAuthOptions = {
       async authorize(credentials) {
         const { email, password } = credentials as { email: string; password: string }
 
+
         try {
           const res = await fetch(API_LOGIN, {
             method: 'POST',
@@ -56,6 +58,7 @@ export const ApiAuthOptions: NextAuthOptions = {
           const user = data.user
 
           user['token'] = data.token
+          console.log('user=======>', user)
 
           if (user) {
             return user

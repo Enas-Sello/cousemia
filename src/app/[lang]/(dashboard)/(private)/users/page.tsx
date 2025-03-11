@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { Grid } from '@mui/material'
 
 import UserListTable from '@/views/users/UserListTable'
 import getUsers from '@/data/users/getUsers'
@@ -31,8 +30,8 @@ export default function Users() {
   }, [perPage, page, status, verified, search])
 
   return (
-    <Grid container spacing={6}>
-      <Grid item xs={12}>
+    <>
+      {/* <Grid size={{ xs: 12 }}> */}
         <UserListTable
           tableData={data}
           total={total}
@@ -46,7 +45,7 @@ export default function Users() {
           setVerified={setVerified}
           setSearch={setSearch}
         />
-      </Grid>
-    </Grid>
+      {/* </Grid> */}
+    </>
   )
 }
