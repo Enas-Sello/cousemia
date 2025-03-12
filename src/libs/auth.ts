@@ -58,7 +58,6 @@ export const ApiAuthOptions: NextAuthOptions = {
           const user = data.user
 
           user['token'] = data.token
-          console.log('user=======>', user)
 
           if (user) {
             return user

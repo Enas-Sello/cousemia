@@ -117,7 +117,7 @@ const colorSchemes = (skin: Skin): Theme['colorSchemes'] => {
           successFilledBg: 'var(--mui-palette-success-main)'
         },
         Avatar: {
-          defaultBg: '#EEEDF0'
+          defaultBg: '#FFFFFF'
         },
         Chip: {
           defaultBorder: 'var(--mui-palette-divider)'

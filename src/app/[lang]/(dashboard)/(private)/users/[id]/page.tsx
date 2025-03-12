@@ -18,7 +18,6 @@ import UserCourses from '@/views/users/UserCourses'
 export default async function page({ params }: { params: { id: number } }) {
   const user: UserType = (await getUser(params.id)) as UserType
 
-  console.log('====', { user })
 
   if (!user) {
     notFound()
