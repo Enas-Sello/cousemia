@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-
+import React, { useEffect, useState, useCallback } from 'react'
 
 import UserListTable from '@/views/users/UserListTable'
 import getUsers from '@/data/users/getUsers'
@@ -18,33 +17,33 @@ export default function Users() {
   const [status, setStatus] = useState<string>('')
   const [search, setSearch] = useState<string>('')
 
-  const fetchData = async () => {
-    const result = await getUsers(search, perPage, page + 1, sortBy, sortDesc, verified, status) // page + 1 to match server-side pagination
+  const fetchData = useCallback(async () => {
+    const result = await getUsers(search, perPage, page + 1, sortBy, sortDesc, verified, status)
 
     setData(result.users)
-    setTotal(result.total) // total number of items
-  }
+    setTotal(result.total)
+  }, [search, perPage, page, sortBy, sortDesc, verified, status])
 
   useEffect(() => {
     fetchData()
-  }, [perPage, page, status, verified, search])
+  }, [fetchData])
 
   return (
     <>
       {/* <Grid size={{ xs: 12 }}> */}
-        <UserListTable
-          tableData={data}
-          total={total}
-          perPage={perPage}
-          setPerPage={setPerPage}
-          page={page}
-          setPage={setPage}
-          setSortBy={setSortBy}
-          setSortDesc={setSortDesc}
-          setStatus={setStatus}
-          setVerified={setVerified}
-          setSearch={setSearch}
-        />
+      <UserListTable
+        tableData={data}
+        total={total}
+        perPage={perPage}
+        setPerPage={setPerPage}
+        page={page}
+        setPage={setPage}
+        setSortBy={setSortBy}
+        setSortDesc={setSortDesc}
+        setStatus={setStatus}
+        setVerified={setVerified}
+        setSearch={setSearch}
+      />
       {/* </Grid> */}
     </>
   )

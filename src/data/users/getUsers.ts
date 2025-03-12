@@ -1,6 +1,7 @@
+import { notFound } from 'next/navigation'
+
 import { API_USERS } from '@/configs/api'
 import AxiosRequest from '@/libs/axios.config'
-import { notFound } from 'next/navigation'
 
 const getUsers = async (
   q: string = '',
@@ -30,6 +31,7 @@ export const updateUserStatus = async (userId: number, status: boolean) => {
 export const getUser = async (userId: number) => {
   try {
     const res = await AxiosRequest.get(API_USERS + `/${userId}`)
+
     return res.data.data
   } catch (error) {
     notFound()

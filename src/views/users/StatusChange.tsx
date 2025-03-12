@@ -25,7 +25,7 @@ export default function StatusChange({ row }: { row: any }) {
 
   return (
     <>
-      <Switch color='primary' checked={status} onChange={() => statusChange(id)} />
+      <Switch color='success' checked={status} onChange={() => statusChange(id)} />
     </>
   )
 }

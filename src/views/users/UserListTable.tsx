@@ -15,9 +15,7 @@ import { Autocomplete, CardContent, Chip, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
 // Third-party Imports
-import classnames from 'classnames'
 import {
-  flexRender,
   getCoreRowModel,
   useReactTable,
   getPaginationRowModel,
@@ -27,8 +25,6 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 
-import { useTheme } from '@mui/material/styles'
-
 import type { UserType } from '@/types/usertTypes'
 
 // Component Imports
@@ -36,18 +32,18 @@ import CustomTextField from '@core/components/mui/TextField'
 import CustomAvatar from '@core/components/mui/Avatar'
 import { getInitials } from '@/utils/getInitials'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
+import GenericTable from '@/components/GenericTable'
 
 // Styles Imports
-import tableStyles from '@core/styles/table.module.css'
 import StatusChange from './StatusChange'
 
 const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
   const { avatar, fullName } = params
 
   if (avatar) {
-    return <CustomAvatar src={avatar} size={40} />
+    return <CustomAvatar src={avatar} size={30} />
   } else {
-    return <CustomAvatar size={34}>{getInitials(fullName as string)}</CustomAvatar>
+    return <CustomAvatar size={24}>{getInitials(fullName as string)}</CustomAvatar>
   }
 }
 
@@ -86,27 +82,22 @@ const UserListTable = ({
 }: UserListTableProps) => {
   const data = useMemo(() => tableData, [tableData])
 
-  const theme = useTheme()
-
   const columns: ColumnDef<UserType>[] = [
     {
       accessorKey: 'fullname',
       header: 'User',
       sortDescFirst: true,
       cell: ({ row }) => (
-        <Link href={`/users/${row.original.id}`}>
-          <div className='flex items-center gap-4'>
-            {getAvatar({ avatar: row?.original.avatar, fullName: row.original.fullName })}
-            <div className='flex flex-col'>
-              <Typography color='text.primary' className='font-medium'>
-                {row.original.fullName}
-              </Typography>
-            </div>
+        <div className='flex items-center gap-4'>
+          {getAvatar({ avatar: row?.original.avatar, fullName: row.original.fullName })}
+          <div className='flex flex-col'>
+            <Typography color='text.primary' className='font-normal'>
+              {row.original.fullName}
+            </Typography>
           </div>
-        </Link>
+        </div>
       )
     },
-    { accessorKey: 'username', header: 'Username' },
     { accessorKey: 'email', header: 'Email' },
     { accessorKey: 'phone', header: 'Phone' },
     { accessorKey: 'referral_code', header: 'Referral Code' },
@@ -260,7 +251,7 @@ const UserListTable = ({
                     select
                     value={perPage}
                     onChange={e => setPerPage(Number(e.target.value))}
-                    className='is-[80px]'
+                    className='is-[90px]'
                   >
                     <MenuItem value='10'>10</MenuItem>
                     <MenuItem value='25'>25</MenuItem>
@@ -271,72 +262,21 @@ const UserListTable = ({
                 </div>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
-                <CustomTextField
-                  placeholder='Search...'
-                  className='is-[300px]'
-                  onChange={e => setSearch(e.target.value)}
-                />
+                <div className='flex justify-center sm:justify-end'>
+                  <CustomTextField
+                    placeholder='Search...'
+                    className=' w-full sm:is-[300px]'
+                    onChange={e => setSearch(e.target.value)}
+                  />
+                </div>
               </Grid>
             </Grid>
           </CardContent>
-          <div className='overflow-x-auto'>
-            <table className={tableStyles.table}>
-              <thead>
-                {table.getHeaderGroups().map(headerGroup => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map(header => (
-                      <th
-                        key={header.id}
-                        style={{
-                          backgroundColor: theme.palette.secondary.light,
-                          color: theme.palette.secondary.main
-                        }}
-                      >
-                        {' '}
-                        {header.isPlaceholder ? null : (
-                          <div
-                            className={classnames({
-                              'flex items-center': header.column.getIsSorted(),
-                              'cursor-pointer select-none': header.column.getCanSort()
-                            })}
-                            onClick={header.column.getToggleSortingHandler()}
-                          >
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                            {{
-                              asc: <i className='tabler-chevron-up text-xl' />,
-                              desc: <i className='tabler-chevron-down text-xl' />
-                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                          </div>
-                        )}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              {table.getRowModel().rows.length === 0 ? (
-                <tbody>
-                  <tr>
-                    <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                      No data available
-                    </td>
-                  </tr>
-                </tbody>
-              ) : (
-                <tbody>
-                  {table.getRowModel().rows.map(row => (
-                    <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
-                      {row.getVisibleCells().map(cell => (
-                        <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              )}
-            </table>
-          </div>
-        <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
-        </Card>
 
+          <GenericTable table={table} />
+
+          <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
+        </Card>
       </Grid>
     </Grid>
   )
