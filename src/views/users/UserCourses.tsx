@@ -6,7 +6,6 @@ import { useState, useMemo, useEffect } from 'react'
 // MUI Imports
 import Typography from '@mui/material/Typography'
 import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
 import MenuItem from '@mui/material/MenuItem'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
@@ -110,6 +109,8 @@ const UserCourses = ({ user }: { user: UserType }) => {
   const [userId, setUserId] = useState<number>()
   const [courseId, setCourseId] = useState<number>()
 
+  // const [deleteItem, setDeleteItem] = useState<boolean>(false)
+
   // Hooks
   const columns = useMemo<ColumnDef<CourseType, any>[]>(
     () => [
@@ -152,6 +153,8 @@ const UserCourses = ({ user }: { user: UserType }) => {
   const handleDelete = () => {
     try {
       deleteUserCourse(courseId, userId)
+
+      // setDeleteItem(true)
       toast.success('Course has been deleted from user.')
       const updatedList = data.filter(item => item.id != courseId)
 
@@ -165,6 +168,8 @@ const UserCourses = ({ user }: { user: UserType }) => {
 
   const handleCloseModal = () => {
     setOpenModal(false)
+
+    // setDeleteItem(false)
     setCourseId(0)
     setCourseId(0)
   }
@@ -243,6 +248,7 @@ const UserCourses = ({ user }: { user: UserType }) => {
         setData={setData}
       />
       <DeleteDialog open={openModal} handleClose={handleCloseModal} handleDelete={handleDelete} />
+      {/* <DeleteDialog open={deleteItem} handleClose={handleCloseModal} /> */}
     </Card>
   )
 }

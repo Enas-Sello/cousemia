@@ -56,7 +56,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                   </div>
                   <div className='flex items-center gap-4'>
                     <CustomAvatar variant='rounded' color='primary' skin='light'>
-                      <IconCurrencyDollar size={24} className='text-primary' />
+                      <IconCurrencyDollar size={24} className='text-primary ' />
                     </CustomAvatar>
                     <div>
                       <Typography variant='h5'>{user.courses_bought.length || 0}</Typography>

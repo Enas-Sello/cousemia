@@ -1,6 +1,9 @@
 'use client'
 
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import type { ChangeEvent } from 'react'
+import React, { useEffect, useState } from 'react'
+
+import Link from 'next/link'
 
 import {
   Autocomplete,
@@ -9,35 +12,37 @@ import {
   CardContent,
   CardHeader,
   Chip,
-  Grid,
   IconButton,
   MenuItem,
   Pagination,
   Typography
 } from '@mui/material'
-import { getSpecialties, statusUpdateSpecialties } from '@/data/getSpecialties'
+
+import Grid from '@mui/material/Grid2'
+
 import {
   createColumnHelper,
-  flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
-  type ColumnDef
 } from '@tanstack/react-table'
-import tableStyles from '@core/styles/table.module.css'
-import classNames from 'classnames'
-import Link from 'next/link'
+
+
+import { toast } from 'react-toastify'
+
+import { getSpecialties, statusUpdateSpecialties } from '@/data/getSpecialties'
+
 import CustomTextField from '@/@core/components/mui/TextField'
 import StatusChanger from '@/components/StatusChanger'
-import { toast } from 'react-toastify'
+
 import CustomAvatar from '@/@core/components/mui/Avatar'
-import { getInitials } from '@/utils/getInitials'
-import { CourseType } from '@/types/courseType'
+import type { CourseType } from '@/types/courseType'
 import { updateCourse, getCourses } from '@/data/courses/getCourses'
 import { strTruncate } from '@/utils/str'
-import { AdminType } from '@/types/adminType'
-import { SpecialityType } from '@/types/specialitiesType'
+import type { AdminType } from '@/types/adminType'
+import type { SpecialityType } from '@/types/specialitiesType'
 import { getAdmin } from '@/data/getAdmin'
+import GenericTable from '@/components/GenericTable'
 
 type StatusType = {
   label: string
@@ -68,11 +73,13 @@ export default function CourseList() {
 
   const fetchAdminList = async () => {
     const res = await getAdmin()
+
     setAdmins(res.data.data)
   }
 
   const fetchSpecialities = async () => {
     const res = await getSpecialties({})
+
     setSpecialities(res.specialities)
   }
 
@@ -85,16 +92,20 @@ export default function CourseList() {
       speciality: speciality ?? '',
       status: status ?? ''
     }
+
     const result = await getCourses(filterQuery)
     const { total, courses } = result
+
     setData(courses)
     setTotal(total)
   }
 
   const statusUpdate = async (id: number, status: boolean) => {
     status = status ? false : true
+
     try {
       const updated = await updateCourse(id, { is_active: status })
+
       fetchData()
       toast.success(updated.data.message)
     } catch (error: any) {
@@ -154,7 +165,7 @@ export default function CourseList() {
       cell: ({ row }) => (
         <div key={row.id}>
           <IconButton>
-            <Link href={`/courses/edit/${row.original.id}`} className='flex'>
+            <Link href={`/study/courses/edit/${row.original.id}`} className='flex'>
               <i className='tabler-edit text-[22px] text-textSecondary' />
             </Link>
           </IconButton>
@@ -164,7 +175,7 @@ export default function CourseList() {
             </Link>
           </IconButton>
           <IconButton>
-            <Link href={`/courses/${row.original.id}`} className='flex'>
+            <Link href={`/study/courses/${row.original.id}`} className='flex'>
               <i className='tabler-eye text-[22px] text-textSecondary' />
             </Link>
           </IconButton>
@@ -266,12 +277,12 @@ export default function CourseList() {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Card>
-          <CardHeader title='Courses' className='pbe-4' />
+          <CardHeader title='Filters' className='pbe-4 text-secondary' />
           <CardContent className='border-bs py-6'>
             <Grid container spacing={6}>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Autocomplete
                   id='admins'
                   options={admins}
@@ -288,7 +299,7 @@ export default function CourseList() {
                 />
               </Grid>
 
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Autocomplete
                   id='specialities'
                   options={specialities}
@@ -305,7 +316,7 @@ export default function CourseList() {
                 />
               </Grid>
 
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Autocomplete
                   id='status'
                   options={statusList}
@@ -323,7 +334,7 @@ export default function CourseList() {
               </Grid>
             </Grid>
 
-            <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 gap-4'>
+            <div className='flex justify-between flex-col  items-start sm:flex-row sm:items-center p-6 gap-4'>
               <CustomTextField
                 select
                 value={perPage}
@@ -336,67 +347,19 @@ export default function CourseList() {
                   </MenuItem>
                 ))}
               </CustomTextField>
-              <div>
+              <div className='flex justify-center items-center gap-3'>
                 <CustomTextField
                   placeholder='Search...'
-                  className='is-[300px]'
+                  className='is-[300px] px-[6px] py-[13px]'
                   onChange={e => setSearch(e.target.value)}
                 />
-                <Button variant='contained' className='ml-3'>
+                <Button size='medium' variant='contained' className=' '>
                   Add Course
                 </Button>
               </div>
             </div>
+            <GenericTable table={table} />
 
-            <div className='overflow-x-auto'>
-              <table className={tableStyles.table}>
-                <thead>
-                  {table.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map(header => (
-                        <th key={header.id}>
-                          {header.isPlaceholder ? null : (
-                            <div
-                              className={classNames({
-                                'flex items-center': header.column.getIsSorted(),
-                                'cursor-pointer select-none': header.column.getCanSort()
-                              })}
-                              onClick={header.column.getToggleSortingHandler()}
-                            >
-                              {flexRender(header.column.columnDef.header, header.getContext())}
-                              {{
-                                asc: <i className='tabler-chevron-up text-xl' />,
-                                desc: <i className='tabler-chevron-down text-xl' />
-                              }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                            </div>
-                          )}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-
-                {table.getRowModel().rows.length === 0 ? (
-                  <tbody>
-                    <tr>
-                      <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                        <strong>No data available</strong>
-                      </td>
-                    </tr>
-                  </tbody>
-                ) : (
-                  <tbody>
-                    {table.getRowModel().rows.map(row => (
-                      <tr key={row.id}>
-                        {row.getVisibleCells().map(cell => (
-                          <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                )}
-              </table>
-            </div>
             <div className='flex justify-between items-center flex-wrap pli-6 border-bs bs-auto plb-[12.5px] gap-2'>
               <Typography color='text.disabled'>
                 {`Showing ${total === 0 ? 0 : page * pageSize + 1} to ${Math.min(

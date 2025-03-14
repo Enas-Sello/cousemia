@@ -25,7 +25,7 @@ type Props = {
   open: boolean
   handleClose: () => void
   userId: number
-  setData: Dispatch<SetStateAction<CourseType>>
+  setData: Dispatch<SetStateAction<CourseType[]>>
 }
 
 const UserCourseAdd = ({ open, handleClose, userId, setData }: Props) => {
@@ -65,7 +65,7 @@ const UserCourseAdd = ({ open, handleClose, userId, setData }: Props) => {
   }
 
   const getCoursesData = async () => {
-    const { total, courses } = await getCourses({})
+    const { courses } = await getCourses({})
 
     setCoursesList(courses)
   }

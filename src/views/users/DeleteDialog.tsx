@@ -1,6 +1,5 @@
 // React Imports
 import type { FC } from 'react'
-import { useState } from 'react'
 
 // MUI Imports
 import Button from '@mui/material/Button'
@@ -27,7 +26,6 @@ const DeleteDialog: FC<DeleteProps> = ({ open, handleClose, handleDelete }) => {
         sx={{
           '& .MuiPaper-root': {
             width: '450px',
-            height: 'auto',
             padding: '24px',
             textAlign: 'center'
           }
@@ -39,13 +37,13 @@ const DeleteDialog: FC<DeleteProps> = ({ open, handleClose, handleDelete }) => {
           </div>
         </div>
         {/* Title */}
-        <DialogTitle id='alert-dialog-title' className='text-4xl font-semibold'>
+        <DialogTitle id='alert-dialog-title' className='text-3xl font-semibold pb-2'>
           Are you sure?
-        </DialogTitle>{' '}
-        <DialogContent>
-          <DialogContentText id='alert-dialog-description'>You won't be able to revert this!</DialogContentText>
+        </DialogTitle>
+        <DialogContent className='pb-2'>
+          <DialogContentText id='alert-dialog-description'>You won&apos;t be able to revert this!</DialogContentText>
         </DialogContent>
-        <DialogActions className='dialog-actions-dense'>
+        <DialogActions className='dialog-actions-dense flex justify-center items-center '>
           <Button onClick={handleDelete} variant='contained'>
             Yes, Delete it!
           </Button>

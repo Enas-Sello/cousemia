@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 
-import { Card, CardContent, Chip, List, ListItem, Typography } from '@mui/material'
+import { Button, Card, CardContent, Chip, List, ListItem, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
 //Types imports
@@ -29,7 +29,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({ devices }) => {
                   <Chip
                     label={device.allow_push_notifications ? 'Enabled' : 'Disabled'}
                     size='small'
-                    color={`${device.allow_push_notifications ? 'info' : 'primary'}`}
+                    color={`${device.allow_push_notifications ? 'success' : 'primary'}`}
                     variant='tonal'
                   />
                 </ListItem>
@@ -38,12 +38,15 @@ const UserDevices: React.FC<UserDevicesProps> = ({ devices }) => {
                   <Chip
                     label={device.is_tablet ? 'Yes' : 'No'}
                     size='small'
-                    color={`${device.is_tablet ? 'primary' : 'warning'}`}
+                    color={`${device.is_tablet ? 'success' : 'warning'}`}
                     variant='tonal'
                   />
                 </ListItem>
                 <ListItem className='px-0 py-1 '>Device Type : {device.device_type}</ListItem>
               </List>
+              <Button variant='contained' className='ml-2'>
+                Delete Device
+              </Button>
             </CardContent>
           </Card>
         </Grid>
