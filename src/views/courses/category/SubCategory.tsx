@@ -94,9 +94,7 @@ export default function CourseSubCategory({ id }: { id: number }) {
 
     const result = await getSubCategories(course, filterQuery)
 
-    const { total, categories } = result
-
-    console.log('Categories: ', result)
+    const { total, categories } = result('Categories: ', result)
 
     setData(categories)
     setTotal(total)
@@ -119,7 +117,7 @@ export default function CourseSubCategory({ id }: { id: number }) {
         toast.success('Category deleted successfully')
         setData(prevData => prevData.filter(lecture => lecture.id !== id))
       } catch (e) {
-        console.log(e)
+        e
         toast.error('Failed to delete. Please try again.')
       }
     }

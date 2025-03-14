@@ -32,7 +32,7 @@ const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
 }
 
 export default function UserOverview({ user }: { user: UserType }) {
-  console.log('user====>', user)
+  'user====>', user
 
   return (
     <Grid container spacing={6}>
@@ -73,7 +73,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                         <td>
                           <div className='flex items-center gap-2'>
                             <CustomAvatar size={18} skin='filled'>
-                              <IconUser size={18} className="text-secondary" />
+                              <IconUser size={18} className='text-secondary' />
                             </CustomAvatar>
                             <Typography className='font-medium'>Username</Typography>
                           </div>
@@ -88,7 +88,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                         <td>
                           <div className='flex items-center gap-2'>
                             <CustomAvatar size={18} skin='filled'>
-                              <IconCheck size={18} className="text-secondary" />
+                              <IconCheck size={18} className='text-secondary' />
                             </CustomAvatar>
                             <Typography className='font-medium'>Status</Typography>
                           </div>
@@ -109,7 +109,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                         <td>
                           <div className='flex items-center gap-2'>
                             <CustomAvatar size={18} skin='filled'>
-                              <IconPhoneOff size={18} className="text-secondary" />
+                              <IconPhoneOff size={18} className='text-secondary' />
                             </CustomAvatar>
                             <Typography className='font-medium'>Phone Verified</Typography>
                           </div>
@@ -130,7 +130,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                         <td>
                           <div className='flex items-center gap-2'>
                             <CustomAvatar size={18} skin='filled'>
-                              <IconStar size={18} className="text-secondary" />
+                              <IconStar size={18} className='text-secondary' />
                             </CustomAvatar>
                             <Typography className='font-medium'>Referral Code</Typography>
                           </div>
@@ -145,7 +145,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                         <td>
                           <div className='flex items-center gap-2'>
                             <CustomAvatar size={18} skin='filled'>
-                              <IconFlag size={18} className="text-secondary" />
+                              <IconFlag size={18} className='text-secondary' />
                             </CustomAvatar>
                             <Typography className='font-medium'>Country</Typography>
                           </div>
@@ -160,7 +160,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                         <td>
                           <div className='flex items-center gap-2'>
                             <CustomAvatar size={18} skin='filled'>
-                              <IconPhone size={18} className="text-secondary" />
+                              <IconPhone size={18} className='text-secondary' />
                             </CustomAvatar>
                             <Typography className='font-medium'>Contact</Typography>
                           </div>
@@ -175,7 +175,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                         <td>
                           <div className='flex items-center gap-2'>
                             <CustomAvatar size={18} skin='filled'>
-                              <IconCheck size={18} className="text-secondary" />
+                              <IconCheck size={18} className='text-secondary' />
                             </CustomAvatar>
                             <Typography className='font-medium'>Suspend/Activate</Typography>
                           </div>

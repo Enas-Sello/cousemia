@@ -117,7 +117,7 @@ export default function CourseNotes({ id }: { id: number }) {
         toast.success('Note deleted successfully')
         setData(prevData => prevData.filter(lecture => lecture.id !== id))
       } catch (e) {
-        console.log(e)
+        e
         toast.error('Failed to delete. Please try again.')
       }
     }

@@ -96,8 +96,10 @@ const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props,
 
   // Handle the click event.
   const handleClick = () => {
+    console.log(isToggled)
+
     if (isToggled) {
-      toggleVerticalNav()
+      console.log(toggleVerticalNav())
     }
   }
 
@@ -139,7 +141,9 @@ const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props,
       rootStyles={rootStyles}
     >
       <MenuButton
-        className={classnames(menuClasses.button, { [menuClasses.active]: active })}
+        className={classnames('flex items-center px-4 py-[10px] hover:animate-padding-left', {
+          [menuClasses.active]: active
+        })}
         component={component}
         tabIndex={disabled ? -1 : 0}
         {...rest}

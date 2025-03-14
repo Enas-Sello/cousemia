@@ -126,7 +126,7 @@ export default function CourseLectures({ id }: { id: number | undefined }) {
         setConfirmDialog(false)
       }
     } catch (e) {
-      console.log(e)
+      e
       toast.error('Failed to delete. Please try again.')
     }
   }
