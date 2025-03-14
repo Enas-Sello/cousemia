@@ -106,7 +106,7 @@ const UserListTable = ({
       header: 'Is Active',
       cell: ({ row }) => (
         <>
-          <StatusChange row={row} />
+          <StatusChange userID={row.original.id} isActive={row.original.is_active} />
         </>
       )
     },

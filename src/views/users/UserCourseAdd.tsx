@@ -1,6 +1,8 @@
 'use client'
+
 // React Imports
-import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from 'react'
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import { useEffect, useState } from 'react'
 
 // MUI Imports
 import Button from '@mui/material/Button'
@@ -10,12 +12,14 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 
 // Component Imports
-import CustomTextField from '@core/components/mui/TextField'
 import { Autocomplete, Chip } from '@mui/material'
-import { CourseType } from '@/types/courseType'
-import { getCourses, courseAssignToUser } from '@/data/courses/getCourses'
+
 import { toast } from 'react-toastify'
-import { UserType } from '@/types/usertTypes'
+
+import CustomTextField from '@core/components/mui/TextField'
+import type { CourseType } from '@/types/courseType'
+import { getCourses, courseAssignToUser } from '@/data/courses/getCourses'
+
 
 type Props = {
   open: boolean
@@ -28,19 +32,24 @@ const UserCourseAdd = ({ open, handleClose, userId, setData }: Props) => {
   // States
   const [courses, setCourses] = useState<CourseType[]>([])
   const [coursesList, setCoursesList] = useState<CourseType[]>([])
-  const [uId, setUId] = useState<number>(userId)
+  const [uId] = useState<number>(userId)
   const [error, setError] = useState<string>('')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
     if (!courses.length) {
       setError('Course field must be required.')
+
       return false
     }
+
     const courseIds = courses.map(item => item.id)
     const response = (await courseAssignToUser(uId, courseIds)).data
+
     toast.success('Course assign to user successfully!')
     const { data } = response
+
     setData(data.courses_bought)
 
     handleClose()
@@ -57,6 +66,7 @@ const UserCourseAdd = ({ open, handleClose, userId, setData }: Props) => {
 
   const getCoursesData = async () => {
     const { total, courses } = await getCourses({})
+
     setCoursesList(courses)
   }
 
@@ -107,9 +117,9 @@ const UserCourseAdd = ({ open, handleClose, userId, setData }: Props) => {
 
           <div className='flex items-center gap-4'>
             <Button variant='contained' type='submit'>
-              Submit
+              Add
             </Button>
-            <Button variant='tonal' color='error' type='reset' onClick={() => handleReset()}>
+            <Button variant='outlined' color='secondary' type='reset' onClick={() => handleReset()}>
               Cancel
             </Button>
           </div>
