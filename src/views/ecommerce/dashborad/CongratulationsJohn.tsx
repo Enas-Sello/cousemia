@@ -11,13 +11,13 @@ const CongratulationsJohn = () => {
       <Grid container>
         <Grid size={{ xs: 8 }}>
           <CardContent>
-            <Typography variant='h5' className='mbe-0.5'>
-              Congratulations 🎉 John 
+            <Typography variant='h6' component='h4' className='mbe-1'>
+              Congratulations🎉John
             </Typography>
-            <Typography variant='subtitle1' className='mbe-2'>
+            <Typography variant='subtitle2' component='p' className='mbe-3'>
               Best seller of the month
             </Typography>
-            <Typography variant='h4' color='primary.main' className='mbe-1'>
+            <Typography variant='h4' color='primary.main' className='mbe-2'>
               $48.9k
             </Typography>
             <Button variant='contained' color='primary'>

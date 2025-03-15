@@ -1,12 +1,8 @@
-'use client'
-
-// React Imports
 import type { ChangeEvent } from 'react'
 import { useMemo } from 'react'
 
 import Link from 'next/link'
 
-// MUI Imports
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import IconButton from '@mui/material/IconButton'
@@ -14,149 +10,109 @@ import MenuItem from '@mui/material/MenuItem'
 import { Autocomplete, CardContent, Chip, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
-// Third-party Imports
 import {
   getCoreRowModel,
-  useReactTable,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  getFilteredRowModel
+  useReactTable,
+  type ColumnDef,
+  type FilterFn
 } from '@tanstack/react-table'
+
 import { rankItem } from '@tanstack/match-sorter-utils'
-import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 
-import type { UserType } from '@/types/usertTypes'
-
-// Component Imports
-import CustomTextField from '@core/components/mui/TextField'
-import CustomAvatar from '@core/components/mui/Avatar'
-import { getInitials } from '@/utils/getInitials'
-import TablePaginationComponent from '@/components/TablePaginationComponent'
+import type { NoteType } from '@/types/noteType'
+import type { NotsListTableProps } from '@/types/propsTypes'
+import CustomTextField from '@/@core/components/mui/TextField'
 import GenericTable from '@/components/GenericTable'
-
-// Styles Imports
-import StatusChange from './StatusChange'
-
-const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
-  const { avatar, fullName } = params
-
-  if (avatar) {
-    return <CustomAvatar src={avatar} size={30} />
-  } else {
-    return <CustomAvatar size={24}>{getInitials(fullName as string)}</CustomAvatar>
-  }
-}
-
-interface UserListTableProps {
-  tableData: UserType[]
-  total: number
-  perPage: number
-  setPerPage: React.Dispatch<React.SetStateAction<number>>
-  page: number
-  setPage: React.Dispatch<React.SetStateAction<number>>
-  setSortBy: React.Dispatch<React.SetStateAction<string>>
-  setSortDesc: React.Dispatch<React.SetStateAction<string>>
-  setStatus: React.Dispatch<React.SetStateAction<string>>
-  setVerified: React.Dispatch<React.SetStateAction<string>>
-  setSearch: React.Dispatch<React.SetStateAction<string>>
-}
+import TablePaginationComponent from '@/components/TablePaginationComponent'
 
 type FilterItemType = {
   title: string
   value: string
 }
 
-const UserListTable = ({
+const NotesTable = ({
   tableData,
   total,
   perPage,
   setPerPage,
   page,
   setPage,
-
-  // setSortBy,
-  // setSortDesc,
-  setStatus,
-  setVerified,
-  setSearch
-}: UserListTableProps) => {
-  const data = useMemo(() => tableData, [tableData])
-
-  const columns: ColumnDef<UserType>[] = [
+  setSearch,
+  setCourse,
+  course,
+  setCategory,
+  category,
+  setSubCategory
+}: NotsListTableProps) => {
+  const columns: ColumnDef<NoteType>[] = [
     {
-      accessorKey: 'fullname',
-      header: 'User',
-      sortDescFirst: true,
+      accessorKey: 'title_en',
+      header: 'Title',
       cell: ({ row }) => (
-        <div className='flex items-center gap-4'>
-          {getAvatar({ avatar: row?.original.avatar, fullName: row.original.fullName })}
-          <div className='flex flex-col'>
-            <Typography color='text.primary' className='font-normal'>
-              {row.original.fullName}
-            </Typography>
-          </div>
-        </div>
+        <Typography color='text.primary' className='font-normal'>
+          {row.original.title_en || row.original.title_ar || 'Untitled'}
+        </Typography>
       )
     },
-    { accessorKey: 'email', header: 'Email' },
-    { accessorKey: 'phone', header: 'Phone' },
-    { accessorKey: 'referral_code', header: 'Referral Code' },
+    {
+      accessorKey: 'category',
+      header: 'Category'
+    },
+    {
+      accessorKey: 'sub_category',
+      header: 'Sub Category'
+    },
+    {
+      accessorKey: 'course',
+      header: 'Course'
+    },
     {
       accessorKey: 'is_active',
-      header: 'Is Active',
+      header: 'Status',
       cell: ({ row }) => (
-        <>
-          <StatusChange userID={row.original.id} isActive={row.original.is_active} />
-        </>
+        <Chip
+          variant='tonal'
+          className='capitalize'
+          label={row.original.is_active ? 'Active' : 'Inactive'}
+          color={row.original.is_active ? 'success' : 'error'}
+          size='medium'
+        />
       )
     },
     {
-      accessorKey: 'verified',
-      header: 'Verified',
+      accessorKey: 'is_free_content',
+      header: 'Free Content',
       cell: ({ row }) => (
-        <div className='flex items-center gap-3'>
-          <Chip
-            variant='tonal'
-            className='capitalize'
-            label={row.original.verified}
-            color={row.original.verified == 'verified' ? 'success' : 'error'}
-            size='medium'
-          />
-        </div>
+        <Chip
+          variant='tonal'
+          className='capitalize'
+          label={row.original.is_free_content ? 'Yes' : 'No'}
+          color={row.original.is_free_content ? 'success' : 'warning'}
+          size='medium'
+        />
       )
+    },
+    {
+      accessorKey: 'created_at',
+      header: 'Created At'
+    },
+    {
+      accessorKey: 'created_by',
+      header: 'Created By'
     },
     {
       accessorKey: 'action',
       header: 'Action',
       cell: ({ row }) => (
         <IconButton>
-          <Link href={`/users/${row.original.id}`} className='flex'>
+          <Link href={row.original.url} target='_blank' className='flex'>
             <i className='tabler-eye text-[22px] text-textSecondary' />
           </Link>
         </IconButton>
       )
-    }
-  ]
-
-  const verfiedList: FilterItemType[] = [
-    {
-      title: 'Phone Verified',
-      value: '1'
-    },
-    {
-      title: 'Phone Not Verified',
-      value: '0'
-    }
-  ]
-
-  const statusList: FilterItemType[] = [
-    {
-      title: 'Active',
-      value: '1'
-    },
-    {
-      title: 'Inactive',
-      value: '0'
     }
   ]
 
@@ -172,6 +128,19 @@ const UserListTable = ({
     // Return if the item should be filtered in/out
     return itemRank.passed
   }
+
+  // Filter options
+  const statusList: FilterItemType[] = [
+    { title: 'Active', value: '1' },
+    { title: 'Inactive', value: '0' }
+  ]
+
+  const freeContentList: FilterItemType[] = [
+    { title: 'Free', value: '1' },
+    { title: 'Paid', value: '0' }
+  ]
+
+  const data = useMemo(() => tableData, [tableData])
 
   const table = useReactTable({
     data,
@@ -203,27 +172,12 @@ const UserListTable = ({
           <CardHeader title='Filters' className='pbe-4' />
           <CardContent>
             <Grid container spacing={6}>
+              {/* Course */}
               <Grid size={{ xs: 12, sm: 4 }}>
                 <Autocomplete
-                  id='status'
-                  options={verfiedList}
-                  onChange={(event: ChangeEvent<{}>, newValue) => setVerified(newValue?.value ?? '')}
-                  renderTags={(tagValue, getTagProps) => {
-                    return tagValue.map((option: FilterItemType, index) => (
-                      <Chip {...getTagProps({ index })} key={index} label={option.title} />
-                    ))
-                  }}
-                  getOptionLabel={option => option.title || ''}
-                  renderInput={params => (
-                    <CustomTextField {...params} key={params.id} placeholder='Select' label='Verified' />
-                  )}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <Autocomplete
-                  id='status'
+                  id='course'
                   options={statusList}
-                  onChange={(event: ChangeEvent<{}>, newValue) => setStatus(newValue?.value ?? '')}
+                  onChange={(event: ChangeEvent<{}>, newValue) => setCourse(newValue?.value ?? '')}
                   renderTags={(tagValue, getTagProps) => {
                     return tagValue.map((option: FilterItemType, index) => (
                       <Chip {...getTagProps({ index })} key={index} label={option.title} />
@@ -231,10 +185,48 @@ const UserListTable = ({
                   }}
                   getOptionLabel={option => option.title || ''}
                   renderInput={params => (
-                    <CustomTextField {...params} key={params.id} placeholder='Select' label='Status' />
+                    <CustomTextField {...params} key={params.id} placeholder='Select' label='course' />
                   )}
                 />
               </Grid>
+              {/* Category */}
+              {course && (
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <Autocomplete
+                    id='category'
+                    options={freeContentList}
+                    onChange={(event: ChangeEvent<{}>, newValue) => setCategory(newValue?.value ?? '')}
+                    renderTags={(tagValue, getTagProps) => {
+                      return tagValue.map((option: FilterItemType, index) => (
+                        <Chip {...getTagProps({ index })} key={index} label={option.title} />
+                      ))
+                    }}
+                    getOptionLabel={option => option.title || ''}
+                    renderInput={params => (
+                      <CustomTextField {...params} key={params.id} placeholder='Select' label='category' />
+                    )}
+                  />
+                </Grid>
+              )}
+              {/* Sub Category */}
+              {course && category && (
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <Autocomplete
+                    id='sub_category'
+                    options={freeContentList}
+                    onChange={(event: ChangeEvent<{}>, newValue) => setSubCategory(newValue?.value ?? '')}
+                    renderTags={(tagValue, getTagProps) => {
+                      return tagValue.map((option: FilterItemType, index) => (
+                        <Chip {...getTagProps({ index })} key={index} label={option.title} />
+                      ))
+                    }}
+                    getOptionLabel={option => option.title || ''}
+                    renderInput={params => (
+                      <CustomTextField {...params} key={params.id} placeholder='Select' label='Sub Category' />
+                    )}
+                  />
+                </Grid>
+              )}
             </Grid>
           </CardContent>
         </Card>
@@ -282,4 +274,4 @@ const UserListTable = ({
   )
 }
 
-export default UserListTable
+export default NotesTable

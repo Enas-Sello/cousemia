@@ -1,11 +1,15 @@
-import { NextRequestWithAuth, withAuth } from 'next-auth/middleware'
 import { type NextRequest, NextResponse } from 'next/server'
+
+import type { NextRequestWithAuth } from 'next-auth/middleware'
+import { withAuth } from 'next-auth/middleware'
+
 import { withoutSuffix } from './utils/string'
 
 const HOME_URL = '/dashboard'
 
 const redirectAction = (url: string, request: NextRequestWithAuth) => {
   const redirectUrl = new URL(url, request.url).toString()
+
   return NextResponse.redirect(redirectUrl)
 }
 

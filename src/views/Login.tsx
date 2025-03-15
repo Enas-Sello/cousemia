@@ -1,9 +1,13 @@
 'use client'
 
+// React Imports
 import React, { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import { useMutation } from '@tanstack/react-query'
+
+// MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -12,18 +16,23 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
-import classnames from 'classnames'
+import CircularProgress from '@mui/material/CircularProgress'
 import { Alert } from '@mui/material'
+import classnames from 'classnames'
+
+// Third-party Imports
+import { toast } from 'react-toastify'
 import { signIn } from 'next-auth/react'
 
-import { toast } from 'react-toastify'
-
+// Custom Imports
 import type { SystemMode } from '@core/types'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
 import themeConfig from '@configs/themeConfig'
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
+import { genericQueryFn } from '@/libs/queryFn'
+import { API_LOGIN } from '@/configs/api'
 
 // Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
@@ -58,28 +67,56 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   const [emailError, setEmailError] = useState('')
   const [passwordError, setPasswordError] = useState('')
 
-  // Vars
-  const darkImg = '/images/pages/auth-mask-dark.png'
-  const lightImg = '/images/pages/auth-mask-light.png'
-  const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
-  const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
-  const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
-  const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
-
   // Hooks
   const router = useRouter()
   const { settings } = useSettings()
   const theme = useTheme()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
-  const authBackground = useImageVariant(mode, lightImg, darkImg)
+  const authBackground = useImageVariant(mode, '/images/pages/auth-mask-light.png', '/images/pages/auth-mask-dark.png')
 
   const characterIllustration = useImageVariant(
     mode,
-    lightIllustration,
-    darkIllustration,
-    borderedLightIllustration,
-    borderedDarkIllustration
+    '/images/illustrations/auth/v2-login-light.png',
+    '/images/illustrations/auth/v2-login-dark.png',
+    '/images/illustrations/auth/v2-login-light-border.png',
+    '/images/illustrations/auth/v2-login-dark-border.png'
   )
+
+  // React Query Mutation for Login
+  const { mutate, isPending } = useMutation({
+    mutationFn: (credentials: { email: string; password: string }) =>
+      genericQueryFn({
+        url: API_LOGIN,
+        method: 'POST',
+        body: credentials
+      }),
+    onSuccess: async data => {
+      const user = data.data?.user
+
+      if (user) {
+        user.token = data.data?.token // Attach token to user object
+
+        // Call signIn to establish the session
+        const res = await signIn('credentials', {
+          email,
+          password,
+          redirect: false
+        })
+
+        if (res?.ok) {
+          toast.success('Logged in successfully')
+          router.push('/dashboards/ecommerce')
+        } else {
+          setError('Failed to establish session. Please try again.')
+        }
+      } else {
+        setError('Invalid response from server.')
+      }
+    },
+    onError: (error: Error) => {
+      setError(error.message || 'Authentication failed')
+    }
+  })
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
@@ -93,7 +130,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     event.preventDefault()
     let isValid = true
 
-    // email validate
+    // Email validation
     if (!email) {
       setEmailError('Email is required')
       isValid = false
@@ -104,7 +141,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
       setEmailError('')
     }
 
-    // password validate
+    // Password validation
     if (!password) {
       setPasswordError('Password is required')
       isValid = false
@@ -113,20 +150,8 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     }
 
     if (isValid) {
-      const res = await signIn('credentials', {
-        email,
-        password,
-        redirect: false
-      })
-
-      if (res?.ok) {
-        toast.success('Logged in successfully')
-        router.push('/dashboards/ecommerce')
-      }
-
-      if (!res?.ok) {
-        setError('You have entered an invalid username or password')
-      }
+      setError('') // Clear previous errors
+      mutate({ email, password })
     }
   }
 
@@ -169,6 +194,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
               placeholder='Enter your email'
               error={!!emailError}
               helperText={emailError}
+              disabled={isPending as boolean} // Explicitly cast to boolean
             />
             <CustomTextField
               value={password}
@@ -180,10 +206,16 @@ const Login = ({ mode }: { mode: SystemMode }) => {
               placeholder='············'
               id='outlined-adornment-password'
               type={isPasswordShown ? 'text' : 'password'}
+              disabled={isPending as boolean} // Explicitly cast to boolean
               InputProps={{
                 endAdornment: (
                   <InputAdornment position='end'>
-                    <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
+                    <IconButton
+                      edge='end'
+                      onClick={handleClickShowPassword}
+                      onMouseDown={e => e.preventDefault()}
+                      disabled={isPending as boolean} // Explicitly cast to boolean
+                    >
                       <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
                     </IconButton>
                   </InputAdornment>
@@ -192,12 +224,18 @@ const Login = ({ mode }: { mode: SystemMode }) => {
             />
             <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
               <FormControlLabel control={<Checkbox />} label='Remember me' />
-              {/* <Typography className='text-end' color='primary' component={Link}>
+              {/* <Typography className="text-end" color="primary" component={Link}>
                 Forgot password?
               </Typography> */}
             </div>
-            <Button fullWidth variant='contained' type='submit'>
-              Login
+            <Button
+              fullWidth
+              variant='contained'
+              type='submit'
+              disabled={isPending as boolean} // Explicitly cast to boolean
+              startIcon={isPending ? <CircularProgress size={20} /> : null}
+            >
+              {isPending ? 'Logging in...' : 'Login'}
             </Button>
           </form>
         </div>
