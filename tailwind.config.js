@@ -13,14 +13,11 @@ module.exports = {
   plugins: [require('tailwindcss-logical'), require('./src/@core/tailwind/plugin')],
   theme: {
     extend: {
-      keyframes: {
-        'padding-left': {
-          '0%': { paddingLeft: '16px' },
-          '100%': { paddingLeft: '20px' }
-        }
+      backgroundImage: {
+        'custom-gradient': 'linear-gradient(118deg, #ff1d5c, #ff1d5cb3)'
       },
-      animation: {
-        'padding-left': 'padding-left 0.2s ease-in-out forwards'
+      boxShadow: {
+        'pink-shadow': '0 0 10px 1px rgba(255, 29, 92, .7);' // Adjust as needed
       }
     }
   }
