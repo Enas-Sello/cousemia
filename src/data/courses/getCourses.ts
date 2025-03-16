@@ -29,13 +29,14 @@ export const updateCourse = async (id: number, course: {}) => {
 
 export const courseAssignToUser = async (userId: number, courseIds: number[]) => {
   const url = API_USERS + '/assign-course-to-user'
-  const res = await AxiosRequest.post(url, { user_id: userId, course_ids: courseIds })
+
+  await AxiosRequest.post(url, { user_id: userId, course_ids: courseIds })
   const response = await AxiosRequest.get(API_USERS + `/${userId}`)
 
   return response
 }
 
-export const deleteUserCourse = async (courseId: number, userId: number) => {
+export const deleteUserCourse = async (courseId: number | undefined, userId: number | undefined) => {
   const url = API_USERS + '/delete-course-from-user'
   const res = await AxiosRequest.post(url, { course_id: courseId, user_id: userId })
 

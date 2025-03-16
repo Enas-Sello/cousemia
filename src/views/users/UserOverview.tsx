@@ -20,6 +20,7 @@ import {
 import CustomAvatar from '@/@core/components/mui/Avatar'
 import type { UserType } from '@/types/usertTypes'
 import { getInitials } from '@/utils/getInitials'
+import StatusChange from './StatusChange'
 
 const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
   const { avatar, fullName } = params
@@ -32,7 +33,7 @@ const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
 }
 
 export default function UserOverview({ user }: { user: UserType }) {
-  'user====>', user
+  console.log('users--->', user)
 
   return (
     <Grid container spacing={6}>
@@ -55,7 +56,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                   </div>
                   <div className='flex items-center gap-4'>
                     <CustomAvatar variant='rounded' color='primary' skin='light'>
-                      <IconCurrencyDollar size={24} className='text-primary' />
+                      <IconCurrencyDollar size={24} className='text-primary ' />
                     </CustomAvatar>
                     <div>
                       <Typography variant='h5'>{user.courses_bought.length || 0}</Typography>
@@ -99,7 +100,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                             className='capitalize'
                             label={user.is_active ? 'Active' : 'Not Active'}
                             color={user.is_active ? 'success' : 'error'}
-                            size='medium'
+                            size='small'
                           />
                         </td>
                       </tr>
@@ -120,7 +121,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                             className='capitalize'
                             label={user.verified === 'verified' ? 'Verified' : 'Not Verified'}
                             color={user.verified === 'verified' ? 'success' : 'error'}
-                            size='medium'
+                            size='small'
                           />
                         </td>
                       </tr>
@@ -181,9 +182,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                           </div>
                         </td>
                         <td>
-                          {/* <Button variant='contained' color='error'>
-                              Suspend
-                            </Button> */}
+                          <StatusChange userID={user.id} isActive={user.is_active} />
                         </td>
                       </tr>
                     </tbody>

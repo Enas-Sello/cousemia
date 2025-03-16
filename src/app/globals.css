@@ -36,6 +36,12 @@ html {
   display: flex;
   inline-size: 100%;
   min-block-size: 100%;
+  transition:
+    all 0.3s ease-in-out,
+    background 0s,
+    color 0s,
+    border-color 0s;
+    scroll-behavior: smooth;
 }
 
 a {

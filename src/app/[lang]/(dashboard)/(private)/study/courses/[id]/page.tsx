@@ -1,7 +1,7 @@
 // 'use client'
 import React from 'react'
 
-import { Grid } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 
 import CourseOverview from '@/views/courses/lectures/overview'
 import Lectures from '@/views/courses/lectures/lectures'
@@ -15,28 +15,28 @@ import Image from '@/views/courses/Image'
 export default function ShowCourse({ params }: { params: { id: number } }) {
   return (
     <Grid container spacing={6}>
-      <Grid item xs={12} lg={12} md={12}>
+      <Grid size={{ xs: 12 }}>
         <CourseOverview courseId={params.id} />
       </Grid>
-      <Grid item xs={12} lg={12} md={12}>
+      <Grid size={{ xs: 12 }}>
         <Lectures id={params.id} />
       </Grid>
-      <Grid item xs={12} lg={12} md={12}>
+      <Grid size={{ xs: 12 }}>
         <FlashCard id={params.id} />
       </Grid>
-      <Grid item xs={12} lg={12} md={12}>
+      <Grid size={{ xs: 12 }}>
         <Notes id={params.id} />
       </Grid>
-      <Grid item xs={12} lg={12} md={12}>
+      <Grid size={{ xs: 12 }}>
         <Question id={params.id} />
       </Grid>
-      <Grid item xs={12} lg={12} md={12}>
+      <Grid size={{ xs: 12 }}>
         <Category id={params.id} />
       </Grid>
-      <Grid item xs={12} lg={12} md={12}>
+      <Grid size={{ xs: 12 }}>
         <SubCategory id={params.id} />
       </Grid>
-      <Grid item xs={12} lg={12} md={12}>
+      <Grid size={{ xs: 12 }}>
         <Image id={params.id} />
       </Grid>
     </Grid>

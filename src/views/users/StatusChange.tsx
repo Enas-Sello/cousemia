@@ -7,9 +7,9 @@ import { Switch } from '@mui/material'
 
 import { updateUserStatus } from '@/data/users/getUsers'
 
-export default function StatusChange({ row }: { row: any }) {
-  const id: number = useMemo(() => row.original.id, [row])
-  const [status, setStatus] = useState(row.original.is_active)
+export default function StatusChange({ userID, isActive }: { userID: number; isActive: boolean }) {
+  const id = useMemo(() => userID, [userID])
+  const [status, setStatus] = useState(isActive)
 
   const statusChange = async (id: number) => {
     if (!status) {

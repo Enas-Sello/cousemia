@@ -24,7 +24,7 @@ const GenericTable = <TData,>({ table }: GenericTableProps<TData>) => {
 
   return (
     <div className='overflow-x-auto'>
-      <table className={tableStyles.table}>
+      <table className={`${tableStyles.table}  text-success`}>
         <thead>
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>

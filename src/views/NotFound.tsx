@@ -3,6 +3,9 @@
 // Next Imports
 import Link from 'next/link'
 
+// Hook Imports
+import { useParams } from 'next/navigation'
+
 // MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
@@ -12,11 +15,10 @@ import Typography from '@mui/material/Typography'
 // Third-party Imports
 import classnames from 'classnames'
 
+import { useImageVariant } from '@core/hooks/useImageVariant'
+
 // Type Imports
 import type { SystemMode } from '@core/types'
-
-// Hook Imports
-import { useImageVariant } from '@core/hooks/useImageVariant'
 
 // Styled Components
 const MaskImg = styled('img')({
@@ -37,6 +39,9 @@ const NotFound = ({ mode }: { mode: SystemMode }) => {
   const theme = useTheme()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const miscBackground = useImageVariant(mode, lightImg, darkImg)
+  const params = useParams()
+
+  const { lang: locale } = params
 
   return (
     <div className='flex items-center justify-center min-bs-[100dvh] relative p-6 overflow-x-hidden'>
@@ -48,7 +53,7 @@ const NotFound = ({ mode }: { mode: SystemMode }) => {
           <Typography variant='h4'>Page Not Found ⚠️</Typography>
           <Typography>we couldn&#39;t find the page you are looking for.</Typography>
         </div>
-        <Button href='/' component={Link} variant='contained'>
+        <Button href={`/${locale}/dashboards/ecommerce`} component={Link} variant='contained'>
           Back To Home
         </Button>
         <img
