@@ -16,7 +16,7 @@ const StyledVerticalMenuSection = styled.li<StyledVerticalMenuSectionProps>`
   display: flex;
   inline-size: 100%;
   position: relative;
-  overflow: hidden;
+
   margin-block-start: 15px;
 
   & .${menuClasses.menuSectionContent} {

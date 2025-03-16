@@ -21,10 +21,7 @@ const AddNewSpecialities = ({ open, handleClose }: Props) => {
   const [thumb, setThumb] = useState<string>('')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log('thumb link: ', thumb)
-
-    console.log('submit form')
+    e.preventDefault()('thumb link: ', thumb)('submit form')
     handleClose()
   }
 

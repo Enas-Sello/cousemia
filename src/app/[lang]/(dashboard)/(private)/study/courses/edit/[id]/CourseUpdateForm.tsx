@@ -42,7 +42,7 @@ export default function CourseUpdateForm({ id }: Props) {
   }
 
   const onSubmit = () => {
-    console.log('update')
+    ;('update')
   }
 
   return (

@@ -124,7 +124,7 @@ export default function CourseLectures({ id }: { id: number }) {
         toast.success('Flash Card deleted successfully')
         setData(prevData => prevData.filter(lecture => lecture.id !== id))
       } catch (e) {
-        console.log(e)
+        e
         toast.error('Failed to delete. Please try again.')
       }
     }

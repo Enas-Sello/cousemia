@@ -228,9 +228,7 @@ const target = join(__dirname, 'generated-icons.css')
     .join('\n')
 
   // Save the CSS to a file
-  await fs.writeFile(target, cssContent, 'utf8')
-
-  console.log(`Saved CSS to ${target}!`)
+  await fs.writeFile(target, cssContent, 'utf8')(`Saved CSS to ${target}!`)
 })().catch(err => {
   console.error(err)
 })
