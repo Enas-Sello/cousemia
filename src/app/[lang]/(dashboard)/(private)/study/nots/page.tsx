@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import getNotes from '@/data/notes/getNotes'
 
 import LoadingSkeleton from '@/@layouts/components/LoadingSkeleton'
-import NotesTable from '@/views/notes/NotesTable'
+import NotesList from '@/views/notes/NotesList'
 
 export default function Notes() {
   // State for query parameters
@@ -51,7 +51,7 @@ export default function Notes() {
   console.log(notes)
 
   return (
-    <NotesTable
+    <NotesList
       tableData={notes}
       total={total}
       perPage={perPage}

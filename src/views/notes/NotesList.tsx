@@ -33,7 +33,7 @@ type FilterItemType = {
   value: string
 }
 
-const NotesTable = ({
+const NotesList = ({
   tableData,
   total,
   perPage,
@@ -274,4 +274,4 @@ const NotesTable = ({
   )
 }
 
-export default NotesTable
+export default NotesList
