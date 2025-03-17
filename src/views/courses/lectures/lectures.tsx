@@ -4,7 +4,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Button, Card, CardContent, CardHeader, Chip, Grid, IconButton, MenuItem, Pagination } from '@mui/material'
+import { Button, Card, CardContent, CardHeader, Chip, IconButton, MenuItem, Pagination } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 
 import type { TextFieldProps } from '@mui/material/TextField'
 
@@ -248,7 +249,7 @@ export default function CourseLectures({ id }: { id: number | undefined }) {
   return (
     <>
       <Grid container spacing={6}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Card>
             <CardHeader title='Course Lectures' className='pbe-4' />
             <CardContent>
