@@ -1,11 +1,13 @@
 import { API_URL, API_LECTURES, API_COURSES_LECTURES } from '@/configs/api'
 import AxiosRequest from '@/libs/axios.config'
+import { genericQueryFn } from '@/libs/queryFn'
 
-export const getLectures = async (queryString: {} = {}) => {
-  const query = new URLSearchParams(queryString)
-  const res = await AxiosRequest.get(`${API_LECTURES}?${query}`)
-
-  return res.data
+export const getLectures = async (queryString: Record<string, any> = {}) => {
+  return genericQueryFn({
+    url: API_LECTURES,
+    method: 'GET',
+    queryParams: queryString
+  })
 }
 
 export const updateLectureStatus = async (id: number, status: boolean) => {

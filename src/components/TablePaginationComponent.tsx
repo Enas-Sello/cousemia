@@ -5,19 +5,14 @@ import Typography from '@mui/material/Typography'
 // Third Party Imports
 import type { useReactTable } from '@tanstack/react-table'
 
-import type { UserType } from '@/types/usertTypes'
-
-const TablePaginationComponent = ({
-  table,
-  total,
-  page,
-  setPage
-}: {
-  table: ReturnType<typeof useReactTable<UserType>>
+interface TablePaginationProps<TData> {
+  table: ReturnType<typeof useReactTable<TData>>
   total: number
   page: number
   setPage: (page: number) => void
-}) => {
+}
+
+const TablePaginationComponent = <TData,>({ table, total, page, setPage }: TablePaginationProps<TData>) => {
   const pageSize = table.getState().pagination.pageSize
   const currentPage = page + 1 // Because page is 0-based in your state
   const totalPages = Math.ceil(total / pageSize)
@@ -37,7 +32,7 @@ const TablePaginationComponent = ({
         count={totalPages}
         page={currentPage}
         onChange={(_, newPage) => {
-          setPage(newPage - 1) // Update the page state
+          setPage(newPage - 1) // Update the page state (0-based)
         }}
         showFirstButton
         showLastButton

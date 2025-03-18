@@ -14,9 +14,9 @@ export default function Users() {
   const [page, setPage] = useState<number>(0)
   const [sortDesc, setSortDesc] = useState<string>('true')
   const [sortBy, setSortBy] = useState<string>('id')
+  const [search, setSearch] = useState<string>('')
   const [verified, setVerified] = useState<string>('')
   const [status, setStatus] = useState<string>('')
-  const [search, setSearch] = useState<string>('')
 
   const fetchData = useCallback(async () => {
     const result = await getUsers(search, perPage, page + 1, sortBy, sortDesc, verified, status)
@@ -31,7 +31,6 @@ export default function Users() {
 
   return (
     <AnimationContainer>
-      {/* <Grid size={{ xs: 12 }}> */}
       <UserListTable
         tableData={data}
         total={total}
@@ -45,7 +44,6 @@ export default function Users() {
         setVerified={setVerified}
         setSearch={setSearch}
       />
-      {/* </Grid> */}
     </AnimationContainer>
   )
 }
