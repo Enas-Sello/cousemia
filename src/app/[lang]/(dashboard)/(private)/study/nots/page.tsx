@@ -9,6 +9,7 @@ import getNotes from '@/data/notes/getNotes'
 
 import LoadingSkeleton from '@/@layouts/components/LoadingSkeleton'
 import NotesList from '@/views/notes/NotesList'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 
 export default function Notes() {
   // State for query parameters
@@ -51,21 +52,23 @@ export default function Notes() {
   console.log(notes)
 
   return (
-    <NotesList
-      tableData={notes}
-      total={total}
-      perPage={perPage}
-      setPerPage={setPerPage}
-      page={page}
-      setPage={setPage}
-      setSortBy={setSortBy}
-      setSortDesc={setSortDesc}
-      setSearch={setSearch}
-      setCourse={setCourse}
-      setCategory={setCategory}
-      setSubCategory={setSubCategory}
-      course={course}
-      category={category}
-    />
+    <AnimationContainer>
+      <NotesList
+        tableData={notes}
+        total={total}
+        perPage={perPage}
+        setPerPage={setPerPage}
+        page={page}
+        setPage={setPage}
+        setSortBy={setSortBy}
+        setSortDesc={setSortDesc}
+        setSearch={setSearch}
+        setCourse={setCourse}
+        setCategory={setCategory}
+        setSubCategory={setSubCategory}
+        course={course}
+        category={category}
+      />
+    </AnimationContainer>
   )
 }

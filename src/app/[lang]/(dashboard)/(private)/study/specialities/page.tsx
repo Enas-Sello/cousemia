@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 
+import Link from 'next/link'
+
 import {
   Button,
   Card,
@@ -13,8 +15,7 @@ import {
   Pagination,
   Typography
 } from '@mui/material'
-import { SpecialityType } from '@/types/specialitiesType'
-import { getSpecialties, statusUpdateSpecialties } from '@/data/getSpecialties'
+
 import {
   createColumnHelper,
   flexRender,
@@ -23,15 +24,22 @@ import {
   useReactTable,
   type ColumnDef
 } from '@tanstack/react-table'
-import tableStyles from '@core/styles/table.module.css'
+
 import classNames from 'classnames'
-import Link from 'next/link'
+
+import { toast } from 'react-toastify'
+
+import type { SpecialityType } from '@/types/specialitiesType'
+import { getSpecialties, statusUpdateSpecialties } from '@/data/getSpecialties'
+import tableStyles from '@core/styles/table.module.css'
+
 import CustomTextField from '@/@core/components/mui/TextField'
 import StatusChanger from '@/components/StatusChanger'
-import { toast } from 'react-toastify'
+
 import AddNewSpecialities from './new'
 import CustomAvatar from '@/@core/components/mui/Avatar'
 import { getInitials } from '@/utils/getInitials'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 
 export default function Specialities() {
   const [data, setData] = useState<SpecialityType[]>([])
@@ -59,8 +67,10 @@ export default function Specialities() {
       perPage: perPage,
       page: page == 0 ? 1 : page + 1
     }
+
     const result = await getSpecialties(filterQuery)
     const { total, specialities } = result
+
     setData(specialities)
     setTotal(total)
   }
@@ -68,6 +78,7 @@ export default function Specialities() {
   const statusUpdate = async (id: number, status: boolean) => {
     status = status ? false : true
     const updated = await statusUpdateSpecialties(id, status)
+
     fetchData()
     toast.success(updated.data.message)
   }
@@ -151,109 +162,111 @@ export default function Specialities() {
   }, [perPage, page, status, verified, search])
 
   return (
-    <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <Card>
-          <CardHeader title='Specialities' className='pbe-4' />
-          <CardContent>
-            <div className='overflow-x-auto'>
-              <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
-                <CustomTextField
-                  select
-                  value={perPage}
-                  onChange={e => setPerPage(Number(e.target.value))}
-                  className='is-[80px]'
-                >
-                  {[10, 20, 25, 50, 100, 200].map(pageSize => (
-                    <MenuItem value={pageSize} key={pageSize}>
-                      {pageSize}
-                    </MenuItem>
-                  ))}
-                </CustomTextField>
-                <div>
+    <AnimationContainer>
+      <Grid container spacing={6}>
+        <Grid item xs={12}>
+          <Card>
+            <CardHeader title='Specialities' className='pbe-4' />
+            <CardContent>
+              <div className='overflow-x-auto'>
+                <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
                   <CustomTextField
-                    placeholder='Search...'
-                    className='is-[300px]'
-                    onChange={e => setSearch(e.target.value)}
-                  />
-                  <Button variant='contained' className='ml-3' onClick={() => setAddOpen(!addOpen)}>
-                    Add Speciality
-                  </Button>
+                    select
+                    value={perPage}
+                    onChange={e => setPerPage(Number(e.target.value))}
+                    className='is-[80px]'
+                  >
+                    {[10, 20, 25, 50, 100, 200].map(pageSize => (
+                      <MenuItem value={pageSize} key={pageSize}>
+                        {pageSize}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
+                  <div>
+                    <CustomTextField
+                      placeholder='Search...'
+                      className='is-[300px]'
+                      onChange={e => setSearch(e.target.value)}
+                    />
+                    <Button variant='contained' className='ml-3' onClick={() => setAddOpen(!addOpen)}>
+                      Add Speciality
+                    </Button>
+                  </div>
                 </div>
-              </div>
 
-              <table className={tableStyles.table}>
-                <thead>
-                  {table.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map(header => (
-                        <th key={header.id}>
-                          {header.isPlaceholder ? null : (
-                            <div
-                              className={classNames({
-                                'flex items-center': header.column.getIsSorted(),
-                                'cursor-pointer select-none': header.column.getCanSort()
-                              })}
-                              onClick={header.column.getToggleSortingHandler()}
-                            >
-                              {flexRender(header.column.columnDef.header, header.getContext())}
-                              {{
-                                asc: <i className='tabler-chevron-up text-xl' />,
-                                desc: <i className='tabler-chevron-down text-xl' />
-                              }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                            </div>
-                          )}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-
-                {table.getRowModel().rows.length === 0 ? (
-                  <tbody>
-                    <tr>
-                      <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                        <strong>No data available</strong>
-                      </td>
-                    </tr>
-                  </tbody>
-                ) : (
-                  <tbody>
-                    {table.getRowModel().rows.map(row => (
-                      <tr key={row.id}>
-                        {row.getVisibleCells().map(cell => (
-                          <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                <table className={tableStyles.table}>
+                  <thead>
+                    {table.getHeaderGroups().map(headerGroup => (
+                      <tr key={headerGroup.id}>
+                        {headerGroup.headers.map(header => (
+                          <th key={header.id}>
+                            {header.isPlaceholder ? null : (
+                              <div
+                                className={classNames({
+                                  'flex items-center': header.column.getIsSorted(),
+                                  'cursor-pointer select-none': header.column.getCanSort()
+                                })}
+                                onClick={header.column.getToggleSortingHandler()}
+                              >
+                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                {{
+                                  asc: <i className='tabler-chevron-up text-xl' />,
+                                  desc: <i className='tabler-chevron-down text-xl' />
+                                }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                              </div>
+                            )}
+                          </th>
                         ))}
                       </tr>
                     ))}
-                  </tbody>
-                )}
-              </table>
-            </div>
-            <div className='flex justify-between items-center flex-wrap pli-6 border-bs bs-auto plb-[12.5px] gap-2'>
-              <Typography color='text.disabled'>
-                {`Showing ${total === 0 ? 0 : page * pageSize + 1} to ${Math.min(
-                  (page + 1) * pageSize,
-                  total
-                )} of ${total} entries`}
-              </Typography>
-              <Pagination
-                shape='rounded'
-                color='primary'
-                variant='tonal'
-                count={totalPages}
-                page={currentPage}
-                onChange={(_, newPage) => {
-                  setPage(newPage - 1) // Update the page state
-                }}
-                showFirstButton
-                showLastButton
-              />
-            </div>
-          </CardContent>
-          <AddNewSpecialities open={addOpen} handleClose={() => setAddOpen(!addOpen)} />
-        </Card>
+                  </thead>
+
+                  {table.getRowModel().rows.length === 0 ? (
+                    <tbody>
+                      <tr>
+                        <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
+                          <strong>No data available</strong>
+                        </td>
+                      </tr>
+                    </tbody>
+                  ) : (
+                    <tbody>
+                      {table.getRowModel().rows.map(row => (
+                        <tr key={row.id}>
+                          {row.getVisibleCells().map(cell => (
+                            <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  )}
+                </table>
+              </div>
+              <div className='flex justify-between items-center flex-wrap pli-6 border-bs bs-auto plb-[12.5px] gap-2'>
+                <Typography color='text.disabled'>
+                  {`Showing ${total === 0 ? 0 : page * pageSize + 1} to ${Math.min(
+                    (page + 1) * pageSize,
+                    total
+                  )} of ${total} entries`}
+                </Typography>
+                <Pagination
+                  shape='rounded'
+                  color='primary'
+                  variant='tonal'
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={(_, newPage) => {
+                    setPage(newPage - 1) // Update the page state
+                  }}
+                  showFirstButton
+                  showLastButton
+                />
+              </div>
+            </CardContent>
+            <AddNewSpecialities open={addOpen} handleClose={() => setAddOpen(!addOpen)} />
+          </Card>
+        </Grid>
       </Grid>
-    </Grid>
+    </AnimationContainer>
   )
 }

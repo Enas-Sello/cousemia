@@ -5,6 +5,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import UserListTable from '@/views/users/UserListTable'
 import getUsers from '@/data/users/getUsers'
 import type { UserType } from '@/types/usertTypes'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 
 export default function Users() {
   const [data, setData] = useState<UserType[]>([])
@@ -29,7 +30,7 @@ export default function Users() {
   }, [fetchData])
 
   return (
-    <>
+    <AnimationContainer>
       <UserListTable
         tableData={data}
         total={total}
@@ -43,6 +44,6 @@ export default function Users() {
         setVerified={setVerified}
         setSearch={setSearch}
       />
-    </>
+    </AnimationContainer>
   )
 }
