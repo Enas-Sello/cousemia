@@ -5,6 +5,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import UserListTable from '@/views/users/UserListTable'
 import getUsers from '@/data/users/getUsers'
 import type { UserType } from '@/types/usertTypes'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 
 export default function Users() {
   const [data, setData] = useState<UserType[]>([])
@@ -29,7 +30,7 @@ export default function Users() {
   }, [fetchData])
 
   return (
-    <>
+    <AnimationContainer>
       {/* <Grid size={{ xs: 12 }}> */}
       <UserListTable
         tableData={data}
@@ -45,6 +46,6 @@ export default function Users() {
         setSearch={setSearch}
       />
       {/* </Grid> */}
-    </>
+    </AnimationContainer>
   )
 }

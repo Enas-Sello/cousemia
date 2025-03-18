@@ -12,6 +12,7 @@ import Lectures from '@/views/courses/lectures/lectures'
 import { getCourses } from '@/data/courses/getCourses'
 import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/getCategories'
 import type { CategoryType } from '@/types/categoryType'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 
 export default function LectureList() {
   const [courses, setCourses] = useState<CourseType[]>([])
@@ -58,7 +59,7 @@ export default function LectureList() {
   }, [])
 
   return (
-    <>
+    <AnimationContainer>
       <Grid container spacing={6} className='mb-6'>
         <Grid item xs={12}>
           <Card>
@@ -130,6 +131,6 @@ export default function LectureList() {
         </Grid>
       </Grid>
       <Lectures id={courseId} />
-    </>
+    </AnimationContainer>
   )
 }

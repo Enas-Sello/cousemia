@@ -2,6 +2,7 @@
 
 import type { ChangeEvent } from 'react'
 import React, { useEffect, useState } from 'react'
+import 'animate.css'
 
 import Link from 'next/link'
 
@@ -20,13 +21,7 @@ import {
 
 import Grid from '@mui/material/Grid2'
 
-import {
-  createColumnHelper,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
-
+import { createColumnHelper, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
 
 import { toast } from 'react-toastify'
 
@@ -43,6 +38,7 @@ import type { AdminType } from '@/types/adminType'
 import type { SpecialityType } from '@/types/specialitiesType'
 import { getAdmin } from '@/data/getAdmin'
 import GenericTable from '@/components/GenericTable'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 
 type StatusType = {
   label: string
@@ -276,113 +272,137 @@ export default function CourseList() {
   ]
 
   return (
-    <Grid container spacing={6}>
-      <Grid size={{ xs: 12 }}>
-        <Card>
-          <CardHeader title='Filters' className='pbe-4 text-secondary' />
-          <CardContent className='border-bs py-6'>
-            <Grid container spacing={6}>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Autocomplete
-                  id='admins'
-                  options={admins}
-                  onChange={(event: ChangeEvent<{}>, newValue) => setAdminId((newValue?.id as number) ?? '')}
-                  renderTags={(tagValue, getTagProps) => {
-                    return tagValue.map((option: AdminType, index) => (
-                      <Chip {...getTagProps({ index })} key={index} label={option.name} />
-                    ))
-                  }}
-                  getOptionLabel={option => option.name || ''}
-                  renderInput={params => (
-                    <CustomTextField {...params} key={params.id} placeholder='Select creator' label='Creator' />
-                  )}
-                />
+    <AnimationContainer>
+      <Grid container spacing={6} sx={{ marginBottom: '2rem' }}>
+        <Grid size={{ xs: 12 }}>
+          <Card>
+            <CardHeader title='Filters' className='pbe-4 text-secondary' />
+            <CardContent className='border-bs py-6'>
+              <Grid container spacing={6}>
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Autocomplete
+                    id='admins'
+                    options={admins}
+                    sx={{
+                      '& .MuiAutocomplete-listbox': {
+                        listStyle: 'none',
+                        margin: 0,
+                        padding: '8px 0',
+                        maxHeight: '40vh',
+                        overflow: 'auto',
+                        position: 'relative',
+                        scrollbarWidth: 'none', // For Firefox
+                        msOverflowStyle: 'none', // For IE/Edge
+                        '&::-webkit-scrollbar': {
+                          display: 'none' // For Chrome, Safari, Edge
+                        }
+                      }
+                    }}
+                    onChange={(event: ChangeEvent<{}>, newValue) => setAdminId((newValue?.id as number) ?? '')}
+                    renderTags={(tagValue, getTagProps) => {
+                      return tagValue.map((option: AdminType, index) => (
+                        <Chip {...getTagProps({ index })} key={index} label={option.name} />
+                      ))
+                    }}
+                    getOptionLabel={option => option.name || ''}
+                    renderInput={params => (
+                      <CustomTextField {...params} placeholder='Select Creator' key={params.id} label='Creator' />
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Autocomplete
+                    id='specialities'
+                    options={specialities}
+                    onChange={(event: ChangeEvent<{}>, newValue) => setSpeciality((newValue?.id as number) ?? '')}
+                    renderTags={(tagValue, getTagProps) => {
+                      return tagValue.map((option: SpecialityType, index) => (
+                        <Chip {...getTagProps({ index })} key={index} label={option.title_en} />
+                      ))
+                    }}
+                    getOptionLabel={option => option.title_en || ''}
+                    renderInput={params => (
+                      <CustomTextField {...params} placeholder='Select Speciality' key={params.id} label='Speciality' />
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Autocomplete
+                    id='status'
+                    options={statusList}
+                    onChange={(event: ChangeEvent<{}>, newValue) => setStatus(newValue?.value)}
+                    renderTags={(tagValue, getTagProps) => {
+                      return tagValue.map((option: StatusType, index) => (
+                        <Chip {...getTagProps({ index })} key={index} label={option.label} />
+                      ))
+                    }}
+                    getOptionLabel={option => option.label || ''}
+                    renderInput={params => (
+                      <CustomTextField {...params} placeholder='Select Status' key={params.id} label='Status' />
+                    )}
+                  />
+                </Grid>
               </Grid>
-
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Autocomplete
-                  id='specialities'
-                  options={specialities}
-                  onChange={(event: ChangeEvent<{}>, newValue) => setSpeciality((newValue?.id as number) ?? '')}
-                  renderTags={(tagValue, getTagProps) => {
-                    return tagValue.map((option: SpecialityType, index) => (
-                      <Chip {...getTagProps({ index })} key={index} label={option.title_en} />
-                    ))
-                  }}
-                  getOptionLabel={option => option.title_en || ''}
-                  renderInput={params => (
-                    <CustomTextField {...params} key={params.id} placeholder='Select speciality' label='Speciality' />
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Autocomplete
-                  id='status'
-                  options={statusList}
-                  onChange={(event: ChangeEvent<{}>, newValue) => setStatus(newValue?.value)}
-                  renderTags={(tagValue, getTagProps) => {
-                    return tagValue.map((option: StatusType, index) => (
-                      <Chip {...getTagProps({ index })} key={index} label={option.label} />
-                    ))
-                  }}
-                  getOptionLabel={option => option.label || ''}
-                  renderInput={params => (
-                    <CustomTextField {...params} key={params.id} placeholder='Select status' label='Status' />
-                  )}
-                />
-              </Grid>
-            </Grid>
-
-            <div className='flex justify-between flex-col  items-start sm:flex-row sm:items-center p-6 gap-4'>
-              <CustomTextField
-                select
-                value={perPage}
-                onChange={e => setPerPage(Number(e.target.value))}
-                className='is-[80px]'
-              >
-                {[10, 20, 25, 50, 100, 200].map(pageSize => (
-                  <MenuItem value={pageSize} key={pageSize}>
-                    {pageSize}
-                  </MenuItem>
-                ))}
-              </CustomTextField>
-              <div className='flex justify-center items-center gap-3'>
-                <CustomTextField
-                  placeholder='Search...'
-                  className='is-[300px] px-[6px] py-[13px]'
-                  onChange={e => setSearch(e.target.value)}
-                />
-                <Button size='medium' variant='contained' className=' '>
-                  Add Course
-                </Button>
-              </div>
-            </div>
-            <GenericTable table={table} />
-
-            <div className='flex justify-between items-center flex-wrap pli-6 border-bs bs-auto plb-[12.5px] gap-2'>
-              <Typography color='text.disabled'>
-                {`Showing ${total === 0 ? 0 : page * pageSize + 1} to ${Math.min(
-                  (page + 1) * pageSize,
-                  total
-                )} of ${total} entries`}
-              </Typography>
-              <Pagination
-                shape='rounded'
-                color='primary'
-                variant='tonal'
-                count={totalPages}
-                page={currentPage}
-                onChange={(_, newPage) => {
-                  setPage(newPage - 1) // Update the page state
-                }}
-                showFirstButton
-                showLastButton
-              />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
-    </Grid>
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12 }}>
+          <Card>
+            <CardContent className='border-bs py-6'>
+              <div className='flex justify-between flex-col  items-start sm:flex-row sm:items-center p-6 gap-4'>
+                <CustomTextField
+                  select
+                  value={perPage}
+                  onChange={e => setPerPage(Number(e.target.value))}
+                  className='is-[80px]'
+                >
+                  {[10, 20, 25, 50, 100, 200].map(pageSize => (
+                    <MenuItem value={pageSize} key={pageSize}>
+                      {pageSize}
+                    </MenuItem>
+                  ))}
+                </CustomTextField>
+                <div className='flex justify-center items-center gap-3'>
+                  <CustomTextField
+                    placeholder='Search...'
+                    className='is-[300px] px-[6px] py-[13px]'
+                    onChange={e => setSearch(e.target.value)}
+                  />
+                  <Button size='medium' variant='contained' className=' '>
+                    Add Course
+                  </Button>
+                </div>
+              </div>
+              <GenericTable table={table} />
+
+              <div className='flex justify-between items-center flex-wrap pli-6 border-bs bs-auto plb-[12.5px] gap-2'>
+                <Typography color='text.disabled'>
+                  {`Showing ${total === 0 ? 0 : page * pageSize + 1} to ${Math.min(
+                    (page + 1) * pageSize,
+                    total
+                  )} of ${total} entries`}
+                </Typography>
+                <Pagination
+                  shape='rounded'
+                  color='primary'
+                  variant='tonal'
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={(_, newPage) => {
+                    setPage(newPage - 1) // Update the page state
+                  }}
+                  showFirstButton
+                  showLastButton
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </AnimationContainer>
   )
 }

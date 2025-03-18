@@ -140,7 +140,7 @@ const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props,
       rootStyles={rootStyles}
     >
       <MenuButton
-        className={classnames('flex items-center px-4 py-[10px] hover:px-5 transition-all duration-300', {
+        className={classnames('flex items-center px-4 py-[10px] hover:px-5 transition-[padding] duration-300', {
           'rounded-sm bg-custom-gradient shadow-pink-shadow text-white ': active
         })}
         component={component}
