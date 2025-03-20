@@ -11,6 +11,8 @@ import { useTheme } from '@mui/material/styles'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
 // Type Imports
+import { IconHome, IconStack, IconBook, IconNotebook, IconBookmark, IconChartBar, IconDatabase, IconSticker } from '@tabler/icons-react'
+
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
@@ -85,7 +87,7 @@ const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
       >
         <SubMenu
           label={dictionary['navigation'].dashboards}
-          icon={<i className='tabler-smart-home' />}
+          icon={<IconHome size={24} stroke={1.5} />}
           suffix={<CustomChip label='2' size='small' color='error' round='true' />}
         >
           {/* <MenuItem href={`/${locale}/dashboards`}>{dictionary['navigation'].eCommerce}</MenuItem> */}
@@ -93,17 +95,26 @@ const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
           <MenuItem href={`/${locale}/dashboards/analytics`}>{dictionary['navigation'].analytics}</MenuItem>
         </SubMenu>
         <MenuSection label={dictionary['navigation'].appsPages}>
-          <MenuItem href={`/${locale}/study/courses`} icon={<i className='tabler-books' />}>
+          <MenuItem href={`/${locale}/study/courses`} icon={<IconStack size={23} stroke={1} />}>
             Courses
           </MenuItem>
-          <MenuItem href={`/${locale}/study/lectures`} icon={<i className='tabler-vocabulary' />}>
+          <MenuItem href={`/${locale}/study/lectures`} icon={<IconBook size={23} stroke={1} />}>
             Lectures
           </MenuItem>
-          <MenuItem href={`/${locale}/study/specialities`} icon={<i className='tabler-tags' />}>
+          <MenuItem href={`/${locale}/study/specialities`} icon={<IconSticker size={23} stroke={1} />}>
             Specialities
           </MenuItem>
-          <MenuItem href={`/${locale}/study/nots`} icon={<i className='tabler-tags' />}>
+          <MenuItem href={`/${locale}/study/nots`} icon={<IconNotebook size={23} stroke={1} />}>
             Nots
+          </MenuItem>
+          <MenuItem href={`/${locale}/study/questionsAnswer`} icon={<IconBookmark size={23} stroke={1} />}>
+            Questions & Answers
+          </MenuItem>
+          <MenuItem href={`/${locale}/study/flashCards`} icon={<IconChartBar size={23} stroke={1} />}>
+            Flash Cards
+          </MenuItem>
+          <MenuItem href={`/${locale}/study/categories`} icon={<IconDatabase size={23} stroke={1} />}>
+            Categories
           </MenuItem>
         </MenuSection>
 

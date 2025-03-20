@@ -112,6 +112,9 @@ const HorizontalMenu = ({ dictionary }: { dictionary: Awaited<ReturnType<typeof 
           <MenuItem href={`/${locale}/study/specialities`} icon={<i className='tabler-tags' />}>
             Specialities
           </MenuItem>
+          <MenuItem href={`/${locale}/study/questionsAnswer`} icon={<i className='tabler-tags' />}>
+            Questions & Answers
+          </MenuItem>
         </MenuSection>
 
         <MenuSection label='Users Management'>

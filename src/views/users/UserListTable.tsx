@@ -10,7 +10,6 @@ import Link from 'next/link'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import IconButton from '@mui/material/IconButton'
-import MenuItem from '@mui/material/MenuItem'
 import { Autocomplete, CardContent, Chip, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
@@ -36,6 +35,7 @@ import GenericTable from '@/components/GenericTable'
 
 // Styles Imports
 import StatusChange from './StatusChange'
+import TableRowsNumber from '@/components/TableRowsNumber'
 
 const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
   const { avatar, fullName } = params
@@ -190,7 +190,6 @@ const UserListTable = ({
     manualPagination: true, // Enable manual pagination for server-side handling
     manualFiltering: true,
 
-    // filterFns: undefined
     filterFns: {
       fuzzy: fuzzyFilter
     }
@@ -243,34 +242,7 @@ const UserListTable = ({
       <Grid size={{ xs: 12 }}>
         <Card>
           <CardContent>
-            <Grid container spacing={6}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <div className='flex gap-2 items-center'>
-                  <p className='text-sm'>show</p>
-                  <CustomTextField
-                    select
-                    value={perPage}
-                    onChange={e => setPerPage(Number(e.target.value))}
-                    className='is-[90px]'
-                  >
-                    <MenuItem value='10'>10</MenuItem>
-                    <MenuItem value='25'>25</MenuItem>
-                    <MenuItem value='50'>50</MenuItem>
-                    <MenuItem value='100'>100</MenuItem>
-                  </CustomTextField>
-                  <p className='text-sm'>entries</p>
-                </div>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <div className='flex justify-center sm:justify-end'>
-                  <CustomTextField
-                    placeholder='Search...'
-                    className=' w-full sm:is-[300px]'
-                    onChange={e => setSearch(e.target.value)}
-                  />
-                </div>
-              </Grid>
-            </Grid>
+            <TableRowsNumber perPage={perPage} setPerPage={setPerPage} setGlobalFilter={setSearch} />
           </CardContent>
 
           <GenericTable table={table} />

@@ -7,11 +7,19 @@ import AnimationContainer from '@/@core/components/animation-container/animation
 
 export default function LectureList() {
   const [courseId, setCourseId] = useState<number>()
+  const [categoryId, setCategoryId] = useState<number | undefined>(undefined)
+  const [subCategoryId, setSubCategoryId] = useState<number | undefined>(undefined)
 
   return (
     <AnimationContainer>
-      <FiltersDataInput courseId={courseId} setCourseId={setCourseId} />
-      <Lectures id={courseId} />
+      <FiltersDataInput
+        courseId={courseId}
+        categoryId={categoryId}
+        setCourseId={setCourseId}
+        setCategoryId={setCategoryId}
+        setSubCategoryId={setSubCategoryId}
+      />
+      <Lectures courseId={courseId} categoryId={categoryId} subCategoryId={subCategoryId}  />
     </AnimationContainer>
   )
 }

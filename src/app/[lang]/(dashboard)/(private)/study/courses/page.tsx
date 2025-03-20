@@ -6,32 +6,24 @@ import 'animate.css'
 
 import Link from 'next/link'
 
-import {
-  Autocomplete,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Chip,
-  IconButton,
-  MenuItem,
-  Pagination,
-  Typography
-} from '@mui/material'
+import { Autocomplete, Card, CardContent, CardHeader, Chip, IconButton } from '@mui/material'
 
 import Grid from '@mui/material/Grid2'
 
+import type { FilterFn } from '@tanstack/react-table'
 import { createColumnHelper, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
 
 import { toast } from 'react-toastify'
 
-import { getSpecialties, statusUpdateSpecialties } from '@/data/getSpecialties'
+import { rankItem } from '@tanstack/match-sorter-utils'
+
+import { getSpecialties } from '@/data/getSpecialties'
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import StatusChanger from '@/components/StatusChanger'
 
 import CustomAvatar from '@/@core/components/mui/Avatar'
-import type { CourseType } from '@/types/courseType'
+import type { CourseType, StatusType } from '@/types/courseType'
 import { updateCourse, getCourses } from '@/data/courses/getCourses'
 import { strTruncate } from '@/utils/str'
 import type { AdminType } from '@/types/adminType'
@@ -39,10 +31,20 @@ import type { SpecialityType } from '@/types/specialitiesType'
 import { getAdmin } from '@/data/getAdmin'
 import GenericTable from '@/components/GenericTable'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
+import TableRowsNumber from '@/components/TableRowsNumber'
+import TablePaginationComponent from '@/components/TablePaginationComponent'
 
-type StatusType = {
-  label: string
-  value: number
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  const itemRank = rankItem(row.getValue(columnId), value)
+
+  // Store the itemRank info
+  addMeta({
+    itemRank
+  })
+
+  // Return if the item should be filtered in/out
+  return itemRank.passed
 }
 
 export default function CourseList() {
@@ -50,8 +52,6 @@ export default function CourseList() {
   const [total, setTotal] = useState<number>(0)
   const [perPage, setPerPage] = useState<number>(10)
   const [page, setPage] = useState<number>(0)
-  const [sortDesc, setSortDesc] = useState<string>('true')
-  const [sortBy, setSortBy] = useState<string>('id')
   const [status, setStatus] = useState<number>()
   const [search, setSearch] = useState<string>('')
   const [admins, setAdmins] = useState<AdminType[]>([])
@@ -87,7 +87,7 @@ export default function CourseList() {
       admin_id: adminId ?? '',
       speciality: speciality ?? '',
       status: status ?? ''
-    }
+    } as { [key: string]: any }
 
     const result = await getCourses(filterQuery)
     const { total, courses } = result
@@ -244,12 +244,10 @@ export default function CourseList() {
       }
     },
     manualPagination: true,
-    filterFns: undefined
+    filterFns: {
+      fuzzy: fuzzyFilter
+    }
   })
-
-  const pageSize = table.getState().pagination.pageSize
-  const currentPage = page + 1 // Because page is 0-based in your state
-  const totalPages = Math.ceil(total / pageSize)
 
   useEffect(() => {
     fetchAdminList()
@@ -258,7 +256,7 @@ export default function CourseList() {
 
   useEffect(() => {
     fetchData()
-  }, [perPage, page, search, status, speciality, adminId])
+  }, [perPage, page, search, status, speciality, adminId, perPage])
 
   const statusList: StatusType[] = [
     {
@@ -353,53 +351,18 @@ export default function CourseList() {
         <Grid size={{ xs: 12 }}>
           <Card>
             <CardContent className='border-bs py-6'>
-              <div className='flex justify-between flex-col  items-start sm:flex-row sm:items-center p-6 gap-4'>
-                <CustomTextField
-                  select
-                  value={perPage}
-                  onChange={e => setPerPage(Number(e.target.value))}
-                  className='is-[80px]'
-                >
-                  {[10, 20, 25, 50, 100, 200].map(pageSize => (
-                    <MenuItem value={pageSize} key={pageSize}>
-                      {pageSize}
-                    </MenuItem>
-                  ))}
-                </CustomTextField>
-                <div className='flex justify-center items-center gap-3'>
-                  <CustomTextField
-                    placeholder='Search...'
-                    className='is-[300px] px-[6px] py-[13px]'
-                    onChange={e => setSearch(e.target.value)}
-                  />
-                  <Button size='medium' variant='contained' className=' '>
-                    Add Course
-                  </Button>
-                </div>
-              </div>
-              <GenericTable table={table} />
+              <TableRowsNumber
+                addText='Add Courses'
+                perPage={perPage}
+                setPerPage={setPerPage}
+                setGlobalFilter={setSearch}
+                addButton
 
-              <div className='flex justify-between items-center flex-wrap pli-6 border-bs bs-auto plb-[12.5px] gap-2'>
-                <Typography color='text.disabled'>
-                  {`Showing ${total === 0 ? 0 : page * pageSize + 1} to ${Math.min(
-                    (page + 1) * pageSize,
-                    total
-                  )} of ${total} entries`}
-                </Typography>
-                <Pagination
-                  shape='rounded'
-                  color='primary'
-                  variant='tonal'
-                  count={totalPages}
-                  page={currentPage}
-                  onChange={(_, newPage) => {
-                    setPage(newPage - 1) // Update the page state
-                  }}
-                  showFirstButton
-                  showLastButton
-                />
-              </div>
+                // addFunction={() => setAddLectureOpen(!addLectureOpen)}
+              />
             </CardContent>
+            <GenericTable table={table} />
+            <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
           </Card>
         </Grid>
       </Grid>

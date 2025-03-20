@@ -2,15 +2,24 @@
 import React, { useState } from 'react'
 
 import FiltersDataInput from '@/components/FiltersDataInput'
-import CourseLectures from '@/views/courses/question/Question'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
+import Question from '@/views/courses/question/Question'
 
 export default function QuestionsAnswer() {
   const [courseId, setCourseId] = useState<number>()
+  const [categoryId, setCategoryId] = useState<number | undefined>(undefined)
+  const [subCategoryId, setSubCategoryId] = useState<number | undefined>(undefined)
 
   return (
-    <>
-      <FiltersDataInput courseId={courseId} setCourseId={setCourseId} />
-      <CourseLectures id={courseId} />
-    </>
+    <AnimationContainer>
+      <FiltersDataInput
+        courseId={courseId}
+        categoryId={categoryId}
+        setCourseId={setCourseId}
+        setCategoryId={setCategoryId}
+        setSubCategoryId={setSubCategoryId}
+      />
+      <Question courseId={courseId} categoryId={categoryId} subCategoryId={subCategoryId} />
+    </AnimationContainer>
   )
 }

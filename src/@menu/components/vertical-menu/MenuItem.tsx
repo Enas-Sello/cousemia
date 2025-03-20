@@ -97,7 +97,6 @@ const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props,
   // Handle the click event.
   const handleClick = () => {
     if (isToggled) {
-      console.log(toggleVerticalNav())
     }
   }
 
@@ -120,7 +119,6 @@ const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props,
   useUpdateEffect(() => {
     onActiveChange?.(active)
   }, [active])
-  console.log(active)
 
   return (
     <StyledVerticalMenuItem

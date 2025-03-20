@@ -1,11 +1,13 @@
 import { API_URL, API_FLASH_CARDS, API_COURSES_LECTURES } from '@/configs/api'
 import AxiosRequest from '@/libs/axios.config'
+import { genericQueryFn } from '@/libs/queryFn'
 
-export const getFlashCards = async (queryString: {} = {}) => {
-  const query = new URLSearchParams(queryString)
-  const res = await AxiosRequest.get(`${API_FLASH_CARDS}?${query}`)
-
-  return res.data
+export const getFlashCards = async (queryString: Record<string, any> = {}) => {
+  return genericQueryFn({
+    url: API_FLASH_CARDS,
+    method: 'GET',
+    queryParams: queryString
+  })
 }
 
 export const updateFlashCardStatus = async (id: number, status: boolean) => {

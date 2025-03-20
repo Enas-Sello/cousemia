@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid2'
 
 import CourseOverview from '@/views/courses/lectures/overview'
 import Lectures from '@/views/courses/lectures/lectures'
-import FlashCard from '@/views/courses/flashcard/flashcard'
+import FlashCard from '@/views/courses/flashcard/FlashCards'
 import Notes from '@/views/courses/note/Note'
 import Question from '@/views/courses/question/Question'
 import Category from '@/views/courses/category/Category'

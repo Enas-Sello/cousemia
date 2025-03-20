@@ -1,11 +1,15 @@
-import { API_COURSE_CATEGORIES } from '@/configs/api'
+import { API_CATEGORIES, API_COURSE_CATEGORIES } from '@/configs/api'
 import AxiosRequest from '@/libs/axios.config'
+import { genericQueryFn } from '@/libs/queryFn'
 
-export const getCategories = async (id: number, queryString: {} = {}) => {
-  const query = new URLSearchParams(queryString)
-  const res = await AxiosRequest.get(API_COURSE_CATEGORIES + `/${id}?${query}`)
+export const getCategories = async (queryString: Record<string, any> = {}) => {
+      console.log('filterQuery', queryString)
 
-  return res.data
+  return genericQueryFn({
+    url: API_CATEGORIES,
+    method: 'GET',
+    queryParams: queryString
+  })
 }
 
 export const updateCategoryStatus = async (id: number, status: boolean) => {

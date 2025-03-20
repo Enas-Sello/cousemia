@@ -33,7 +33,6 @@ const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
 }
 
 export default function UserOverview({ user }: { user: UserType }) {
-  console.log('users--->', user)
 
   return (
     <Grid container spacing={6}>

@@ -29,3 +29,10 @@ export type CourseFormType = {
   description_en: string
   description_ar: string
 }
+
+
+
+export type StatusType = {
+  label: string
+  value: number
+}

@@ -3,9 +3,9 @@ import React, { useState } from 'react'
 
 import FiltersDataInput from '@/components/FiltersDataInput'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
-import Notes from '@/views/courses/note/Notes'
+import FlashCards from '@/views/courses/flashcard/FlashCards'
 
-export default function NotesList() {
+export default function FlashCardsList() {
   const [courseId, setCourseId] = useState<number>()
   const [categoryId, setCategoryId] = useState<number | undefined>(undefined)
   const [subCategoryId, setSubCategoryId] = useState<number | undefined>(undefined)
@@ -19,7 +19,7 @@ export default function NotesList() {
         setCategoryId={setCategoryId}
         setSubCategoryId={setSubCategoryId}
       />
-      <Notes courseId={courseId} categoryId={categoryId} subCategoryId={subCategoryId} />
+      <FlashCards courseId={courseId} categoryId={categoryId} subCategoryId={subCategoryId} />
     </AnimationContainer>
   )
 }
