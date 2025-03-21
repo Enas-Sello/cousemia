@@ -1,4 +1,5 @@
 'use client'
+
 // React Imports
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from 'react'
 
@@ -8,6 +9,7 @@ import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
+
 import CustomTextField from '@/@core/components/mui/TextField'
 import ImageUploader from '@components/ImageUploader'
 

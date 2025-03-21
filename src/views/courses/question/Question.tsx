@@ -30,7 +30,7 @@ import { deleteLecture } from '@/data/courses/getLectures'
 import StatusChange from './StatusChange'
 import AddLectureDrawer from './AddLectureDrawer'
 import { getQuestions } from '@/data/courses/getQuestions'
-import TableRowsNumber from '@/components/TableRowsNumber'
+import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 
@@ -225,7 +225,7 @@ export default function Question({
           <Card>
             <CardHeader title='Course Questions' className='pbe-4' />
             <CardContent>
-              <TableRowsNumber
+              <TableRowsNumberAndAddNew
                 addText='Add Lecture'
                 perPage={perPage}
                 setPerPage={setPerPage}

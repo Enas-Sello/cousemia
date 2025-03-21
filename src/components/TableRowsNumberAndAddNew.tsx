@@ -13,7 +13,7 @@ interface TableRowsNumberProps {
   addButton?: boolean
 }
 
-const TableRowsNumber: React.FC<TableRowsNumberProps> = ({
+const TableRowsNumberAndAddNew: React.FC<TableRowsNumberProps> = ({
   perPage,
   setPerPage,
   setGlobalFilter,
@@ -41,15 +41,18 @@ const TableRowsNumber: React.FC<TableRowsNumberProps> = ({
           <p className='text-sm'>entries</p>
         </div>
       </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-        <div className='flex justify-end '>
+      <Grid
+        size={{ xs: 12, sm: 6 }}
+        sx={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 2, justifyContent: 'end' }}
+      >
+        <div className='flex justify-end flex-col md:flex-row gap-2'>
           <CustomTextField
             placeholder='Search...'
-            className=' w-full sm:is-[300px]'
+            className='w-full sm:w-[300px]'
             onChange={e => setGlobalFilter(e.target.value)}
           />
           {addButton && (
-            <Button variant='contained' className='ml-3' onClick={addFunction}>
+            <Button variant='contained' className='ml-3 text-sm text-nowrap' size='medium' onClick={addFunction}>
               {addText}
             </Button>
           )}
@@ -59,4 +62,4 @@ const TableRowsNumber: React.FC<TableRowsNumberProps> = ({
   )
 }
 
-export default TableRowsNumber
+export default TableRowsNumberAndAddNew

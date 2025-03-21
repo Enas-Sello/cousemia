@@ -1,4 +1,5 @@
 import type { NoteType } from './noteType'
+import type { UserType } from './usertTypes'
 
 // Define TypeScript type for a device
 interface Device {
@@ -36,4 +37,44 @@ export interface NotsListTableProps {
   setSubCategory: React.Dispatch<React.SetStateAction<string>>
   course: string
   category: string
+}
+type FilterItemType = {
+  title: string
+  value: string
+}
+
+export const verfiedList: FilterItemType[] = [
+  {
+    title: 'Phone Verified',
+    value: '1'
+  },
+  {
+    title: 'Phone Not Verified',
+    value: '0'
+  }
+]
+
+export const statusList: FilterItemType[] = [
+  {
+    title: 'Active',
+    value: '1'
+  },
+  {
+    title: 'Inactive',
+    value: '0'
+  }
+]
+
+export interface UserListTableProps {
+  tableData: UserType[]
+  total: number
+  perPage: number
+  setPerPage: React.Dispatch<React.SetStateAction<number>>
+  page: number
+  setPage: React.Dispatch<React.SetStateAction<number>>
+  setSortBy: React.Dispatch<React.SetStateAction<string>>
+  setSortDesc: React.Dispatch<React.SetStateAction<string>>
+  setStatus: React.Dispatch<React.SetStateAction<string>>
+  setVerified: React.Dispatch<React.SetStateAction<string>>
+  setSearch: React.Dispatch<React.SetStateAction<string>>
 }

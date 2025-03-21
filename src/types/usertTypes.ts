@@ -20,3 +20,4 @@ export type Ability = {
   action: string
   subject: string
 }
+

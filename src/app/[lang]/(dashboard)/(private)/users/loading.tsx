@@ -6,7 +6,9 @@ export default function Loading() {
   // Or a custom loading skeleton component
   return (
     <AnimationContainer>
-      <CircularProgress />
+      <div className='flex justify-center items-center p-10'>
+        <CircularProgress />
+      </div>
     </AnimationContainer>
   )
 }

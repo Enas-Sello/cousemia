@@ -22,7 +22,6 @@ import { getSpecialties } from '@/data/getSpecialties'
 import CustomTextField from '@/@core/components/mui/TextField'
 import StatusChanger from '@/components/StatusChanger'
 
-import CustomAvatar from '@/@core/components/mui/Avatar'
 import type { CourseType, StatusType } from '@/types/courseType'
 import { updateCourse, getCourses } from '@/data/courses/getCourses'
 import { strTruncate } from '@/utils/str'
@@ -31,8 +30,9 @@ import type { SpecialityType } from '@/types/specialitiesType'
 import { getAdmin } from '@/data/getAdmin'
 import GenericTable from '@/components/GenericTable'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
-import TableRowsNumber from '@/components/TableRowsNumber'
+import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
+import { getAvatar } from '@/libs/helpers/getAvatar'
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -58,14 +58,6 @@ export default function CourseList() {
   const [specialities, setSpecialities] = useState<SpecialityType[]>([])
   const [adminId, setAdminId] = useState<number>()
   const [speciality, setSpeciality] = useState<number>()
-
-  const getAvatar = (params: Pick<CourseType, 'image'>) => {
-    const { image } = params
-
-    if (image) {
-      return <CustomAvatar src={image} size={40} />
-    }
-  }
 
   const fetchAdminList = async () => {
     const res = await getAdmin()
@@ -351,7 +343,7 @@ export default function CourseList() {
         <Grid size={{ xs: 12 }}>
           <Card>
             <CardContent className='border-bs py-6'>
-              <TableRowsNumber
+              <TableRowsNumberAndAddNew
                 addText='Add Courses'
                 perPage={perPage}
                 setPerPage={setPerPage}

@@ -1,9 +1,7 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL as string
 export const API_LOGIN = API_URL + '/auth/login'
-export const API_USERS = API_URL + '/users'
 export const API_COURSES = API_URL + '/courses'
 export const API_ALL_COURSES = API_URL + '/all-courses'
-export const API_SPECIALTIES = API_URL + '/specialities'
 export const API_ADMIN = API_URL + '/all-admins'
 export const API_LECTURES = API_URL + '/lectures'
 export const API_COURSES_LECTURES = API_URL + '/course-lectures'
@@ -15,3 +13,10 @@ export const API_CATEGORIES = API_URL + '/all-categories'
 export const API_COURSE_CATEGORIES = API_URL + '/course-categories'
 export const API_SUB_CATEGORIES = API_URL + '/sub-categories'
 export const API_GET_COURSE_IMAGES = API_URL + '/get-course-images'
+
+//users
+export const API_USERS = API_URL + '/users'
+
+//utilities
+export const API_SPECIALTIES = API_URL + '/specialities'
+export const API_COUNTRIES = API_URL + '/countries'

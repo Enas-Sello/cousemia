@@ -30,7 +30,7 @@ import AddLectureDrawer from './AddLectureDrawer'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { getNotes } from '@/data/courses/getCourses'
 import type { NoteType } from '@/types/noteType'
-import TableRowsNumber from '@/components/TableRowsNumber'
+import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 
@@ -213,7 +213,6 @@ export default function Notes({
     onSortingChange: setSorting
   })
 
-
   useEffect(() => {
     fetchData(courseId)
   }, [courseId, categoryId, subCategoryId, page, sorting, globalFilter, addLectureOpen])
@@ -225,7 +224,7 @@ export default function Notes({
           <Card>
             <CardHeader title='Course Notes' className='pbe-4' />
             <CardContent>
-              <TableRowsNumber
+              <TableRowsNumberAndAddNew
                 addText='Add Note'
                 perPage={perPage}
                 setPerPage={setPerPage}

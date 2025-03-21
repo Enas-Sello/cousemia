@@ -30,7 +30,7 @@ import { getLectures, deleteLecture } from '@/data/courses/getLectures'
 import StatusChange from './StatusChange'
 import AddLectureDrawer from './AddLectureDrawer'
 import ConfirmDialog from '@/components/ConfirmDialog'
-import TableRowsNumber from '@/components/TableRowsNumber'
+import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 
@@ -236,7 +236,7 @@ export default function CourseLectures({
             <CardHeader title='Course Lectures' className='pbe-4' />
 
             <CardContent>
-              <TableRowsNumber
+              <TableRowsNumberAndAddNew
                 addText='Add Lecture'
                 perPage={perPage}
                 setPerPage={setPerPage}

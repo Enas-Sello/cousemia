@@ -1,7 +1,6 @@
 'use client'
 
 // React Imports
-import type { ChangeEvent } from 'react'
 import { useMemo } from 'react'
 
 import Link from 'next/link'
@@ -10,7 +9,7 @@ import Link from 'next/link'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import IconButton from '@mui/material/IconButton'
-import { Autocomplete, CardContent, Chip, Typography } from '@mui/material'
+import { CardContent, Chip, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
 // Third-party Imports
@@ -25,9 +24,9 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 
 import type { UserType } from '@/types/usertTypes'
+import type { UserListTableProps } from '@/types/propsTypes'
 
 // Component Imports
-import CustomTextField from '@core/components/mui/TextField'
 import CustomAvatar from '@core/components/mui/Avatar'
 import { getInitials } from '@/utils/getInitials'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
@@ -35,7 +34,8 @@ import GenericTable from '@/components/GenericTable'
 
 // Styles Imports
 import StatusChange from './StatusChange'
-import TableRowsNumber from '@/components/TableRowsNumber'
+import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
+import StatusAndVerifiedFilters from '@/components/StatusAndVerifiedFilters'
 
 const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
   const { avatar, fullName } = params
@@ -45,25 +45,6 @@ const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
   } else {
     return <CustomAvatar size={24}>{getInitials(fullName as string)}</CustomAvatar>
   }
-}
-
-interface UserListTableProps {
-  tableData: UserType[]
-  total: number
-  perPage: number
-  setPerPage: React.Dispatch<React.SetStateAction<number>>
-  page: number
-  setPage: React.Dispatch<React.SetStateAction<number>>
-  setSortBy: React.Dispatch<React.SetStateAction<string>>
-  setSortDesc: React.Dispatch<React.SetStateAction<string>>
-  setStatus: React.Dispatch<React.SetStateAction<string>>
-  setVerified: React.Dispatch<React.SetStateAction<string>>
-  setSearch: React.Dispatch<React.SetStateAction<string>>
-}
-
-type FilterItemType = {
-  title: string
-  value: string
 }
 
 const UserListTable = ({
@@ -138,28 +119,6 @@ const UserListTable = ({
     }
   ]
 
-  const verfiedList: FilterItemType[] = [
-    {
-      title: 'Phone Verified',
-      value: '1'
-    },
-    {
-      title: 'Phone Not Verified',
-      value: '0'
-    }
-  ]
-
-  const statusList: FilterItemType[] = [
-    {
-      title: 'Active',
-      value: '1'
-    },
-    {
-      title: 'Inactive',
-      value: '0'
-    }
-  ]
-
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     // Rank the item
     const itemRank = rankItem(row.getValue(columnId), value)
@@ -201,40 +160,7 @@ const UserListTable = ({
         <Card>
           <CardHeader title='Filters' className='pbe-4' />
           <CardContent>
-            <Grid container spacing={6}>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <Autocomplete
-                  id='status'
-                  options={verfiedList}
-                  onChange={(event: ChangeEvent<{}>, newValue) => setVerified(newValue?.value ?? '')}
-                  renderTags={(tagValue, getTagProps) => {
-                    return tagValue.map((option: FilterItemType, index) => (
-                      <Chip {...getTagProps({ index })} key={index} label={option.title} />
-                    ))
-                  }}
-                  getOptionLabel={option => option.title || ''}
-                  renderInput={params => (
-                    <CustomTextField {...params} key={params.id} placeholder='Select' label='Verified' />
-                  )}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <Autocomplete
-                  id='status'
-                  options={statusList}
-                  onChange={(event: ChangeEvent<{}>, newValue) => setStatus(newValue?.value ?? '')}
-                  renderTags={(tagValue, getTagProps) => {
-                    return tagValue.map((option: FilterItemType, index) => (
-                      <Chip {...getTagProps({ index })} key={index} label={option.title} />
-                    ))
-                  }}
-                  getOptionLabel={option => option.title || ''}
-                  renderInput={params => (
-                    <CustomTextField {...params} key={params.id} placeholder='Select' label='Status' />
-                  )}
-                />
-              </Grid>
-            </Grid>
+            <StatusAndVerifiedFilters setVerified={setVerified} setStatus={setStatus} Verified />
           </CardContent>
         </Card>
       </Grid>
@@ -242,7 +168,7 @@ const UserListTable = ({
       <Grid size={{ xs: 12 }}>
         <Card>
           <CardContent>
-            <TableRowsNumber perPage={perPage} setPerPage={setPerPage} setGlobalFilter={setSearch} />
+            <TableRowsNumberAndAddNew perPage={perPage} setPerPage={setPerPage} setGlobalFilter={setSearch} />
           </CardContent>
 
           <GenericTable table={table} />

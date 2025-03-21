@@ -15,10 +15,9 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
-import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
 
 // Third-party Imports
-import { rankItem } from '@tanstack/match-sorter-utils'
 
 import Swal from 'sweetalert2'
 
@@ -29,17 +28,10 @@ import { deleteLecture } from '@/data/courses/getLectures'
 
 import AddLectureDrawer from './AddLectureDrawer'
 import { getCategories } from '@/data/courses/getCategories'
-import TableRowsNumber from '@/components/TableRowsNumber'
+import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
-
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), value)
-
-  addMeta({ itemRank })
-
-  return itemRank.passed
-}
+import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 
 export default function CourseCategory({
   courseId,
@@ -116,6 +108,7 @@ export default function CourseCategory({
   const columns = useMemo<ColumnDef<CourseCategoryType, any>[]>(
     () => [
       columnHelper.accessor('id', {
+        id: 'id',
         header: 'Id'
       }),
       columnHelper.accessor('course_name', {
@@ -183,8 +176,7 @@ export default function CourseCategory({
           <Card>
             <CardHeader title='Course Categories' className='pbe-4' />
             <CardContent>
-              <TableRowsNumber
-                addText='Add Category'
+              <TableRowsNumberAndAddNew
                 perPage={perPage}
                 setPerPage={setPerPage}
                 globalFilter={globalFilter}

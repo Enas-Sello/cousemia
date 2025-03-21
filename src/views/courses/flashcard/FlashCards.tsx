@@ -30,7 +30,7 @@ import { deleteLecture } from '@/data/courses/getLectures'
 import StatusChange from './StatusChange'
 import AddLectureDrawer from './AddLectureDrawer'
 import { getFlashCards } from '@/data/courses/getFlashCards'
-import TableRowsNumber from '@/components/TableRowsNumber'
+import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 
@@ -231,7 +231,7 @@ export default function FlashCards({
             <CardHeader title='Course Flashcards' className='pbe-4' />
 
             <CardContent>
-              <TableRowsNumber
+              <TableRowsNumberAndAddNew
                 addText='Add Flash Card'
                 perPage={perPage}
                 setPerPage={setPerPage}
