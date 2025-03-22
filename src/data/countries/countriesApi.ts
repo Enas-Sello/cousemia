@@ -21,10 +21,11 @@ export const getCountryByID = async (id: string): Promise<CountryResponse> => {
 }
 
 // Function to edit a country by ID
-export const editCountry = async (id: string): Promise<CountryResponse> => {
+export const updateCountry = async (data: UpdateCountryData) => {
   return genericQueryFn({
-    url: `${API_COUNTRIES}/${id}`,
-    method: 'GET'
+    url: `${API_COUNTRIES}/${data.id}`,
+    method: 'PUT',
+    body: data
   })
 }
 
@@ -33,6 +34,16 @@ export const deleteCountry = async (id: number) => {
     url: `${API_COUNTRIES}/${id}`,
     method: 'DELETE'
   })
+}
+
+type UpdateCountryData = {
+  id: number
+  title_en: string
+  title_ar: string
+  country_code: string
+  is_active: boolean
+  flag?: string // URL of the uploaded flag
+  flag_id?: string // ID of the uploaded flag (if applicable)
 }
 
 // Type for the country data

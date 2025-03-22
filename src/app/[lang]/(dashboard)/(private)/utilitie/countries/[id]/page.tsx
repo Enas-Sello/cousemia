@@ -6,7 +6,8 @@ import { useQuery } from '@tanstack/react-query'
 
 // import { toast } from 'react-toastify'
 
-import { Box, Typography, Card, CardContent } from '@mui/material'
+import { Typography, Card, CardContent, Box } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 
 import { getCountryByID } from '@/data/countries/countriesApi'
 import Loading from '@/components/loading'
@@ -37,7 +38,7 @@ export default function Page() {
   return (
     <>
       {country && (
-        <Box sx={{ p: 3 }}>
+        <Grid container spacing={6}>
           <Typography variant='h4' gutterBottom>
             Country Details
           </Typography>
@@ -61,7 +62,7 @@ export default function Page() {
               </Typography>
             </CardContent>
           </Card>
-        </Box>
+        </Grid>
       )}
     </>
   )
