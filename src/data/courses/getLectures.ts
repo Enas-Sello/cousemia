@@ -18,34 +18,38 @@ export const updateLectureStatus = async (id: number, status: boolean) => {
 }
 
 export const deleteLecture = async (id: number) => {
-  const url = API_LECTURES + `/${id}`
-  const res = await AxiosRequest.delete(url)
-
-  return res
+  return genericQueryFn({
+    url: `${API_LECTURES}/${id}`,
+    method: 'DELETE'
+  })
 }
 
 export const uploadLectureVideo = async (data: FormData) => {
-  const url = API_LECTURES + '/upload-video'
+  console.log('data', data)
 
-  const res = await AxiosRequest.post(url, data, {
+  return genericQueryFn({
+    url: `${API_LECTURES}/upload-video`,
+    method: 'POST',
+    body: data,
     headers: {
-      'Content-Type': 'multipart/form-data'
+      'Content-Type': 'multipart/form-data' // Note: FormData sets this automatically, but we include it for clarity
     }
   })
-
-  return res.data
 }
 
 export const uploadLectureImage = async (data: FormData) => {
-  const url = API_URL + '/media'
+  console.log('dataimg', data)
 
-  const res = await AxiosRequest.post(url, data, {
+  const response = await genericQueryFn({
+    url: `${API_URL}/media`,
+    method: 'POST',
+    body: data,
     headers: {
-      'Content-Type': 'image/png'
+      'Content-Type': 'multipart/form-data' // Note: FormData sets this automatically
     }
   })
 
-  return res.data.data
+  return response.data
 }
 
 export const storeLecture = async (data: {
@@ -63,9 +67,12 @@ export const storeLecture = async (data: {
   image_src: string
   video_type: string
 }) => {
-  const url = API_COURSES_LECTURES
-
-  const res = await AxiosRequest.post(url, { lectureData: data })
-
-  return res.data
+  return genericQueryFn({
+    url: `${API_COURSES_LECTURES}/store`,
+    method: 'POST',
+    body: data,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
 }

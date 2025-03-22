@@ -21,6 +21,7 @@ import CustomAvatar from '@/@core/components/mui/Avatar'
 import type { UserType } from '@/types/usertTypes'
 import { getInitials } from '@/utils/getInitials'
 import StatusChange from './StatusChange'
+import { API_USERS } from '@/configs/api'
 
 const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
   const { avatar, fullName } = params
@@ -33,7 +34,6 @@ const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
 }
 
 export default function UserOverview({ user }: { user: UserType }) {
-
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12 }}>
@@ -181,7 +181,7 @@ export default function UserOverview({ user }: { user: UserType }) {
                           </div>
                         </td>
                         <td>
-                          <StatusChange userID={user.id} isActive={user.is_active} />
+                          <StatusChange route={API_USERS} id={user.id} isActive={user.is_active} />
                         </td>
                       </tr>
                     </tbody>

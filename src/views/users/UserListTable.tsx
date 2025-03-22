@@ -36,6 +36,7 @@ import GenericTable from '@/components/GenericTable'
 import StatusChange from './StatusChange'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import StatusAndVerifiedFilters from '@/components/StatusAndVerifiedFilters'
+import { API_USERS } from '@/configs/api'
 
 const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
   const { avatar, fullName } = params
@@ -87,7 +88,7 @@ const UserListTable = ({
       header: 'Is Active',
       cell: ({ row }) => (
         <>
-          <StatusChange userID={row.original.id} isActive={row.original.is_active} />
+          <StatusChange route={API_USERS} id={row.original.id} isActive={row.original.is_active} />
         </>
       )
     },

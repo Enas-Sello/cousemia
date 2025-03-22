@@ -7,7 +7,7 @@ import type { BoxProps } from '@mui/material/Box'
 
 // Third-party Imports
 import 'react-toastify/dist/ReactToastify.css'
-import { ToastContainer } from 'react-toastify'
+import { Slide, ToastContainer } from 'react-toastify'
 import type { ToastContainerProps } from 'react-toastify'
 
 // Hook Imports
@@ -82,7 +82,7 @@ const AppReactToastify = (props: Props) => {
 
   return (
     <ToastifyWrapper {...boxProps}>
-      <ToastContainer {...rest} />
+      <ToastContainer autoClose={2000} hideProgressBar={false} transition={Slide} {...rest} />
     </ToastifyWrapper>
   )
 }

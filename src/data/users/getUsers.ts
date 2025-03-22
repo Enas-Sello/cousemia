@@ -21,8 +21,8 @@ const getUsers = async (
 
 export default getUsers
 
-export const updateUserStatus = async (userId: number, status: boolean) => {
-  const url = API_USERS + `/${userId}`
+export const updateUserStatus = async (route: string, Id: number, status: boolean) => {
+  const url = route + `/${Id}`
   const res = await AxiosRequest.put(url, { is_active: status })
 
   return res.data

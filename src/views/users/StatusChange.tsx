@@ -7,16 +7,16 @@ import { Switch } from '@mui/material'
 
 import { updateUserStatus } from '@/data/users/getUsers'
 
-export default function StatusChange({ userID, isActive }: { userID: number; isActive: boolean }) {
-  const id = useMemo(() => userID, [userID])
+export default function StatusChange({ route, id, isActive }: { route: string; id: number; isActive: boolean }) {
+  const ID = useMemo(() => id, [id])
   const [status, setStatus] = useState(isActive)
 
-  const statusChange = async (id: number) => {
+  const statusChange = async (ID: number) => {
     if (!status) {
-      updateUserStatus(id, true)
+      updateUserStatus(route, ID, true)
       setStatus(true)
     } else {
-      updateUserStatus(id, false)
+      updateUserStatus(route, ID, false)
       setStatus(false)
     }
 
@@ -25,7 +25,7 @@ export default function StatusChange({ userID, isActive }: { userID: number; isA
 
   return (
     <>
-      <Switch color='success' checked={status} onChange={() => statusChange(id)} />
+      <Switch color='success' checked={status} onChange={() => statusChange(ID)} />
     </>
   )
 }

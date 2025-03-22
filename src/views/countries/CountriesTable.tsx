@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Grid from '@mui/material/Grid2'
 import { Card, CardContent, IconButton } from '@mui/material'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
@@ -17,16 +17,20 @@ import {
 } from '@tanstack/react-table'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 
-import { getCountries } from '@/data/countries/countriesApi'
+import { toast } from 'react-toastify'
+
+import { deleteCountry, getCountries } from '@/data/countries/countriesApi'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 import { getAvatar } from '@/libs/helpers/getAvatar'
 
-// import StatusChanger from '@/components/StatusChanger'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 import StatusChange from '../users/StatusChange'
-import Loading from '@/app/[lang]/(dashboard)/(private)/users/loading'
+import Loading from '@/components/loading'
+import AddCountryDrawer from './AddCountryDrawer'
+import ConfirmDialog from '@/components/ConfirmDialog'
+import { API_COUNTRIES } from '@/configs/api'
 
 interface CountryType {
   id: number
@@ -41,6 +45,10 @@ interface CountryType {
 const columnHelper = createColumnHelper<CountryType>()
 
 const CountriesTable = ({ status }: { status: string }) => {
+  const queryClient = useQueryClient()
+  const [addNew, setAddNew] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
+  const [selectedCountryId, setSelectedCountryId] = useState<number | null>(null)
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [perPage, setPerPage] = useState<number>(10)
   const [page, setPage] = useState<number>(0)
@@ -73,6 +81,43 @@ const CountriesTable = ({ status }: { status: string }) => {
     queryKey: ['countries', filterQuery],
     queryFn: () => getCountries(filterQuery)
   })
+
+  // Mutation for deleting a country
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteCountry(id),
+    onSuccess: () => {
+      toast.success('Country deleted successfully')
+
+      // Invalidate the countries query to trigger a refetch
+      queryClient.invalidateQueries({ queryKey: ['countries'] })
+      setConfirmDialog(false)
+      setSelectedCountryId(null)
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to delete. Please try again.')
+      setConfirmDialog(false)
+      setSelectedCountryId(null)
+    }
+  })
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = (id: number) => {
+    setSelectedCountryId(id)
+    setConfirmDialog(true)
+  }
+
+  // Handle dialog action (delete)
+  const handleDialogAction = async () => {
+    if (selectedCountryId !== null) {
+      deleteMutation.mutate(selectedCountryId)
+    }
+  }
+
+  // Handle dialog close
+  const handleDialogClose = () => {
+    setConfirmDialog(false)
+    setSelectedCountryId(null)
+  }
 
   const countries = useMemo(() => countriesData?.countries || [], [countriesData])
   const total = useMemo(() => countriesData?.total || 0, [countriesData])
@@ -110,7 +155,7 @@ const CountriesTable = ({ status }: { status: string }) => {
 
       cell: ({ row }) => (
         <>
-          <StatusChange userID={row.original.id} isActive={row.original.is_active} />
+          <StatusChange route={API_COUNTRIES} id={row.original.id} isActive={row.original.is_active} />
         </>
       )
     }),
@@ -120,12 +165,12 @@ const CountriesTable = ({ status }: { status: string }) => {
       cell: ({ row }) => (
         <div key={row.id} className='flex'>
           <IconButton>
-            <Link href={`/countries/edit/${row.original.id}`} className='flex'>
+            <Link href={`/utilitie/countries/edit/${row.original.id}`} className='flex'>
               <IconEdit size={20} stroke={1.5} />
             </Link>
           </IconButton>
 
-          <IconButton>
+          <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
             <Link href='#' className='flex'>
               <IconTrash size={20} stroke={1.5} />
             </Link>
@@ -160,26 +205,36 @@ const CountriesTable = ({ status }: { status: string }) => {
   if (countriesError) return <div>Error loading countries: {countriesError.message}</div>
 
   return (
-    <Grid size={{ xs: 12 }}>
-      <Card>
-        <CardContent>
-          <TableRowsNumberAndAddNew
-            addText='Add Country'
-            addButton
-            perPage={perPage}
-            setPerPage={setPerPage}
-            setGlobalFilter={setGlobalFilter}
-          />
-        </CardContent>
-        {countriesLoading && <Loading />}
-        {!countriesLoading && !countriesError && (
-          <>
-            <GenericTable table={table} />
-            <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
-          </>
-        )}
-      </Card>
-    </Grid>
+    <>
+      <Grid size={{ xs: 12 }}>
+        <Card>
+          <CardContent>
+            <TableRowsNumberAndAddNew
+              perPage={perPage}
+              setPerPage={setPerPage}
+              setGlobalFilter={setGlobalFilter}
+              addButton
+              addText='Add Country'
+              addFunction={() => setAddNew(!addNew)}
+            />
+          </CardContent>
+          {countriesLoading && <Loading />}
+          {!countriesLoading && !countriesError && (
+            <>
+              <GenericTable table={table} />
+              <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
+            </>
+          )}
+        </Card>
+      </Grid>
+      <AddCountryDrawer open={addNew} handleClose={() => setAddNew(!addNew)} />
+      <ConfirmDialog
+        handleAction={handleDialogAction}
+        handleClose={handleDialogClose}
+        open={confirmDialog}
+        closeText={'Cancel'}
+      />
+    </>
   )
 }
 
