@@ -25,6 +25,7 @@ import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import type { HostCourseRequest, HostCourseRequestsResponse } from '@/data/hostCourse/hostCourse'
 import { getHostCourseRequests } from '@/data/hostCourse/hostCourse'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
+import ErroBox from '@/components/ErrorBox'
 
 const columnHelper = createColumnHelper<HostCourseRequest>()
 
@@ -52,7 +53,7 @@ const HostCourseTable = () => {
   )
 
   // Fetch hostCourseRequests
-  const { data, isLoading, error } = useQuery<HostCourseRequestsResponse, Error>({
+  const { data, isLoading, error, refetch } = useQuery<HostCourseRequestsResponse, Error>({
     queryKey: ['hostCourseRequests', filterQuery],
     queryFn: () => getHostCourseRequests(filterQuery)
   })
@@ -114,6 +115,8 @@ const HostCourseTable = () => {
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting
   })
+
+  if (error) return <ErroBox error={error} refetch={refetch} />
 
   return (
     <>

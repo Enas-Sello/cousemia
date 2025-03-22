@@ -84,3 +84,4 @@ export const deleteOffer = async (id: number) => {
     method: 'DELETE'
   })
 }
+

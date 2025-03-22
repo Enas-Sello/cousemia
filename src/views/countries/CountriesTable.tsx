@@ -1,4 +1,3 @@
-
 import { useMemo, useState } from 'react'
 
 import Link from 'next/link'
@@ -30,6 +29,7 @@ import Loading from '@/components/loading'
 import AddCountryDrawer from './AddCountryDrawer'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { API_COUNTRIES } from '@/configs/api'
+import ErroBox from '@/components/ErrorBox'
 
 interface CountryType {
   id: number
@@ -75,7 +75,8 @@ const CountriesTable = ({ status }: { status: string }) => {
   const {
     data: countriesData,
     isLoading: countriesLoading,
-    error: countriesError
+    error: countriesError,
+    refetch
   } = useQuery<{ countries: CountryType[]; total: number }, Error>({
     queryKey: ['countries', filterQuery],
     queryFn: () => getCountries(filterQuery)
@@ -205,7 +206,7 @@ const CountriesTable = ({ status }: { status: string }) => {
     onSortingChange: setSorting
   })
 
-  if (countriesError) return <div>Error loading countries: {countriesError.message}</div>
+  if (countriesError) return <ErroBox error={countriesError} refetch={refetch} />
 
   return (
     <>

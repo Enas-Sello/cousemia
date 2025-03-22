@@ -29,6 +29,7 @@ import Loading from '@/components/loading'
 import AddEventDrawer from './AddEventDrawer'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { API_EVENTS } from '@/configs/api'
+import ErroBox from '@/components/ErrorBox'
 
 const columnHelper = createColumnHelper<Event>()
 
@@ -64,7 +65,8 @@ const EventsTable = ({ status }: { status: string }) => {
   const {
     data: eventsData,
     isLoading: eventsLoading,
-    error: eventsError
+    error: eventsError,
+    refetch
   } = useQuery({
     queryKey: ['events', filterQuery],
     queryFn: () => fetchEvents(filterQuery)
@@ -200,7 +202,7 @@ const EventsTable = ({ status }: { status: string }) => {
     onSortingChange: setSorting
   })
 
-  if (eventsError) return <div>Error loading events: {eventsError.message}</div>
+  if (eventsError) return <ErroBox error={eventsError} refetch={refetch} />
 
   return (
     <>
