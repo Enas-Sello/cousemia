@@ -1,15 +1,16 @@
-import { getServerSession } from 'next-auth'
+import Grid from '@mui/material/Grid2'
 
-import { ApiAuthOptions } from '@/libs/auth'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
+import HostCourseTable from '@/views/hostCourse/HostCourseTable'
 
 export default async function Page() {
-  const session = await getServerSession(ApiAuthOptions)
-
   return (
     <>
-      <p>{JSON.stringify(session?.user?.fullname)}</p>
+      <AnimationContainer>
+        <Grid container spacing={6}>
+          <HostCourseTable />
+        </Grid>
+      </AnimationContainer>
     </>
   )
 }
-
-//to do delete

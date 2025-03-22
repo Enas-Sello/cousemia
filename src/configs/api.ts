@@ -20,3 +20,6 @@ export const API_USERS = API_URL + '/users'
 //utilities
 export const API_SPECIALTIES = API_URL + '/specialities'
 export const API_COUNTRIES = API_URL + '/countries'
+export const API_HOSTCOURSE = API_URL + '/host-course-requests'
+export const API_EVENTS = API_URL + '/events'
+export const API_OFFERS = API_URL + '/offers'

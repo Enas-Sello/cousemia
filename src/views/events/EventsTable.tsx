@@ -1,4 +1,4 @@
-
+'use client'
 import { useMemo, useState } from 'react'
 
 import Link from 'next/link'
@@ -15,39 +15,28 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 import { IconEdit, IconEye, IconTrash } from '@tabler/icons-react'
-
 import { toast } from 'react-toastify'
 
-import { deleteCountry, getCountries } from '@/data/countries/countriesApi'
+import type { Event } from '@/data/events/eventsApi'
+import { fetchEvents, deleteEvent } from '@/data/events/eventsApi' // Updated imports
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 import { getAvatar } from '@/libs/helpers/getAvatar'
-
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 import StatusChange from '../users/StatusChange'
 import Loading from '@/components/loading'
-import AddCountryDrawer from './AddCountryDrawer'
+import AddEventDrawer from './AddEventDrawer'
 import ConfirmDialog from '@/components/ConfirmDialog'
-import { API_COUNTRIES } from '@/configs/api'
+import { API_EVENTS } from '@/configs/api'
 
-interface CountryType {
-  id: number
-  title_en: string
-  title_ar: string
-  country_code: string
-  flag: string
-  is_active: boolean
-  status: string
-}
+const columnHelper = createColumnHelper<Event>()
 
-const columnHelper = createColumnHelper<CountryType>()
-
-const CountriesTable = ({ status }: { status: string }) => {
+const EventsTable = ({ status }: { status: string }) => {
   const queryClient = useQueryClient()
   const [addNew, setAddNew] = useState(false)
   const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
-  const [selectedCountryId, setSelectedCountryId] = useState<number | null>(null)
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null) // Renamed from selectedCountryId
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [perPage, setPerPage] = useState<number>(10)
   const [page, setPage] = useState<number>(0)
@@ -71,64 +60,64 @@ const CountriesTable = ({ status }: { status: string }) => {
     [globalFilter, perPage, page, sorting, status]
   )
 
-  // Fetch countries
+  // Fetch events
   const {
-    data: countriesData,
-    isLoading: countriesLoading,
-    error: countriesError
-  } = useQuery<{ countries: CountryType[]; total: number }, Error>({
-    queryKey: ['countries', filterQuery],
-    queryFn: () => getCountries(filterQuery)
+    data: eventsData,
+    isLoading: eventsLoading,
+    error: eventsError
+  } = useQuery({
+    queryKey: ['events', filterQuery],
+    queryFn: () => fetchEvents(filterQuery)
   })
 
-  // Mutation for deleting a country
+  // Mutation for deleting an event
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteCountry(id),
+    mutationFn: (id: number) => deleteEvent(id),
     onSuccess: () => {
-      toast.success('Country deleted successfully')
+      toast.success('Event deleted successfully')
 
-      // Invalidate the countries query to trigger a refetch
-      queryClient.invalidateQueries({ queryKey: ['countries'] })
+      // Invalidate the events query to trigger a refetch
+      queryClient.invalidateQueries({ queryKey: ['events'] })
       setConfirmDialog(false)
-      setSelectedCountryId(null)
+      setSelectedEventId(null)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to delete. Please try again.')
       setConfirmDialog(false)
-      setSelectedCountryId(null)
+      setSelectedEventId(null)
     }
   })
 
   // Handle delete confirmation
   const handleDeleteConfirm = (id: number) => {
-    setSelectedCountryId(id)
+    setSelectedEventId(id)
     setConfirmDialog(true)
   }
 
   // Handle dialog action (delete)
   const handleDialogAction = async () => {
-    if (selectedCountryId !== null) {
-      deleteMutation.mutate(selectedCountryId)
+    if (selectedEventId !== null) {
+      deleteMutation.mutate(selectedEventId)
     }
   }
 
   // Handle dialog close
   const handleDialogClose = () => {
     setConfirmDialog(false)
-    setSelectedCountryId(null)
+    setSelectedEventId(null)
   }
 
-  const countries = useMemo(() => countriesData?.countries || [], [countriesData])
-  const total = useMemo(() => countriesData?.total || 0, [countriesData])
+  const events = useMemo(() => eventsData?.events || [], [eventsData])
+  const total = useMemo(() => eventsData?.total || 0, [eventsData])
 
   // Memoize columns
-  const columns: ColumnDef<CountryType, any>[] = [
-    columnHelper.accessor('flag', {
-      id: 'flag',
-      header: 'Flag',
+  const columns: ColumnDef<Event, any>[] = [
+    columnHelper.accessor('image', {
+      id: 'image',
+      header: 'Image',
       cell: ({ row }) => (
         <div className='flex items-center gap-4' key={row.id}>
-          {getAvatar({ image: row?.original.flag })}
+          {getAvatar({ image: row?.original.image })}
         </div>
       )
     }),
@@ -140,9 +129,19 @@ const CountriesTable = ({ status }: { status: string }) => {
       id: 'title_ar',
       header: 'Title AR'
     }),
-    columnHelper.accessor('country_code', {
-      id: 'country_code',
-      header: 'Country Code'
+    columnHelper.accessor('event_url', {
+      id: 'event_url',
+      header: 'Event URL',
+      cell: ({ row }) => (
+        <a
+          href={row.original.event_url}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='text-blue-600 hover:underline'
+        >
+          Link
+        </a>
+      )
     }),
     columnHelper.accessor('status', {
       id: 'status',
@@ -151,11 +150,7 @@ const CountriesTable = ({ status }: { status: string }) => {
     columnHelper.display({
       id: 'is_active',
       header: 'Is Active',
-      cell: ({ row }) => (
-        <>
-          <StatusChange route={API_COUNTRIES} id={row.original.id} isActive={row.original.is_active} />
-        </>
-      )
+      cell: ({ row }) => <StatusChange route={API_EVENTS} id={row.original.id} isActive={row.original.is_active} />
     }),
     columnHelper.display({
       id: 'actions',
@@ -163,18 +158,18 @@ const CountriesTable = ({ status }: { status: string }) => {
       cell: ({ row }) => (
         <div key={row.id} className='flex'>
           <IconButton>
-            <Link href={`/utilitie/countries/${row.original.id}`} className='flex'>
+            <Link href={`/utilitie/events/${row.original.id}`} className='flex'>
               <IconEye size={20} stroke={1.5} />
             </Link>
           </IconButton>
+
           <IconButton>
-            <Link href={`/utilitie/countries/edit/${row.original.id}`} className='flex'>
+            <Link href={`/utilitie/events/edit/${row.original.id}`} className='flex'>
               <IconEdit size={20} stroke={1.5} />
             </Link>
           </IconButton>
-
           <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
-            <Link href='#' className='flex'>
+            <Link href='#' className='flex' onClick={e => e.preventDefault()}>
               <IconTrash size={20} stroke={1.5} />
             </Link>
           </IconButton>
@@ -185,7 +180,7 @@ const CountriesTable = ({ status }: { status: string }) => {
 
   // Initialize table
   const table = useReactTable({
-    data: countries,
+    data: events,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     getCoreRowModel: getCoreRowModel(),
@@ -205,7 +200,7 @@ const CountriesTable = ({ status }: { status: string }) => {
     onSortingChange: setSorting
   })
 
-  if (countriesError) return <div>Error loading countries: {countriesError.message}</div>
+  if (eventsError) return <div>Error loading events: {eventsError.message}</div>
 
   return (
     <>
@@ -217,12 +212,12 @@ const CountriesTable = ({ status }: { status: string }) => {
               setPerPage={setPerPage}
               setGlobalFilter={setGlobalFilter}
               addButton
-              addText='Add Country'
+              addText='Add Event' // Updated text
               addFunction={() => setAddNew(!addNew)}
             />
           </CardContent>
-          {countriesLoading && <Loading />}
-          {!countriesLoading && !countriesError && (
+          {eventsLoading && <Loading />}
+          {!eventsLoading && !eventsError && (
             <>
               <GenericTable table={table} />
               <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
@@ -230,15 +225,15 @@ const CountriesTable = ({ status }: { status: string }) => {
           )}
         </Card>
       </Grid>
-      <AddCountryDrawer open={addNew} handleClose={() => setAddNew(!addNew)} />
+      <AddEventDrawer open={addNew} handleClose={() => setAddNew(!addNew)} />
       <ConfirmDialog
         handleAction={handleDialogAction}
         handleClose={handleDialogClose}
         open={confirmDialog}
-        closeText={'Cancel'}
+        closeText='Cancel'
       />
     </>
   )
 }
 
-export default CountriesTable
+export default EventsTable
