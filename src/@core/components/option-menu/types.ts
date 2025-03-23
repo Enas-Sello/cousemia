@@ -33,6 +33,7 @@ export type OptionType = string | OptionDividerType | OptionMenuItemType
 
 export type OptionsMenuType = {
   icon?: ReactNode
+  tooltipProps?: any
   iconClassName?: string
   options: OptionType[]
   leftAlignMenu?: boolean

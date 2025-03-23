@@ -127,7 +127,6 @@ const HostCourseTable = () => {
               perPage={perPage}
               setPerPage={setPerPage}
               setGlobalFilter={setGlobalFilter}
-              addButton
             />
           </CardContent>
           {isLoading && <Loading />}

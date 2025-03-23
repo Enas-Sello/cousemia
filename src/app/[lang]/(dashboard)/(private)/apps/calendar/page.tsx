@@ -1,11 +1,12 @@
 // MUI Imports
 import Card from '@mui/material/Card'
 
+import AppFullCalendar from '@/libs/styles/AppFullCalendar'
+import CalendarWrapper from '@/views/calendar/CalendarWrapper'
+
 // Component Imports
-import CalendarWrapper from '@views/apps/calendar/CalendarWrapper'
 
 // Styled Component Imports
-import AppFullCalendar from '@/libs/styles/AppFullCalendar'
 
 const CalendarApp = () => {
   return (
