@@ -8,13 +8,6 @@ import type { CSSObject } from '@emotion/styled'
 // Type Imports
 import type { ChildrenType, RenderExpandedMenuItemIcon } from '../types'
 
-// Component Imports
-import {
-  SubMenu as HorizontalSubMenu,
-  MenuItem as HorizontalMenuItem,
-  Menu as HorizontalMenu
-} from '../horizontal-menu'
-import { SubMenu as VerticalSubMenu, MenuItem as VerticalMenuItem, Menu as VerticalMenu } from '../vertical-menu'
 
 // Util Imports
 import { menuClasses } from './menuClasses'
@@ -69,15 +62,8 @@ export const confirmUrlInChildren = (children: ChildrenType['children'], url: st
 export const mapHorizontalToVerticalMenu = (children: ChildrenType['children']) => {
   return Children.map(children, child => {
     if (isValidElement(child)) {
-      const { children, verticalMenuProps, ...rest } = child.props
 
       switch (child.type) {
-        case HorizontalMenuItem:
-          return <VerticalMenuItem {...rest}>{children}</VerticalMenuItem>
-        case HorizontalSubMenu:
-          return <VerticalSubMenu {...rest}>{mapHorizontalToVerticalMenu(children)}</VerticalSubMenu>
-        case HorizontalMenu:
-          return <VerticalMenu {...verticalMenuProps}>{mapHorizontalToVerticalMenu(child.props.children)}</VerticalMenu>
         default:
           return child
       }

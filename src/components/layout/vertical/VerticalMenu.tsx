@@ -104,6 +104,7 @@ const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
           label={dictionary['navigation'].dashboards}
           icon={<IconHome size={24} stroke={1.5} />}
           suffix={<CustomChip label='2' size='small' color='error' round='true' />}
+          defaultOpen={true}
         >
           {/* <MenuItem href={`/${locale}/dashboards`}>{dictionary['navigation'].eCommerce}</MenuItem> */}
           <MenuItem href={`/${locale}/dashboards/ecommerce`}>{dictionary['navigation'].eCommerce}</MenuItem>

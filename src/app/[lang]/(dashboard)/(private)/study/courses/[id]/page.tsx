@@ -6,11 +6,11 @@ import Grid from '@mui/material/Grid2'
 import CourseOverview from '@/views/courses/lectures/overview'
 import Lectures from '@/views/courses/lectures/lectures'
 import FlashCard from '@/views/courses/flashcard/FlashCards'
-import Notes from '@/views/courses/note/Note'
 import Question from '@/views/courses/question/Question'
 import Category from '@/views/courses/category/Category'
 import SubCategory from '@/views/courses/category/SubCategory'
 import Image from '@/views/courses/Image'
+import Notes from '@/views/courses/note/Notes'
 
 export default function ShowCourse({ params }: { params: { id: number } }) {
   return (

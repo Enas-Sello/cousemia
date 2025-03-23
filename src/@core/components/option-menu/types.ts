@@ -10,6 +10,15 @@ import type { MenuItemProps } from '@mui/material/MenuItem'
 import type { DividerProps } from '@mui/material/Divider'
 import type { BoxProps } from '@mui/material/Box'
 
+import type { DefaultSession } from 'next-auth'
+
+import type { LoggedInUser } from '@/libs/auth'
+
+declare module 'next-auth' {
+  interface Session {
+    user: LoggedInUser & DefaultSession['user']
+  }
+}
 export type OptionDividerType = {
   divider: boolean
   dividerProps?: DividerProps

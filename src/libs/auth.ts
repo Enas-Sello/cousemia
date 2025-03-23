@@ -17,7 +17,7 @@ export type LoggedInUser = {
   email?: string | null
   avatar?: string | null
   role?: string | null
-  ability?: { action: string; subject: string }[] | []
+  ability?: { action: string; subject: string }[]
   token?: string | null
 }
 
