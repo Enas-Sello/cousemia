@@ -1,4 +1,3 @@
-
 import { useMemo, useState } from 'react'
 
 import Link from 'next/link'
@@ -18,7 +17,7 @@ import { IconEdit, IconEye, IconTrash } from '@tabler/icons-react'
 
 import { toast } from 'react-toastify'
 
-import { deleteCountry, getCountries } from '@/data/countries/countriesApi'
+import { deleteCountry, getCountries } from '@/data/countries/countriesQuery'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 import { getAvatar } from '@/libs/helpers/getAvatar'

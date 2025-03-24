@@ -18,8 +18,7 @@ import { toast } from 'react-toastify'
 
 import CustomTextField from '@core/components/mui/TextField'
 import type { CourseType } from '@/types/courseType'
-import { getCourses, courseAssignToUser } from '@/data/courses/getCourses'
-
+import { getCourses, courseAssignToUser } from '@/data/courses/coursesQuery'
 
 type Props = {
   open: boolean

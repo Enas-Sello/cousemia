@@ -42,7 +42,7 @@ import UserCourseAdd from './UserCourseAdd'
 import type { CourseType } from '@/types/courseType'
 import DeleteDialog from './DeleteDialog'
 import type { UserType } from '@/types/usertTypes'
-import { deleteUserCourse } from '@/data/courses/getCourses'
+import { deleteUserCourse } from '@/data/courses/coursesQuery'
 import GenericTable from '@/components/GenericTable'
 
 declare module '@tanstack/table-core' {

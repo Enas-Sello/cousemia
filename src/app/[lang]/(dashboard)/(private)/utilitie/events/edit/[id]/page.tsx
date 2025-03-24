@@ -12,7 +12,7 @@ import { Typography, Card, CardContent, Switch, Button, CircularProgress, Box } 
 import Grid from '@mui/material/Grid2'
 
 import MediaUploader from '@/components/MediaUploader'
-import { fetchEventById, updateEvent, Event } from '@/data/events/eventsApi'
+import { fetchEventById, updateEvent, Event } from '@/data/events/eventsQuery'
 import CustomTextField from '@/@core/components/mui/TextField'
 
 // Form data type

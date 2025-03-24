@@ -8,7 +8,7 @@ import Grid from '@mui/material/Grid2'
 // api call
 import { Typography } from '@mui/material'
 
-import { getUser } from '@/data/users/getUsers'
+import { getUser } from '@/data/users/usersQuery'
 
 //types import
 import type { UserType } from '@/types/usertTypes'
@@ -34,7 +34,7 @@ export default async function page({ params }: { params: { id: number } }) {
         <Typography variant='h5' component='h5' className='self-start mb-2' color='secondary.dark'>
           Allowed Devices
         </Typography>
-      <UserDevices devices={user.devices} />
+        <UserDevices devices={user.devices} />
       </Grid>
       <Grid size={{ xs: 12 }}>
         <Typography variant='h5' component='h5' className='self-start mb-2' color='secondary.dark'>

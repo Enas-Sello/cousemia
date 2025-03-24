@@ -10,9 +10,9 @@ import { Drawer, IconButton, Typography, Divider, Button, Box } from '@mui/mater
 import CustomTextField, { CustomTextFieldRadio } from '@core/components/mui/TextField'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
 import MediaUploader from '@/components/MediaUploader' // Adjust path as needed
-import { getCourseList } from '@/data/courses/getCourses'
-import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/getCategories'
-import { uploadLectureImage, uploadLectureVideo, storeLecture } from '@/data/courses/getLectures'
+import { getCourseList } from '@/data/courses/coursesQuery'
+import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/categoriesQuerys'
+import { uploadLectureImage, uploadLectureVideo, storeLecture } from '@/data/lectures/lecturesQuery'
 
 // Props type
 type Props = {

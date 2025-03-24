@@ -3,7 +3,6 @@ import { useEffect } from 'react'
 
 import { useParams, useRouter } from 'next/navigation'
 
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm, Controller } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
@@ -13,7 +12,7 @@ import { Typography, Card, CardContent, TextField, Switch, Button, CircularProgr
 import Grid from '@mui/material/Grid2'
 
 import MediaUploader from '@/components/MediaUploader'
-import { getCountryByID, updateCountry } from '@/data/countries/countriesApi'
+import { getCountryByID, updateCountry } from '@/data/countries/countriesQuery'
 import CustomTextField from '@/@core/components/mui/TextField'
 
 // Form data type

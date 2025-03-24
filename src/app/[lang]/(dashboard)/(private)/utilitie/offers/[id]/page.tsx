@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Typography, Card, CardContent, Box } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
-import { fetchOfferById } from '@/data/offers/offersApi'
+import { fetchOfferById } from '@/data/offers/offersQuery'
 import Loading from '@/components/loading'
 import ErroBox from '@/components/ErrorBox'
 import { getAvatar } from '@/libs/helpers/getAvatar'

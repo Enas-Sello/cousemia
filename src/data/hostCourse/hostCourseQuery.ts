@@ -1,7 +1,6 @@
 import { API_HOSTCOURSE } from '@/configs/api'
 import { genericQueryFn } from '@/libs/queryFn'
 
-//dev-api.coursemia.com/api/v1/en/admin/host-course-requests?searchKey=&perPage=10&page=1&sortBy=id&sortDesc=true
 // Fetch all countries
 export const getHostCourseRequests = async (queryString: Record<string, any> = {}): Promise<HostCourseRequestsResponse> => {
   return genericQueryFn({

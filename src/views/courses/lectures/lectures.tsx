@@ -25,7 +25,7 @@ import { toast } from 'react-toastify'
 import CustomAvatar from '@/@core/components/mui/Avatar'
 
 import type { LectureType } from '@/types/lectureType'
-import { getLectures, deleteLecture } from '@/data/courses/getLectures'
+import { getLectures, deleteLecture } from '@/data/lectures/lecturesQuery'
 
 import StatusChange from './StatusChange'
 import AddLectureDrawer from './AddLectureDrawer'

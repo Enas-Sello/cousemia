@@ -8,10 +8,10 @@ import { Autocomplete, Card, CardContent, CardHeader, Chip } from '@mui/material
 import Grid from '@mui/material/Grid2'
 
 import CustomTextField from '@/@core/components/mui/TextField'
-import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/getCategories' // Adjust path
+import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/categoriesQuerys' // Adjust path
 import type { CourseType } from '@/types/courseType'
 import type { CategoryType } from '@/types/categoryType'
-import { getCourses } from '@/data/courses/getCourses'
+import { getCourses } from '@/data/courses/coursesQuery'
 
 // import Loading from '@/app/[lang]/(dashboard)/(private)/users/loading'
 

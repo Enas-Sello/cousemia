@@ -30,7 +30,7 @@ import classNames from 'classnames'
 import { toast } from 'react-toastify'
 
 import type { SpecialityType } from '@/types/specialitiesType'
-import { getSpecialties, statusUpdateSpecialties } from '@/data/getSpecialties'
+import { getSpecialties, statusUpdateSpecialties } from '@/data/specialties/specialtiesQuery'
 import tableStyles from '@core/styles/table.module.css'
 
 import CustomTextField from '@/@core/components/mui/TextField'

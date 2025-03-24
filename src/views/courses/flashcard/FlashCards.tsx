@@ -25,11 +25,11 @@ import Swal from 'sweetalert2'
 import { toast } from 'react-toastify'
 
 import type { FlashCardType } from '@/types/flashCardType'
-import { deleteLecture } from '@/data/courses/getLectures'
+import { deleteLecture } from '@/data/lectures/lecturesQuery'
 
 import StatusChange from './StatusChange'
 import AddLectureDrawer from './AddLectureDrawer'
-import { getFlashCards } from '@/data/courses/getFlashCards'
+import { getFlashCards } from '@/data/flashCards/flashCardsQuery'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'

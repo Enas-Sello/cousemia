@@ -17,8 +17,8 @@ import {
 import { IconEdit, IconEye, IconTrash } from '@tabler/icons-react'
 import { toast } from 'react-toastify'
 
-import type { Offer } from '@/data/offers/offersApi'
-import { fetchOffers, deleteOffer } from '@/data/offers/offersApi' // Updated imports
+import type { Offer } from '@/data/offers/offersQuery'
+import { fetchOffers, deleteOffer } from '@/data/offers/offersQuery' // Updated imports
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 import { getAvatar } from '@/libs/helpers/getAvatar'

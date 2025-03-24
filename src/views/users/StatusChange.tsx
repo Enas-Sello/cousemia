@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 
 import { Switch } from '@mui/material'
 
-import { updateUserStatus } from '@/data/users/getUsers'
+import { updateUserStatus } from '@/data/users/usersQuery'
 
 export default function StatusChange({ route, id, isActive }: { route: string; id: number; isActive: boolean }) {
   const ID = useMemo(() => id, [id])

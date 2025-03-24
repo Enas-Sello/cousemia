@@ -12,8 +12,8 @@ import { Typography, Card, CardContent, Switch, Button, CircularProgress, Box } 
 import Grid from '@mui/material/Grid2'
 
 import MediaUploader from '@/components/MediaUploader'
-import type { SelectedCourse } from '@/data/offers/offersApi'
-import { fetchOfferById, updateOffer } from '@/data/offers/offersApi'
+import type { SelectedCourse } from '@/data/offers/offersQuery'
+import { fetchOfferById, updateOffer } from '@/data/offers/offersQuery'
 import CustomTextField from '@/@core/components/mui/TextField'
 
 // Form data type

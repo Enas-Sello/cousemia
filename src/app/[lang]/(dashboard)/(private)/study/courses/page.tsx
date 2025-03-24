@@ -17,13 +17,13 @@ import { toast } from 'react-toastify'
 
 import { rankItem } from '@tanstack/match-sorter-utils'
 
-import { getSpecialties } from '@/data/getSpecialties'
+import { getSpecialties } from '@/data/specialties/specialtiesQuery'
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import StatusChanger from '@/components/StatusChanger'
 
 import type { CourseType, StatusType } from '@/types/courseType'
-import { updateCourse, getCourses } from '@/data/courses/getCourses'
+import { updateCourse, getCourses } from '@/data/courses/coursesQuery'
 import { strTruncate } from '@/utils/str'
 import type { AdminType } from '@/types/adminType'
 import type { SpecialityType } from '@/types/specialitiesType'

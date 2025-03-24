@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Typography, Card, CardContent, Box } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
-import { fetchEventById } from '@/data/events/eventsApi'
+import { fetchEventById } from '@/data/events/eventsQuery'
 import Loading from '@/components/loading'
 import ErroBox from '@/components/ErrorBox'
 import { getAvatar } from '@/libs/helpers/getAvatar'

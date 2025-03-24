@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { Card, CardContent, Chip, Grid, Typography } from '@mui/material'
 
 import CustomAvatar from '@/@core/components/mui/Avatar'
-import { getCourse } from '@/data/courses/getCourses'
+import { getCourse } from '@/data/courses/coursesQuery'
 import type { CourseType } from '@/types/courseType'
 
 export default function CourseOverview({ courseId }: { courseId: number }) {

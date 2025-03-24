@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Typography, Card, CardContent, Box } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
-import { getCountryByID } from '@/data/countries/countriesApi'
+import { getCountryByID } from '@/data/countries/countriesQuery'
 import Loading from '@/components/loading'
 import ErroBox from '@/components/ErrorBox'
 import { getAvatar } from '@/libs/helpers/getAvatar'

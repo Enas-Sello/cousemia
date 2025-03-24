@@ -31,11 +31,11 @@ import { toast } from 'react-toastify'
 import CustomTextField from '@/@core/components/mui/TextField'
 
 import type { CourseCategoryType } from '@/types/categoryType'
-import { deleteLecture } from '@/data/courses/getLectures'
+import { deleteLecture } from '@/data/lectures/lecturesQuery'
 import tableStyles from '@core/styles/table.module.css'
 
 import AddLectureDrawer from '@/views/courses/category/AddLectureDrawer'
-import { getSubCategories } from '@/data/courses/getSubCategories'
+import { getSubCategories } from '@/data/categories/getSubCategories'
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)

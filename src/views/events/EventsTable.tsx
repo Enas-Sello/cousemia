@@ -17,8 +17,8 @@ import {
 import { IconEdit, IconEye, IconTrash } from '@tabler/icons-react'
 import { toast } from 'react-toastify'
 
-import type { Event } from '@/data/events/eventsApi'
-import { fetchEvents, deleteEvent } from '@/data/events/eventsApi' // Updated imports
+import type { Event } from '@/data/events/eventsQuery'
+import { fetchEvents, deleteEvent } from '@/data/events/eventsQuery' // Updated imports
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 import { getAvatar } from '@/libs/helpers/getAvatar'

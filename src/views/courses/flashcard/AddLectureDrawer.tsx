@@ -16,10 +16,10 @@ import type { Input } from 'valibot'
 import { toast } from 'react-toastify'
 
 import CustomTextField, { CustomTextFieldRadio } from '@core/components/mui/TextField'
-import { getCourseList } from '@/data/courses/getCourses'
-import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/getCategories'
+import { getCourseList } from '@/data/courses/coursesQuery'
+import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/categoriesQuerys'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
-import { uploadLectureImage, uploadLectureVideo, storeLecture } from '@/data/courses/getLectures'
+import { uploadLectureImage, uploadLectureVideo, storeLecture } from '@/data/lectures/lecturesQuery'
 
 type Props = {
   open: boolean

@@ -22,8 +22,8 @@ import GenericTable from '@/components/GenericTable'
 import Loading from '@/components/loading'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
-import type { HostCourseRequest, HostCourseRequestsResponse } from '@/data/hostCourse/hostCourse'
-import { getHostCourseRequests } from '@/data/hostCourse/hostCourse'
+import type { HostCourseRequest, HostCourseRequestsResponse } from '@/data/hostCourse/hostCourseQuery'
+import { getHostCourseRequests } from '@/data/hostCourse/hostCourseQuery'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 
 const columnHelper = createColumnHelper<HostCourseRequest>()

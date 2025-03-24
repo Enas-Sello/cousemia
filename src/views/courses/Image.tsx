@@ -13,7 +13,7 @@ import {
   getCourseImages,
   uploadCourseImage,
   uploadSingleCourseImage
-} from '@/data/courses/getCourseImages'
+} from '@/data/courses/coursesQuery'
 import ConfirmDialog from '@/components/ConfirmDialog'
 
 export default function CourseImages({ id }: { id: number }) {

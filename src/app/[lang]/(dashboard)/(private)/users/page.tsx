@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 
 import UserListTable from '@/views/users/UserListTable'
-import getUsers from '@/data/users/getUsers'
+import getUsers from '@/data/users/usersQuery'
 import type { UserType } from '@/types/usertTypes'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 

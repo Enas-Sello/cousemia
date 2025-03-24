@@ -1,8 +1,10 @@
 import { API_ADMIN } from '@/configs/api'
-import AxiosRequest from '@/libs/axios.config'
+import { genericQueryFn } from '@/libs/queryFn'
 
-export const getAdmin = async () => {
-  const res = await AxiosRequest.get(`${API_ADMIN}`)
-
-  return res.data
+// Fetch admin data
+export const getAdmin = async (): Promise<any> => {
+  return genericQueryFn({
+    url: API_ADMIN,
+    method: 'GET'
+  })
 }

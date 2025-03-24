@@ -24,14 +24,14 @@ import Swal from 'sweetalert2'
 import { toast } from 'react-toastify'
 
 import type { CourseCategoryType } from '@/types/categoryType'
-import { deleteLecture } from '@/data/courses/getLectures'
+import { deleteLecture } from '@/data/lectures/lecturesQuery'
 
 import AddLectureDrawer from './AddLectureDrawer'
-import { getCategories } from '@/data/courses/getCategories'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
+import { getCategories } from '@/data/categories/categoriesQuerys'
 
 export default function CourseCategory({
   courseId,
