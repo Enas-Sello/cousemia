@@ -1,4 +1,11 @@
-import { API_CATEGORIES_BY_CourseID, API_SUB_CATEGORIES, API_CATEGORIES, API_COURSE_CATEGORIES } from '@/configs/api'
+import {
+  API_CATEGORIES_BY_CourseID,
+  API_SUB_CATEGORIES,
+  API_CATEGORIES,
+
+  // API_COURSE_CATEGORIES,
+  API_LIST_CATEGORIES
+} from '@/configs/api'
 
 // import AxiosRequest from '@/libs/axios.config'
 import { genericQueryFn } from '@/libs/queryFn'
@@ -23,25 +30,32 @@ export const getSubCategoryList = async (courseId: number, categoryId: number): 
 // Fetch categories with optional query parameters
 export const getCategories = async (queryString: Record<string, any> = {}) => {
   return genericQueryFn({
-    url: API_CATEGORIES,
+    url: API_LIST_CATEGORIES,
     method: 'GET',
     queryParams: queryString
   })
 }
 
-// Update category status (active/inactive)
-export const updateCategoryStatus = async (id: number, status: boolean) => {
+export const getCategoryById = async (id: number) => {
   return genericQueryFn({
-    url: `${API_COURSE_CATEGORIES}/${id}`,
+    url: `${API_CATEGORIES}/${id}`,
+    method: 'GET'
+  })
+}
+
+// Update category status (active/inactive)
+export const updateCategory = async (id: number, data: any) => {
+  return genericQueryFn({
+    url: `${API_CATEGORIES}/${id}`,
     method: 'PUT',
-    body: { is_active: status }
+    body: data
   })
 }
 
 // Delete a category by ID
 export const deleteCategory = async (id: number) => {
   return genericQueryFn({
-    url: `${API_COURSE_CATEGORIES}/${id}`,
+    url: `${API_CATEGORIES}/${id}`,
     method: 'DELETE'
   })
 }

@@ -1,14 +1,22 @@
 import { Box, Button, Typography } from '@mui/material'
 
 interface ErrorBoxProps {
-  refetch: () => void,
+  refetch: () => void
   error: { message: string }
 }
 
-const ErroBox: React.FC<ErrorBoxProps> = ({ error, refetch }) => {
-
+const ErrorBox: React.FC<ErrorBoxProps> = ({ error, refetch }) => {
   return (
-    <Box sx={{ p: 3, textAlign: 'center' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '20px',
+        width: '100%',
+        gap: '5px'
+      }}
+    >
       <Typography variant='h6' color='error'>
         Error: {error.message || 'Failed to load country details'}
       </Typography>
@@ -19,4 +27,4 @@ const ErroBox: React.FC<ErrorBoxProps> = ({ error, refetch }) => {
   )
 }
 
-export default ErroBox
+export default ErrorBox

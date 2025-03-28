@@ -6,7 +6,7 @@ export default function Loading() {
   // Or a custom loading skeleton component
   return (
     <AnimationContainer>
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
         <CircularProgress size={30} />
       </Box>
     </AnimationContainer>

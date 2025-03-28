@@ -29,8 +29,7 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
   setCourseId,
   categoryId,
   setCategoryId,
-  setSubCategoryId,
-  subCategory
+  setSubCategoryId
 }) => {
   // Fetch courses
   const {
@@ -119,7 +118,7 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
               )}
 
               {/* Subcategories Autocomplete (shown if courseId and categoryId exist) */}
-              {subCategory && courseId && categoryId && (
+              {subCategoryData?.data && courseId && categoryId && (
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                   <Autocomplete
                     id='sub-categories'

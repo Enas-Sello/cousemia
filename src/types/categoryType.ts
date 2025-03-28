@@ -9,5 +9,4 @@ export type CourseCategoryType = {
   title_en: string
   title_ar: string
   course_name: string
-  parent_category: string
 }

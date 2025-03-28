@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Card, CardContent, CardHeader, IconButton } from '@mui/material'
+import { Card, CardContent, CardHeader, IconButton, Tooltip } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -14,24 +13,26 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
-
-// Third-party Imports
-
-import Swal from 'sweetalert2'
-
 import { toast } from 'react-toastify'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
+import { IconPlus, IconBook, IconDeviceLaptop, IconChartBar, IconEdit, IconTrash } from '@tabler/icons-react'
 
 import type { CourseCategoryType } from '@/types/categoryType'
-import { deleteLecture } from '@/data/lectures/lecturesQuery'
+import { deleteCategory, getCategories } from '@/data/categories/categoriesQuerys'
 
 import AddLectureDrawer from './AddLectureDrawer'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
-import { getCategories } from '@/data/categories/categoriesQuerys'
+import Loading from '@/components/loading'
+import ErrorBox from '@/components/ErrorBox'
+import ConfirmDialog from '@/components/ConfirmDialog'
+
+// Table setup
+const columnHelper = createColumnHelper<CourseCategoryType>()
 
 export default function CourseCategory({
   courseId,
@@ -40,70 +41,100 @@ export default function CourseCategory({
   courseId: number | undefined
   categoryId: number | undefined
 }) {
-  const [data, setData] = useState<CourseCategoryType[]>([])
-  const [total, setTotal] = useState<number>(0)
+  // State for table controls
   const [perPage, setPerPage] = useState<number>(10)
   const [page, setPage] = useState<number>(0)
 
   const [sorting, setSorting] = useState<SortingState>([
     {
       desc: true,
-      id: ''
+      id: 'id'
     }
   ])
 
-  const [addLectureOpen, setAddLectureOpen] = useState(false)
   const [globalFilter, setGlobalFilter] = useState('')
+  const [addCategoryOpen, setAddCategoryOpen] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
 
-  const fetchData = async (course: number | undefined) => {
-    const filterQuery = {
-      q: globalFilter,
-      perPage: perPage,
-      page: page === 0 ? 1 : page + 1,
-      sortBy: sorting[0]?.id || 'id',
-      sortDesc: sorting[0]?.desc ? true : 'asc'
-    } as { [key: string]: any }
+  // React Query: Fetch categories
+  const queryClient = useQueryClient()
 
-    if (course) {
-      filterQuery.course_id = course
+  const queryKey = ['categories', courseId, categoryId, page, perPage, sorting, globalFilter]
 
-      if (categoryId) {
-        filterQuery.parent_id = categoryId
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const filterQuery: Record<string, any> = {
+        q: globalFilter,
+        perPage,
+        page: page === 0 ? 1 : page + 1,
+        sortBy: sorting[0]?.id || 'id',
+        sortDesc: sorting[0]?.desc ? 'true' : 'false'
       }
+
+      if (courseId) {
+        filterQuery.course_id = courseId
+
+        if (categoryId) {
+          filterQuery.parent_id = categoryId
+        }
+      }
+
+      const result = await getCategories(filterQuery)
+
+      return result // { categories: CourseCategoryType[], total: number }
     }
 
-    const result = await getCategories(filterQuery)
+    // keepPreviousData: true // Keep previous data while fetching new data (for smooth pagination)
+  })
 
-    const { total, categories } = result
+  // React Query: Delete category mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteCategory(id),
+    onSuccess: (_, id) => {
+      toast.success('Category deleted successfully')
 
-    setData(categories)
-    setTotal(total)
+      // Optimistically update the UI by filtering out the deleted category
+      queryClient.setQueryData(queryKey, (oldData: { categories: CourseCategoryType[]; total: number } | undefined) => {
+        if (!oldData) return { categories: [], total: 0 }
+
+        return {
+          categories: oldData.categories.filter(category => category.id !== id),
+          total: oldData.total - 1
+        }
+      })
+
+      // Invalidate the query to refetch the latest data
+      queryClient.invalidateQueries({ queryKey })
+      setConfirmDialog(false) // Close the dialog
+      setSelectedCategoryId(null) // Reset the selected category
+    },
+    onError: () => {
+      toast.error('Failed to delete. Please try again.')
+      setConfirmDialog(false) // Close the dialog on error
+      setSelectedCategoryId(null) // Reset the selected category
+    }
+  })
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = (id: number) => {
+    setSelectedCategoryId(id)
+    setConfirmDialog(true)
   }
 
-  const handleDelete = async (id: number) => {
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
-    })
-
-    if (result.isConfirmed) {
-      try {
-        await deleteLecture(id)
-        toast.success('Category deleted successfully')
-        setData(prevData => prevData.filter(lecture => lecture.id !== id))
-      } catch (e) {
-        e
-        toast.error('Failed to delete. Please try again.')
-      }
+  // Handle dialog action (delete)
+  const handleDialogAction = () => {
+    if (selectedCategoryId !== null) {
+      deleteMutation.mutate(selectedCategoryId)
     }
   }
 
-  const columnHelper = createColumnHelper<CourseCategoryType>()
+  // Handle dialog close
+  const handleDialogClose = () => {
+    setConfirmDialog(false)
+    setSelectedCategoryId(null)
+  }
 
   const columns = useMemo<ColumnDef<CourseCategoryType, any>[]>(
     () => [
@@ -124,18 +155,54 @@ export default function CourseCategory({
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => (
-          <div>
-            <IconButton>
-              <Link href='#' className='flex'>
-                <i className='tabler-edit text-[22px] text-textSecondary' />
-              </Link>
-            </IconButton>
+          <div className='flex'>
+            <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Question</span>} arrow>
+              <IconButton>
+                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                  <IconPlus size={18} className='text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
 
-            <IconButton onClick={() => handleDelete(row.original.id)}>
-              <Link href='#' className='flex'>
-                <i className='tabler-trash text-[22px] text-textSecondary' />
-              </Link>
-            </IconButton>
+            <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Note</span>} arrow>
+              <IconButton>
+                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                  <IconBook size={18} className='text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Lecture</span>} arrow>
+              <IconButton>
+                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                  <IconDeviceLaptop size={18} className='text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Flash Card</span>} arrow>
+              <IconButton>
+                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                  <IconChartBar size={18} className='text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Edit</span>} arrow>
+              <IconButton>
+                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                  <IconEdit size={18} className='text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Delete</span>} arrow>
+              <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
+                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                  <IconTrash size={18} className='text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
           </div>
         )
       })
@@ -144,7 +211,7 @@ export default function CourseCategory({
   )
 
   const table = useReactTable({
-    data,
+    data: data?.categories || [],
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     getCoreRowModel: getCoreRowModel(),
@@ -152,7 +219,7 @@ export default function CourseCategory({
     onGlobalFilterChange: setGlobalFilter,
     manualPagination: true,
     getSortedRowModel: getSortedRowModel(),
-    pageCount: Math.round(total / perPage),
+    pageCount: data ? Math.round(data.total / perPage) : 0,
     state: {
       globalFilter,
       sorting,
@@ -164,10 +231,14 @@ export default function CourseCategory({
     onSortingChange: setSorting
   })
 
-  useEffect(() => {
-    fetchData(courseId)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  }, [courseId, categoryId, page, sorting, globalFilter, addLectureOpen, perPage])
+  // Handle loading and error states
+  if (isLoading) {
+    return <Loading />
+  }
+
+  if (error) {
+    return <ErrorBox refetch={refetch} error={error} />
+  }
 
   return (
     <>
@@ -184,11 +255,17 @@ export default function CourseCategory({
               />
             </CardContent>
             <GenericTable table={table} />
-            <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
+            <TablePaginationComponent table={table} total={data?.total || 0} page={page} setPage={setPage} />
           </Card>
         </Grid>
       </Grid>
-      <AddLectureDrawer open={addLectureOpen} handleClose={() => setAddLectureOpen(!addLectureOpen)} />
+      <AddLectureDrawer open={addCategoryOpen} handleClose={() => setAddCategoryOpen(!addCategoryOpen)} />
+      <ConfirmDialog
+        handleAction={handleDialogAction}
+        handleClose={handleDialogClose}
+        open={confirmDialog}
+        closeText={'Cancel'}
+      />
     </>
   )
 }

@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { Button, Card, CardContent, Grid } from '@mui/material'
+import { Button, Card, CardContent } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 
 import { Controller, useForm } from 'react-hook-form'
 
@@ -50,7 +51,7 @@ export default function CourseUpdateForm({ id }: Props) {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={6}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 name='title_en'
                 control={control}
@@ -59,7 +60,7 @@ export default function CourseUpdateForm({ id }: Props) {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 name='title_ar'
                 control={control}
@@ -68,7 +69,7 @@ export default function CourseUpdateForm({ id }: Props) {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 name='description_en'
                 control={control}
@@ -79,7 +80,7 @@ export default function CourseUpdateForm({ id }: Props) {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 name='description_ar'
                 control={control}
@@ -90,7 +91,7 @@ export default function CourseUpdateForm({ id }: Props) {
               />
             </Grid>
 
-            <Grid item xs={12} className='flex gap-4 flex-wrap'>
+            <Grid size={{ xs: 12, sm: 6 }} className='flex gap-4 flex-wrap'>
               <Button variant='contained' type='submit'>
                 Save Changes
               </Button>
