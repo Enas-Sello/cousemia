@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
 import { Card, CardContent, CardHeader, Chip, IconButton } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -14,26 +13,24 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-
 import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
-
-// Third-party Imports
 import { rankItem } from '@tanstack/match-sorter-utils'
-
-import Swal from 'sweetalert2'
-
 import { toast } from 'react-toastify'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import type { FlashCardType } from '@/types/flashCardType'
-import { deleteLecture } from '@/data/lectures/lecturesQuery'
+import { deleteFlashCard, getFlashCards } from '@/data/flashCards/flashCardsQuery'
 
 import StatusChange from './StatusChange'
-import AddLectureDrawer from './AddLectureDrawer'
-import { getFlashCards } from '@/data/flashCards/flashCardsQuery'
+import AddFlashCardDrawer from './AddFlashCardDrawer' // Renamed for clarity
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
+import ConfirmDialog from '@/components/ConfirmDialog'
+import Loading from '@/components/loading'
+import ErrorBox from '@/components/ErrorBox'
 
+// Custom fuzzy filter for Tanstack Table
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
 
@@ -41,6 +38,9 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 
   return itemRank.passed
 }
+
+// Table setup
+const columnHelper = createColumnHelper<FlashCardType>()
 
 export default function FlashCards({
   courseId,
@@ -51,74 +51,103 @@ export default function FlashCards({
   subCategoryId: number | undefined
   categoryId: number | undefined
 }) {
-  const [data, setData] = useState<FlashCardType[]>([])
-  const [total, setTotal] = useState<number>(0)
+  // State for table controls
   const [perPage, setPerPage] = useState<number>(10)
   const [page, setPage] = useState<number>(0)
 
   const [sorting, setSorting] = useState<SortingState>([
     {
       desc: true,
-      id: ''
+      id: 'id'
     }
   ])
 
-  const [addLectureOpen, setAddLectureOpen] = useState(false)
   const [globalFilter, setGlobalFilter] = useState('')
+  const [addFlashCardOpen, setAddFlashCardOpen] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
+  const [selectedFlashCardId, setSelectedFlashCardId] = useState<number | null>(null)
 
-  const fetchData = async (course: number | undefined) => {
-    const filterQuery = {
-      q: globalFilter,
-      perPage: perPage,
-      page: page === 0 ? 1 : page + 1,
-      sortBy: sorting[0]?.id || 'id',
-      sortDesc: sorting[0]?.desc ? true : 'asc'
-    } as { [key: string]: any }
+  // React Query: Fetch flash cards
+  const queryClient = useQueryClient()
 
-    if (course) {
-      filterQuery.course = course
+  const queryKey = ['flashCards', courseId, subCategoryId, categoryId, page, perPage, sorting, globalFilter]
 
-      if (categoryId) {
-        filterQuery.category = categoryId
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const filterQuery: Record<string, any> = {
+        q: globalFilter,
+        perPage,
+        page: page === 0 ? 1 : page + 1,
+        sortBy: sorting[0]?.id || 'id',
+        sortDesc: sorting[0]?.desc ? 'true' : 'false'
+      }
 
-        if (subCategoryId) {
-          filterQuery.sub_category = subCategoryId
+      if (courseId) {
+        filterQuery.course = courseId
+
+        if (categoryId) {
+          filterQuery.category = categoryId
+
+          if (subCategoryId) {
+            filterQuery.sub_category = subCategoryId
+          }
         }
       }
+
+      const result = await getFlashCards(filterQuery)
+
+      return result // { flashCards: FlashCardType[], total: number }
+    },
+    placeholderData: keepPreviousData
+  })
+
+  // React Query: Delete flash card mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteFlashCard(id),
+    onSuccess: (_, id) => {
+      toast.success('Flash Card deleted successfully')
+
+      // Optimistically update the UI by filtering out the deleted flash card
+      queryClient.setQueryData(queryKey, (oldData: { flashCards: FlashCardType[]; total: number } | undefined) => {
+        if (!oldData) return { flashCards: [], total: 0 }
+
+        return {
+          flashCards: oldData.flashCards.filter(flashCard => flashCard.id !== id),
+          total: oldData.total - 1
+        }
+      })
+
+      // Invalidate the query to refetch the latest data
+      queryClient.invalidateQueries({ queryKey })
+      setConfirmDialog(false)
+      setSelectedFlashCardId(null)
+    },
+    onError: () => {
+      toast.error('Failed to delete. Please try again.')
+      setConfirmDialog(false)
+      setSelectedFlashCardId(null)
     }
+  })
 
-    const result = await getFlashCards(filterQuery)
-
-    const { total, flashCards } = result
-
-    setData(flashCards)
-    setTotal(total)
+  // Handle delete confirmation
+  const handleDeleteConfirm = (id: number) => {
+    setSelectedFlashCardId(id)
+    setConfirmDialog(true)
   }
 
-  const handleDelete = async (id: number) => {
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
-    })
-
-    if (result.isConfirmed) {
-      try {
-        await deleteLecture(id)
-        toast.success('Flash Card deleted successfully')
-        setData(prevData => prevData.filter(lecture => lecture.id !== id))
-      } catch (e) {
-        e
-        toast.error('Failed to delete. Please try again.')
-      }
+  // Handle dialog action (delete)
+  const handleDialogAction = () => {
+    if (selectedFlashCardId !== null) {
+      deleteMutation.mutate(selectedFlashCardId)
     }
   }
 
-  const columnHelper = createColumnHelper<FlashCardType>()
+  // Handle dialog close
+  const handleDialogClose = () => {
+    setConfirmDialog(false)
+    setSelectedFlashCardId(null)
+  }
 
   const columns = useMemo<ColumnDef<FlashCardType, any>[]>(
     () => [
@@ -158,11 +187,7 @@ export default function FlashCards({
       }),
       columnHelper.display({
         header: 'Is Active',
-        cell: ({ row }) => (
-          <>
-            <StatusChange row={row} />
-          </>
-        )
+        cell: ({ row }) => <StatusChange row={row} />
       }),
       columnHelper.accessor('is_free_content', {
         header: 'Is Free Content',
@@ -181,13 +206,12 @@ export default function FlashCards({
         cell: ({ row }) => (
           <div>
             <IconButton>
-              <Link href='#' className='flex'>
+              <Link href={`/study/flashCards/edit/${row.original.id}`} className='flex'>
                 <i className='tabler-edit text-[22px] text-textSecondary' />
               </Link>
             </IconButton>
-
-            <IconButton onClick={() => handleDelete(row.original.id)}>
-              <Link href='#' className='flex'>
+            <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
+              <Link href='#' className='flex' onClick={e => e.preventDefault()}>
                 <i className='tabler-trash text-[22px] text-textSecondary' />
               </Link>
             </IconButton>
@@ -199,7 +223,7 @@ export default function FlashCards({
   )
 
   const table = useReactTable({
-    data,
+    data: data?.flashCards || [],
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     getCoreRowModel: getCoreRowModel(),
@@ -207,7 +231,7 @@ export default function FlashCards({
     onGlobalFilterChange: setGlobalFilter,
     manualPagination: true,
     getSortedRowModel: getSortedRowModel(),
-    pageCount: Math.round(total / perPage),
+    pageCount: data ? Math.round(data.total / perPage) : 0,
     state: {
       globalFilter,
       sorting,
@@ -219,9 +243,14 @@ export default function FlashCards({
     onSortingChange: setSorting
   })
 
-  useEffect(() => {
-    fetchData(courseId)
-  }, [courseId, categoryId, subCategoryId, page, sorting, globalFilter, addLectureOpen, perPage])
+  // Handle loading and error states
+  if (isLoading) {
+    return <Loading />
+  }
+
+  if (error) {
+    return <ErrorBox refetch={refetch} error={error} />
+  }
 
   return (
     <>
@@ -229,7 +258,6 @@ export default function FlashCards({
         <Grid size={{ xs: 12 }}>
           <Card>
             <CardHeader title='Course Flashcards' className='pbe-4' />
-
             <CardContent>
               <TableRowsNumberAndAddNew
                 addText='Add Flash Card'
@@ -238,17 +266,28 @@ export default function FlashCards({
                 globalFilter={globalFilter}
                 setGlobalFilter={setGlobalFilter}
                 addButton
-                addFunction={() => setAddLectureOpen(!addLectureOpen)}
+                type='button'
+                addFunction={() => setAddFlashCardOpen(!addFlashCardOpen)}
               />
             </CardContent>
-
             <GenericTable table={table} />
-
-            <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
+            <TablePaginationComponent table={table} total={data?.total || 0} page={page} setPage={setPage} />
           </Card>
         </Grid>
       </Grid>
-      <AddLectureDrawer open={addLectureOpen} handleClose={() => setAddLectureOpen(!addLectureOpen)} />
+      <AddFlashCardDrawer
+        open={addFlashCardOpen}
+        handleClose={() => setAddFlashCardOpen(!addFlashCardOpen)}
+        courseId={courseId}
+        categoryId={categoryId}
+        subCategoryId={subCategoryId}
+      />
+      <ConfirmDialog
+        handleAction={handleDialogAction}
+        handleClose={handleDialogClose}
+        open={confirmDialog}
+        closeText='Cancel'
+      />
     </>
   )
 }

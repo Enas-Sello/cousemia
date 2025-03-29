@@ -11,6 +11,18 @@ export const getQuestions = async (queryString: Record<string, any> = {}): Promi
 }
 
 // Update question status (active/inactive)
+export const createQuestion = async (body: FormData): Promise<void> => {
+  return genericQueryFn({
+    url: `${API_QUESTIONS}`,
+    method: 'POST',
+    body: body,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+// Update question status (active/inactive)
 export const updateQuestionStatus = async (id: number, status: boolean): Promise<any> => {
   return genericQueryFn({
     url: `${API_QUESTIONS}/${id}`,
@@ -20,7 +32,7 @@ export const updateQuestionStatus = async (id: number, status: boolean): Promise
 }
 
 // Delete a question by ID
-export const deleteQuestion = async (id: number): Promise<any> => {
+export const deleteQuestion = async (id: number): Promise<void> => {
   return genericQueryFn({
     url: `${API_QUESTIONS}/${id}`,
     method: 'DELETE'

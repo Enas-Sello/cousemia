@@ -51,6 +51,15 @@ export const uploadFlashCardImage = async (data: FormData): Promise<any> => {
   })
 }
 
+// Create a new flash card
+export const createFlashCard = async (data: Record<string, any>): Promise<void> => {
+  return genericQueryFn({
+    url: API_FLASH_CARDS,
+    method: 'POST',
+    body: data
+  })
+}
+
 // Store a new flash card
 export const storeFlashCard = async (data: {
   title_en: string

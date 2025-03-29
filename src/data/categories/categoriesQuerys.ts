@@ -53,7 +53,7 @@ export const updateCategory = async (id: number, data: any) => {
 }
 
 // Delete a category by ID
-export const deleteCategory = async (id: number) => {
+export const deleteCategory = async (id: number): Promise<void> => {
   return genericQueryFn({
     url: `${API_CATEGORIES}/${id}`,
     method: 'DELETE'

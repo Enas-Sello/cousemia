@@ -15,14 +15,13 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { toast } from 'react-toastify'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { IconPlus, IconBook, IconDeviceLaptop, IconChartBar, IconEdit, IconTrash } from '@tabler/icons-react'
 
 import type { CourseCategoryType } from '@/types/categoryType'
 import { deleteCategory, getCategories } from '@/data/categories/categoriesQuerys'
 
-import AddLectureDrawer from './AddLectureDrawer'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
@@ -53,7 +52,6 @@ export default function CourseCategory({
   ])
 
   const [globalFilter, setGlobalFilter] = useState('')
-  const [addCategoryOpen, setAddCategoryOpen] = useState(false)
   const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
 
@@ -84,9 +82,8 @@ export default function CourseCategory({
       const result = await getCategories(filterQuery)
 
       return result // { categories: CourseCategoryType[], total: number }
-    }
-
-    // keepPreviousData: true // Keep previous data while fetching new data (for smooth pagination)
+    },
+    placeholderData: keepPreviousData
   })
 
   // React Query: Delete category mutation
@@ -138,10 +135,10 @@ export default function CourseCategory({
 
   const columns = useMemo<ColumnDef<CourseCategoryType, any>[]>(
     () => [
-      columnHelper.accessor('id', {
-        id: 'id',
-        header: 'Id'
-      }),
+      // columnHelper.accessor('id', {
+      //   id: 'id',
+      //   header: 'Id'
+      // }),
       columnHelper.accessor('course_name', {
         header: 'Course Name'
       }),
@@ -156,14 +153,15 @@ export default function CourseCategory({
         header: 'Actions',
         cell: ({ row }) => (
           <div className='flex'>
+            {/* add question to category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Question</span>} arrow>
               <IconButton>
-                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                <Link href={`/study/questionsAnswer/create?categoryId=${row.original.id}`} className='flex'>
                   <IconPlus size={18} className='text-textSecondary' />
                 </Link>
               </IconButton>
             </Tooltip>
-
+            {/* add note to  category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Note</span>} arrow>
               <IconButton>
                 <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
@@ -171,7 +169,7 @@ export default function CourseCategory({
                 </Link>
               </IconButton>
             </Tooltip>
-
+            {/* add lectcher to  category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Lecture</span>} arrow>
               <IconButton>
                 <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
@@ -179,7 +177,7 @@ export default function CourseCategory({
                 </Link>
               </IconButton>
             </Tooltip>
-
+            {/* add flashCard to  category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Flash Card</span>} arrow>
               <IconButton>
                 <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
@@ -187,6 +185,7 @@ export default function CourseCategory({
                 </Link>
               </IconButton>
             </Tooltip>
+            {/* edit category */}
 
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Edit</span>} arrow>
               <IconButton>
@@ -195,10 +194,10 @@ export default function CourseCategory({
                 </Link>
               </IconButton>
             </Tooltip>
-
+            {/* delet category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Delete</span>} arrow>
               <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
-                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                <Link href='#' className='flex'>
                   <IconTrash size={18} className='text-textSecondary' />
                 </Link>
               </IconButton>
@@ -259,7 +258,6 @@ export default function CourseCategory({
           </Card>
         </Grid>
       </Grid>
-      <AddLectureDrawer open={addCategoryOpen} handleClose={() => setAddCategoryOpen(!addCategoryOpen)} />
       <ConfirmDialog
         handleAction={handleDialogAction}
         handleClose={handleDialogClose}

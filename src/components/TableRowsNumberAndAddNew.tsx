@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import { Button, MenuItem } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
@@ -11,6 +13,8 @@ interface TableRowsNumberProps {
   addText?: string
   addFunction?: () => void
   addButton?: boolean
+  type?: 'link' | 'button'
+  href?: string
 }
 
 const TableRowsNumberAndAddNew: React.FC<TableRowsNumberProps> = ({
@@ -19,7 +23,9 @@ const TableRowsNumberAndAddNew: React.FC<TableRowsNumberProps> = ({
   setGlobalFilter,
   addButton,
   addText,
-  addFunction
+  addFunction,
+  type = 'button',
+  href
 }) => {
   return (
     <Grid container spacing={6}>
@@ -52,9 +58,23 @@ const TableRowsNumberAndAddNew: React.FC<TableRowsNumberProps> = ({
             onChange={e => setGlobalFilter(e.target.value)}
           />
           {addButton && (
-            <Button variant='contained' className='ml-3 text-sm text-nowrap' size='medium' onClick={addFunction}>
-              {addText}
-            </Button>
+            <>
+              {type === 'link' && href ? (
+                <Button
+                  variant='contained'
+                  className='ml-3 text-sm text-nowrap'
+                  size='medium'
+                  component={Link}
+                  href={href}
+                >
+                  {addText}
+                </Button>
+              ) : (
+                <Button variant='contained' className='ml-3 text-sm text-nowrap' size='medium' onClick={addFunction}>
+                  {addText}
+                </Button>
+              )}
+            </>
           )}
         </div>
       </Grid>

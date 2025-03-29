@@ -20,7 +20,7 @@ export default function StatusChange({ route, id, isActive }: { route: string; i
       setStatus(false)
     }
 
-    toast.success('User status has been updated')
+    toast.success('status has been updated')
   }
 
   return (
