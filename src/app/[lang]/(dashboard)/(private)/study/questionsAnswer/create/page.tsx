@@ -23,6 +23,7 @@ import {
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import { createQuestion } from '@/data/courses/questionsQuery'
+import { uploadAudio, uploadImage } from '@/data/media/mediaQuery'
 
 type Answer = {
   answer_en: string
@@ -39,8 +40,13 @@ type FormData = {
   explanation_en: string
   explanation_ar: string
   image?: File | null
+  image_id?: number // Store the uploaded image ID
+  image_url?: string // Store the uploaded image URL
   explanation_image?: File | null
+  explanation_image_id?: number // Store the uploaded explanation image ID
+  explanation_image_url?: string // Store the uploaded explanation image URL
   explanation_voice?: File | null
+  explanation_voice_path?: string // Store the uploaded audio path
   voice_type: 'upload' | 'record' | null
   answers: Answer[]
   category_id: number
@@ -64,8 +70,13 @@ export default function AddQuestion() {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
   const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null)
 
+  // State for uploaded media metadata
+  const [uploadedImage, setUploadedImage] = useState<{ id?: number; url?: string }>({})
+  const [uploadedExplanationImage, setUploadedExplanationImage] = useState<{ id?: number; url?: string }>({})
+  const [uploadedExplanationVoice, setUploadedExplanationVoice] = useState<string | null>(null)
+
   // React Hook Form setup
-  const { control, handleSubmit, setValue, watch } = useForm<FormData>({
+  const { control, handleSubmit, setValue, watch, reset } = useForm<FormData>({
     defaultValues: {
       title_en: '',
       title_ar: '',
@@ -74,8 +85,13 @@ export default function AddQuestion() {
       explanation_en: '',
       explanation_ar: '',
       image: null,
+      image_id: undefined,
+      image_url: undefined,
       explanation_image: null,
+      explanation_image_id: undefined,
+      explanation_image_url: undefined,
       explanation_voice: null,
+      explanation_voice_path: undefined,
       voice_type: null,
       answers: [{ answer_en: '', answer_ar: '', is_correct: false, showArabicAnswer: true }],
       category_id: categoryId,
@@ -104,42 +120,128 @@ export default function AddQuestion() {
     if (subCategoryId) setValue('sub_category_id', subCategoryId)
   }, [categoryId, courseId, subCategoryId, setValue])
 
+  // Upload image mutation
+  const uploadImageMutation = useMutation({
+    mutationFn: (file: File) => uploadImage(file),
+    onSuccess: (data, file) => {
+      if (file === imageFile) {
+        setUploadedImage({ id: data.id, url: data.url })
+        setValue('image_id', data.id)
+        setValue('image_url', data.url)
+      } else if (file === explanationImageFile) {
+        setUploadedExplanationImage({ id: data.id, url: data.url })
+        setValue('explanation_image_id', data.id)
+        setValue('explanation_image_url', data.url)
+      }
+    },
+    onError: () => {
+      toast.error('Failed to upload image. Please try again.')
+    }
+  })
+
+  // Upload audio mutation
+  const uploadAudioMutation = useMutation({
+    mutationFn: (file: File) => uploadAudio(file, 'notes'),
+    onSuccess: path => {
+      setUploadedExplanationVoice(path)
+      setValue('explanation_voice_path', path)
+    },
+    onError: () => {
+      toast.error('Failed to upload audio. Please try again.')
+    }
+  })
+
+  // Handle image file selection and upload
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    field: 'image' | 'explanation_image'
+  ) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setValue(field, file)
+      // Immediately upload the image
+      uploadImageMutation.mutate(file)
+    }
+  }
+
+  // Handle audio file upload
+  const handleAudioUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setValue('explanation_voice', file)
+      // Immediately upload the audio
+      uploadAudioMutation.mutate(file)
+    }
+  }
+
+  // Handle voice recording
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      const chunks: Blob[] = []
+
+      recorder.ondataavailable = e => chunks.push(e.data)
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'audio/mp3' })
+        const file = new File([blob], `recording-${new Date().toISOString()}.mp3`, { type: 'audio/mp3' })
+        setRecordedAudio(blob)
+        setValue('explanation_voice', file)
+        // Immediately upload the recorded audio
+        uploadAudioMutation.mutate(file)
+      }
+
+      recorder.start()
+      setMediaRecorder(recorder)
+      setIsRecording(true)
+    } catch (error) {
+      toast.error('Failed to access microphone. Please check permissions.')
+    }
+  }
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop()
+      setIsRecording(false)
+    }
+  }
+
   // Mutation to create a new question
   const createMutation = useMutation({
     mutationFn: (data: FormData) => {
-      const formData = new FormData()
-
-      formData.append('title_en', data.title_en)
-      formData.append('title_ar', data.title_ar)
-      formData.append('description_en', data.description_en)
-      formData.append('description_ar', data.description_ar)
-      formData.append('explanation_en', data.explanation_en)
-      formData.append('explanation_ar', data.explanation_ar)
-      if (data.image) formData.append('image', data.image)
-      if (data.explanation_image) formData.append('explanation_image', data.explanation_image)
-      if (data.explanation_voice) formData.append('explanation_voice', data.explanation_voice)
-      formData.append('voice_type', data.voice_type === 'upload' ? '1' : data.voice_type === 'record' ? '2' : '0')
-      formData.append(
-        'answers',
-        JSON.stringify(
-          data.answers.map(answer => ({
+      const payload = {
+        questionData: {
+          title_en: data.title_en,
+          title_ar: data.title_ar,
+          description_en: data.description_en,
+          description_ar: data.description_ar,
+          explanation_en: data.explanation_en,
+          explanation_ar: data.explanation_ar,
+          image_id: data.image_id || null,
+          image: data.image_url || null,
+          explanation_image_id: data.explanation_image_id || null,
+          explanation_image: data.explanation_image_url || null,
+          explanation_voice: data.explanation_voice_path || null,
+          voice_type: data.voice_type === 'upload' ? '1' : data.voice_type === 'record' ? '2' : '0',
+          answers: data.answers.map(answer => ({
             answer_en: answer.answer_en,
             answer_ar: answer.showArabicAnswer ? answer.answer_ar : '',
             is_correct: answer.is_correct ? '1' : '0'
-          }))
-        )
-      )
-      formData.append('category_id', data.category_id.toString())
-      formData.append('course_id', data.course_id.toString())
-      if (data.sub_category_id) formData.append('sub_category_id', data.sub_category_id.toString())
-      formData.append('is_free_content', data.is_free_content ? '1' : '0')
-
-      return createQuestion(formData)
+          })),
+          course_id: data.course_id,
+          category_id: data.category_id,
+          sub_category_id: data.sub_category_id || '',
+          is_free_content: data.is_free_content ? '1' : '0',
+          file: null // No PDF in this component
+        }
+      }
+      return createQuestion(payload)
     },
     onSuccess: () => {
       toast.success('Question created successfully')
       queryClient.invalidateQueries({ queryKey: ['questions'] })
       router.push('/study/questions')
+      reset()
     },
     onError: () => {
       toast.error('Failed to create question. Please try again.')
@@ -159,55 +261,6 @@ export default function AddQuestion() {
   // Handle deleting an answer
   const handleDeleteAnswer = (index: number) => {
     remove(index)
-  }
-
-  // Handle image file selection
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>, field: 'image' | 'explanation_image') => {
-    const file = event.target.files?.[0]
-
-    if (file) {
-      setValue(field, file)
-    }
-  }
-
-  // Handle audio file upload
-  const handleAudioUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-
-    if (file) {
-      setValue('explanation_voice', file)
-    }
-  }
-
-  // Handle voice recording
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream)
-      const chunks: Blob[] = []
-
-      recorder.ondataavailable = e => chunks.push(e.data)
-
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/mp3' })
-
-        setRecordedAudio(blob)
-        setValue('explanation_voice', new File([blob], 'recorded-audio.mp3', { type: 'audio/mp3' }))
-      }
-
-      recorder.start()
-      setMediaRecorder(recorder)
-      setIsRecording(true)
-    } catch (error) {
-      toast.error('Failed to access microphone. Please check permissions.')
-    }
-  }
-
-  const stopRecording = () => {
-    if (mediaRecorder) {
-      mediaRecorder.stop()
-      setIsRecording(false)
-    }
   }
 
   return (
@@ -287,12 +340,8 @@ export default function AddQuestion() {
                     backgroundColor: '#f5f5f5'
                   }}
                 >
-                  {imageFile ? (
-                    <img
-                      src={URL.createObjectURL(imageFile)}
-                      alt='Question Image'
-                      style={{ maxWidth: '100%', maxHeight: '100%' }}
-                    />
+                  {uploadedImage.url ? (
+                    <img src={uploadedImage.url} alt='Question Image' style={{ maxWidth: '100%', maxHeight: '100%' }} />
                   ) : (
                     <span>Choose Your Image</span>
                   )}
@@ -456,12 +505,7 @@ export default function AddQuestion() {
                   />
                   <Button variant='outlined' component='label' className='mb-2'>
                     Browse
-                    <input
-                      type='file'
-                      accept='audio/mp3'
-                      hidden
-                      onChange={handleAudioUpload}
-                    />
+                    <input type='file' accept='audio/mp3' hidden onChange={handleAudioUpload} />
                   </Button>
                 </Box>
               </Grid>
@@ -501,9 +545,9 @@ export default function AddQuestion() {
                     backgroundColor: '#f5f5f5'
                   }}
                 >
-                  {explanationImageFile ? (
+                  {uploadedExplanationImage.url ? (
                     <img
-                      src={URL.createObjectURL(explanationImageFile)}
+                      src={uploadedExplanationImage.url}
                       alt='Explanation Image'
                       style={{ maxWidth: '100%', maxHeight: '100%' }}
                     />

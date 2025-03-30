@@ -1,0 +1,33 @@
+{
+  "questionData": {
+    "title_en": "test",
+    "title_ar": "test",
+    "description_en": "",
+    "description_ar": "",
+    "explanation_image_id": 430,
+    "image_id": 429,
+    "explanation_image": "https://dev-api.coursemia.com/storage/garbage_media/1743341649fkmpqwyiym.png",
+    "explanation_voice": "storage/public/uploads/documents/t31wdmdllkrecording-2025-03-30-15-44-06-webm.webm",
+    "explanation_en": "test",
+    "explanation_ar": "test",
+    "course_id": 158,
+    "category_id": 179,
+    "sub_category_id": "",
+    "answers": [
+      {
+        "answer_en": "test",
+        "answer_ar": "",
+        "is_correct": "1"
+      },
+      {
+        "answer_en": "test",
+        "answer_ar": null,
+        "is_correct": "0"
+      }
+    ],
+    "is_free_content": "1",
+    "image": "https://dev-api.coursemia.com/storage/garbage_media/1743341516skphawmzba.png",
+    "file": null,
+    "voice_type": "1"
+  }
+}

@@ -51,7 +51,6 @@ export default function AddFlashCardDrawer({ open, handleClose, coursCategoryId 
     queryFn: () => getCourseByCategoriesID(coursCategoryId || 0),
     enabled: !!coursCategoryId
   })
-  console.log('🚀 ~ AddFlashCardDrawer ~ courseData:', courseData)
 
   // Handle successful data fetch
   useEffect(() => {
