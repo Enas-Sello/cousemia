@@ -8,12 +8,10 @@ import { Autocomplete, Card, CardContent, CardHeader, Chip } from '@mui/material
 import Grid from '@mui/material/Grid2'
 
 import CustomTextField from '@/@core/components/mui/TextField'
-import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/categoriesQuerys' // Adjust path
+import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/categoriesQuerys'
 import type { CourseType } from '@/types/courseType'
 import type { CategoryType } from '@/types/categoryType'
 import { getCourses } from '@/data/courses/coursesQuery'
-
-// import Loading from '@/app/[lang]/(dashboard)/(private)/users/loading'
 
 interface FiltersDataInputProps {
   courseId: number | undefined
@@ -22,6 +20,7 @@ interface FiltersDataInputProps {
   setCategoryId: (id: number | undefined) => void
   setSubCategoryId?: (id: number | undefined) => void
   setCourseId: (id: number | undefined) => void
+  drawer?: boolean | false
 }
 
 const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
@@ -29,7 +28,8 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
   setCourseId,
   categoryId,
   setCategoryId,
-  setSubCategoryId
+  setSubCategoryId,
+  drawer
 }) => {
   // Fetch courses
   const {
@@ -66,33 +66,64 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
   // Handle error states
   if (coursesError) return <div>Error loading courses: {coursesError.message}</div>
 
+  // Determine grid size based on drawer prop
+  const gridSize = drawer ? { xs: 12 } : { xs: 12, sm: 6, md: 4 }
+
   return (
-    <Grid container spacing={6} className='mb-6'>
+    <Grid container spacing={drawer ? 0 : 6} className='mb-6'>
       <Grid size={{ xs: 12 }}>
-        <Card>
-          <CardHeader title='Filters' className='pbe-4' />
-          <CardContent className='py-4'>
-            <Grid container spacing={6}>
+        <Card
+          sx={
+            drawer
+              ? {
+                  backgroundColor: 'transparent',
+                  boxShadow: 'none',
+                  '& .MuiCardContent-root': {
+                    paddingLeft: 0,
+                    paddingright: 0
+                  }
+                }
+              : undefined
+          }
+        >
+          {!drawer && <CardHeader title='Filters' className='pbe-4' />}
+          <CardContent >
+            <Grid container spacing={drawer ? 3 : 6}>
               {/* Courses Autocomplete */}
-              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <Grid size={gridSize}>
                 <Autocomplete
                   id='courses'
                   options={courseData?.courses || []}
-                  onChange={(event: ChangeEvent<{}>, newValue) => setCourseId(newValue?.id ?? 0)} // Default to 0 if null
+                  onChange={(event: ChangeEvent<{}>, newValue) => setCourseId(newValue?.id ?? 0)}
                   renderTags={(tagValue, getTagProps) =>
                     tagValue.map((option: CourseType, index) => (
                       <Chip {...getTagProps({ index })} key={index} label={option.title_en} />
                     ))
                   }
                   getOptionLabel={option => option.title_en || ''}
-                  renderInput={params => <CustomTextField {...params} placeholder='Select course' label='Course' />}
+                  renderInput={params => (
+                    <CustomTextField
+                      {...params}
+                      placeholder='Select course'
+                      label='Course'
+                      sx={
+                        drawer
+                          ? {
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: 'background.paper'
+                              }
+                            }
+                          : undefined
+                      }
+                    />
+                  )}
                   disabled={coursesLoading}
                 />
               </Grid>
 
               {/* Categories Autocomplete (shown if courseId exists) */}
               {courseId && (
-                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid size={gridSize}>
                   <Autocomplete
                     id='categories'
                     options={categoryData?.data || []}
@@ -110,6 +141,15 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
                         label='Categories'
                         error={!!categoriesError}
                         helperText={categoriesError?.message}
+                        sx={
+                          drawer
+                            ? {
+                                '& .MuiOutlinedInput-root': {
+                                  backgroundColor: 'background.paper'
+                                }
+                              }
+                            : undefined
+                        }
                       />
                     )}
                     disabled={categoriesLoading}
@@ -119,7 +159,7 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
 
               {/* Subcategories Autocomplete (shown if courseId and categoryId exist) */}
               {subCategoryData?.data && courseId && categoryId && (
-                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid size={gridSize}>
                   <Autocomplete
                     id='sub-categories'
                     options={subCategoryData?.data || []}
@@ -137,6 +177,15 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
                         label='Sub Category'
                         error={!!subCategoriesError}
                         helperText={subCategoriesError?.message}
+                        sx={
+                          drawer
+                            ? {
+                                '& .MuiOutlinedInput-root': {
+                                  backgroundColor: 'background.paper'
+                                }
+                              }
+                            : undefined
+                        }
                       />
                     )}
                     disabled={subCategoriesLoading}

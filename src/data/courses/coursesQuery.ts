@@ -1,4 +1,4 @@
-import { API_COURSES, API_ALL_COURSES, API_USERS, API_URL, API_GET_COURSE_IMAGES } from '@/configs/api'
+import { API_COURSES, API_ALL_COURSES, API_USERS, API_URL, API_GET_COURSE_IMAGES, API_CATEGORIES_COURSE_By_ID } from '@/configs/api'
 import { genericQueryFn } from '@/libs/queryFn'
 import type { CourseType } from '@/types/courseType'
 
@@ -93,6 +93,13 @@ export const uploadSingleCourseImage = async (images: ImageType[], course_id: nu
     url: `${API_URL}/single-course-images`,
     method: 'POST',
     body: { images, course_id }
+  })
+}
+// Fetch course by category ID
+export const getCourseByCategoriesID = async (categoriesID: number): Promise<{ data: any }> => {
+  return genericQueryFn({
+    url: `${API_CATEGORIES_COURSE_By_ID}/?category_id=${categoriesID}`,
+    method: 'GET'
   })
 }
 

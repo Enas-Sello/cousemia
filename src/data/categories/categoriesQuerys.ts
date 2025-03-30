@@ -2,12 +2,9 @@ import {
   API_CATEGORIES_BY_CourseID,
   API_SUB_CATEGORIES,
   API_CATEGORIES,
-
-  // API_COURSE_CATEGORIES,
   API_LIST_CATEGORIES
 } from '@/configs/api'
 
-// import AxiosRequest from '@/libs/axios.config'
 import { genericQueryFn } from '@/libs/queryFn'
 import type { CategoryType } from '@/types/categoryType'
 

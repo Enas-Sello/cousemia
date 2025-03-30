@@ -275,13 +275,7 @@ export default function FlashCards({
           </Card>
         </Grid>
       </Grid>
-      <AddFlashCardDrawer
-        open={addFlashCardOpen}
-        handleClose={() => setAddFlashCardOpen(!addFlashCardOpen)}
-        courseId={courseId}
-        categoryId={categoryId}
-        subCategoryId={subCategoryId}
-      />
+      <AddFlashCardDrawer open={addFlashCardOpen} handleClose={() => setAddFlashCardOpen(!addFlashCardOpen)} />
       <ConfirmDialog
         handleAction={handleDialogAction}
         handleClose={handleDialogClose}

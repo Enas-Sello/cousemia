@@ -29,6 +29,7 @@ import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
 import ConfirmDialog from '@/components/ConfirmDialog'
+import AddFlashCardDrawer from '../flashcard/AddFlashCardDrawer'
 
 // Table setup
 const columnHelper = createColumnHelper<CourseCategoryType>()
@@ -41,6 +42,7 @@ export default function CourseCategory({
   categoryId: number | undefined
 }) {
   // State for table controls
+  const [selectedCategoryIdForFlashCard, setSelectedCategoryIdForFlashCard] = useState<number | null>(null)
   const [perPage, setPerPage] = useState<number>(10)
   const [page, setPage] = useState<number>(0)
 
@@ -54,6 +56,7 @@ export default function CourseCategory({
   const [globalFilter, setGlobalFilter] = useState('')
   const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
+  const [addFlashCardOpen, setAddFlashCardOpen] = useState(false)
 
   // React Query: Fetch categories
   const queryClient = useQueryClient()
@@ -81,7 +84,7 @@ export default function CourseCategory({
 
       const result = await getCategories(filterQuery)
 
-      return result // { categories: CourseCategoryType[], total: number }
+      return result
     },
     placeholderData: keepPreviousData
   })
@@ -133,12 +136,14 @@ export default function CourseCategory({
     setSelectedCategoryId(null)
   }
 
+  // Handle add flash card by categoryID
+  const handleAddFlashCard = (id: number) => {
+    setSelectedCategoryIdForFlashCard(id)
+    setAddFlashCardOpen(true)
+  }
+
   const columns = useMemo<ColumnDef<CourseCategoryType, any>[]>(
     () => [
-      // columnHelper.accessor('id', {
-      //   id: 'id',
-      //   header: 'Id'
-      // }),
       columnHelper.accessor('course_name', {
         header: 'Course Name'
       }),
@@ -180,9 +185,11 @@ export default function CourseCategory({
             {/* add flashCard to  category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Flash Card</span>} arrow>
               <IconButton>
-                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
-                  <IconChartBar size={18} className='text-textSecondary' />
-                </Link>
+                <IconChartBar
+                  onClick={() => handleAddFlashCard(row.original.id)}
+                  size={18}
+                  className='text-textSecondary'
+                />
               </IconButton>
             </Tooltip>
             {/* edit category */}
@@ -258,6 +265,11 @@ export default function CourseCategory({
           </Card>
         </Grid>
       </Grid>
+      <AddFlashCardDrawer
+        open={addFlashCardOpen}
+        handleClose={() => setAddFlashCardOpen(!addFlashCardOpen)}
+        coursCategoryId={selectedCategoryIdForFlashCard}
+      />
       <ConfirmDialog
         handleAction={handleDialogAction}
         handleClose={handleDialogClose}
