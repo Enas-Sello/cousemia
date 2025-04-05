@@ -1,4 +1,7 @@
+import type { AdminType } from './adminType'
+import type { StatusType } from './courseType'
 import type { NoteType } from './noteType'
+import type { SpecialityType } from './specialitiesType'
 import type { UserType } from './usertTypes'
 
 // Define TypeScript type for a device
@@ -77,4 +80,17 @@ export interface UserListTableProps {
   setStatus: React.Dispatch<React.SetStateAction<string>>
   setVerified: React.Dispatch<React.SetStateAction<string>>
   setSearch: React.Dispatch<React.SetStateAction<string>>
+}
+
+export interface CourseFiltersProps {
+  admins: AdminType[]
+  specialities: SpecialityType[]
+  statusList: StatusType[]
+  setAdminId: (value: number | undefined) => void
+  setSpeciality: (value: number | undefined) => void
+  setStatus: (value: number | undefined) => void
+  isLoading: boolean
+  isError: boolean
+  errorMessage: string
+  refetch: () => void
 }

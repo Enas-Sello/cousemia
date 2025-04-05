@@ -1,4 +1,5 @@
 export type CourseType = {
+  data: any
   id: number
   title_en: string
   title_ar: string

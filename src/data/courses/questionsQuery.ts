@@ -16,9 +16,7 @@ export const createQuestion = async (body: any): Promise<void> => {
     url: `${API_QUESTIONS}`,
     method: 'POST',
     body: body,
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+   
   })
 }
 

@@ -62,6 +62,8 @@ export default function AddQuestion() {
 
   // Get categoryId from query parameters
   const categoryId = parseInt(searchParams.get('categoryId') || '0', 10)
+
+  console.log('🚀 ~ AddQuestion ~ categoryId:', categoryId)
   const courseId = parseInt(searchParams.get('courseId') || '158', 10) // Assuming courseId is passed or hardcoded for now
   const subCategoryId = parseInt(searchParams.get('subCategoryId') || '0', 10) || undefined
 
@@ -73,6 +75,7 @@ export default function AddQuestion() {
   // State for uploaded media metadata
   const [uploadedImage, setUploadedImage] = useState<{ id?: number; url?: string }>({})
   const [uploadedExplanationImage, setUploadedExplanationImage] = useState<{ id?: number; url?: string }>({})
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [uploadedExplanationVoice, setUploadedExplanationVoice] = useState<string | null>(null)
 
   // React Hook Form setup
@@ -157,8 +160,10 @@ export default function AddQuestion() {
     field: 'image' | 'explanation_image'
   ) => {
     const file = event.target.files?.[0]
+
     if (file) {
       setValue(field, file)
+
       // Immediately upload the image
       uploadImageMutation.mutate(file)
     }
@@ -167,8 +172,10 @@ export default function AddQuestion() {
   // Handle audio file upload
   const handleAudioUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+
     if (file) {
       setValue('explanation_voice', file)
+
       // Immediately upload the audio
       uploadAudioMutation.mutate(file)
     }
@@ -182,11 +189,14 @@ export default function AddQuestion() {
       const chunks: Blob[] = []
 
       recorder.ondataavailable = e => chunks.push(e.data)
+
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'audio/mp3' })
         const file = new File([blob], `recording-${new Date().toISOString()}.mp3`, { type: 'audio/mp3' })
+
         setRecordedAudio(blob)
         setValue('explanation_voice', file)
+
         // Immediately upload the recorded audio
         uploadAudioMutation.mutate(file)
       }
@@ -229,12 +239,13 @@ export default function AddQuestion() {
             is_correct: answer.is_correct ? '1' : '0'
           })),
           course_id: data.course_id,
-          category_id: data.category_id,
+          category_id: data.category_id || 179,
           sub_category_id: data.sub_category_id || '',
           is_free_content: data.is_free_content ? '1' : '0',
           file: null // No PDF in this component
         }
       }
+
       return createQuestion(payload)
     },
     onSuccess: () => {
