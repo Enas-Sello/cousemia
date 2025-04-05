@@ -46,8 +46,7 @@ const menuSectionWrapperStyles: CSSProperties = {
   inlineSize: '100%',
   position: 'relative',
   listStyle: 'none',
-  padding: 0,
-  overflow: 'hidden'
+  padding: 0
 }
 
 const menuSectionContentStyles: CSSProperties = {

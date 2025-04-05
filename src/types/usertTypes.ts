@@ -1,4 +1,4 @@
-import { CourseType } from './courseType'
+import type { CourseType } from './courseType'
 
 export type UserType = {
   id: number
@@ -20,3 +20,4 @@ export type Ability = {
   action: string
   subject: string
 }
+

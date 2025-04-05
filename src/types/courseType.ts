@@ -1,4 +1,5 @@
 export type CourseType = {
+  data: any
   id: number
   title_en: string
   title_ar: string
@@ -28,4 +29,11 @@ export type CourseFormType = {
   title_ar: string
   description_en: string
   description_ar: string
+}
+
+
+
+export type StatusType = {
+  label: string
+  value: number
 }

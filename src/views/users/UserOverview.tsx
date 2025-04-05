@@ -1,99 +1,194 @@
 'use client'
-import CustomAvatar from '@/@core/components/mui/Avatar'
-import { UserType } from '@/types/usertTypes'
-import { getInitials } from '@/utils/getInitials'
-import { Card, CardContent, Chip, Divider, Grid, Typography } from '@mui/material'
 import React from 'react'
+
+// MUI Imports
+import { Card, CardContent, Chip, Typography } from '@mui/material'
+import Grid from '@mui/material/Grid2'
+
+// Tabler Icons Imports
+import {
+  IconUser,
+  IconCheck,
+  IconPhoneOff,
+  IconStar,
+  IconFlag,
+  IconPhone,
+  IconCurrencyDollar
+} from '@tabler/icons-react'
+
+// Component Imports
+import CustomAvatar from '@/@core/components/mui/Avatar'
+import type { UserType } from '@/types/usertTypes'
+import { getInitials } from '@/utils/getInitials'
+import StatusChange from './StatusChange'
+import { API_USERS } from '@/configs/api'
 
 const getAvatar = (params: Pick<UserType, 'avatar' | 'fullName'>) => {
   const { avatar, fullName } = params
 
   if (avatar) {
-    return <CustomAvatar src={avatar} size={150} />
+    return <CustomAvatar src={avatar} size={104} />
   } else {
-    return <CustomAvatar size={150}>{getInitials(fullName as string)}</CustomAvatar>
+    return <CustomAvatar size={104}>{getInitials(fullName as string)}</CustomAvatar>
   }
 }
 
 export default function UserOverview({ user }: { user: UserType }) {
   return (
     <Grid container spacing={6}>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Card>
-          <CardContent className='flex flex-col pbs-12 gap-6'>
-            <div className='flex flex-col gap-6'>
-              <div className='flex items-center justify-center flex-col gap-4'>
-                <div className='flex flex-col items-center gap-4'>
-                  {getAvatar({ avatar: user.avatar, fullName: user.fullName })}
-                  <Typography variant='h5'>{user.fullName}</Typography>
-                </div>
-                <Chip label='Author' color='secondary' size='small' variant='tonal' />
-              </div>
-              {/* <div className='flex items-center justify-around flex-wrap gap-4'>
-                <div className='flex items-center gap-4'>
-                  <CustomAvatar variant='rounded' color='primary' skin='light'>
-                    <i className='tabler-checkbox' />
-                  </CustomAvatar>
-                  <div>
-                    <Typography variant='h5'>1.23k</Typography>
-                    <Typography>Task Done</Typography>
+          <CardContent>
+            <Grid container spacing={6}>
+              <Grid size={{ xs: 12, xl: 6 }}>
+                <div className='flex justify-center flex-col gap-10'>
+                  <div className='flex gap-4'>
+                    {getAvatar({ avatar: user.avatar, fullName: user.fullName })}
+                    <div className='flex flex-col'>
+                      <Typography color='text.secondary' variant='h5'>
+                        {user.fullName}
+                      </Typography>
+                      <Typography component='span' color='text.secondary'>
+                        {user.email}
+                      </Typography>
+                    </div>
+                  </div>
+                  <div className='flex items-center gap-4'>
+                    <CustomAvatar variant='rounded' color='primary' skin='light'>
+                      <IconCurrencyDollar size={24} className='text-primary ' />
+                    </CustomAvatar>
+                    <div>
+                      <Typography variant='h5'>{user.courses_bought.length || 0}</Typography>
+                      <Typography>Courses Bought</Typography>
+                    </div>
                   </div>
                 </div>
-                <div className='flex items-center gap-4'>
-                  <CustomAvatar variant='rounded' color='primary' skin='light'>
-                    <i className='tabler-briefcase' />
-                  </CustomAvatar>
-                  <div>
-                    <Typography variant='h5'>568</Typography>
-                    <Typography>Project Done</Typography>
-                  </div>
-                </div>
-              </div> */}
-            </div>
-            <div>
-              <Typography variant='h5'>Details</Typography>
-              <Divider className='mlb-4' />
-              <div className='flex flex-col gap-2'>
-                <div className='flex items-center flex-wrap gap-x-1.5'>
-                  <Typography className='font-medium' color='text.primary'>
-                    Username:
-                  </Typography>
-                  <Typography>{user.username}</Typography>
-                </div>
-                <div className='flex items-center flex-wrap gap-x-1.5'>
-                  <Typography className='font-medium' color='text.primary'>
-                    Billing Email:
-                  </Typography>
-                  <Typography>{user.email}</Typography>
-                </div>
-                <div className='flex items-center flex-wrap gap-x-1.5'>
-                  <Typography className='font-medium' color='text.primary'>
-                    Status
-                  </Typography>
-                  <Typography color='text.primary'>{user.is_active}</Typography>
-                </div>
-                <div className='flex items-center flex-wrap gap-x-1.5'>
-                  <Typography className='font-medium' color='text.primary'>
-                    Role:
-                  </Typography>
-                  <Typography color='text.primary'>{user.role}</Typography>
-                </div>
+              </Grid>
+              <Grid size={{ xs: 12, xl: 6 }}>
+                <div className='overflow-x-auto'>
+                  <table className='w-full border-separate border-spacing-y-2'>
+                    <tbody>
+                      {/* Username Row */}
+                      <tr>
+                        <td>
+                          <div className='flex items-center gap-2'>
+                            <CustomAvatar size={18} skin='filled'>
+                              <IconUser size={18} className='text-secondary' />
+                            </CustomAvatar>
+                            <Typography className='font-medium'>Username</Typography>
+                          </div>
+                        </td>
+                        <td>
+                          <Typography className='font-medium'>{user.username}</Typography>
+                        </td>
+                      </tr>
 
-                <div className='flex items-center flex-wrap gap-x-1.5'>
-                  <Typography className='font-medium' color='text.primary'>
-                    Contact:
-                  </Typography>
-                  <Typography color='text.primary'>{user.phone}</Typography>
-                </div>
+                      {/* Status Row */}
+                      <tr>
+                        <td>
+                          <div className='flex items-center gap-2'>
+                            <CustomAvatar size={18} skin='filled'>
+                              <IconCheck size={18} className='text-secondary' />
+                            </CustomAvatar>
+                            <Typography className='font-medium'>Status</Typography>
+                          </div>
+                        </td>
+                        <td>
+                          <Chip
+                            variant='tonal'
+                            className='capitalize'
+                            label={user.is_active ? 'Active' : 'Not Active'}
+                            color={user.is_active ? 'success' : 'error'}
+                            size='small'
+                          />
+                        </td>
+                      </tr>
 
-                <div className='flex items-center flex-wrap gap-x-1.5'>
-                  <Typography className='font-medium' color='text.primary'>
-                    Country:
-                  </Typography>
-                  <Typography color='text.primary'>{user.country}</Typography>
+                      {/* Phone Verified Row */}
+                      <tr>
+                        <td>
+                          <div className='flex items-center gap-2'>
+                            <CustomAvatar size={18} skin='filled'>
+                              <IconPhoneOff size={18} className='text-secondary' />
+                            </CustomAvatar>
+                            <Typography className='font-medium'>Phone Verified</Typography>
+                          </div>
+                        </td>
+                        <td>
+                          <Chip
+                            variant='tonal'
+                            className='capitalize'
+                            label={user.verified === 'verified' ? 'Verified' : 'Not Verified'}
+                            color={user.verified === 'verified' ? 'success' : 'error'}
+                            size='small'
+                          />
+                        </td>
+                      </tr>
+
+                      {/* Referral Code Row */}
+                      <tr>
+                        <td>
+                          <div className='flex items-center gap-2'>
+                            <CustomAvatar size={18} skin='filled'>
+                              <IconStar size={18} className='text-secondary' />
+                            </CustomAvatar>
+                            <Typography className='font-medium'>Referral Code</Typography>
+                          </div>
+                        </td>
+                        <td>
+                          <Typography>{user.referral_code}</Typography>
+                        </td>
+                      </tr>
+
+                      {/* Country Row */}
+                      <tr>
+                        <td>
+                          <div className='flex items-center gap-2'>
+                            <CustomAvatar size={18} skin='filled'>
+                              <IconFlag size={18} className='text-secondary' />
+                            </CustomAvatar>
+                            <Typography className='font-medium'>Country</Typography>
+                          </div>
+                        </td>
+                        <td>
+                          <Typography>{user.country}</Typography>
+                        </td>
+                      </tr>
+
+                      {/* Contact Row */}
+                      <tr>
+                        <td>
+                          <div className='flex items-center gap-2'>
+                            <CustomAvatar size={18} skin='filled'>
+                              <IconPhone size={18} className='text-secondary' />
+                            </CustomAvatar>
+                            <Typography className='font-medium'>Contact</Typography>
+                          </div>
+                        </td>
+                        <td>
+                          <Typography>{user.phone}</Typography>
+                        </td>
+                      </tr>
+
+                      {/* Suspend/Activate Row */}
+                      <tr>
+                        <td>
+                          <div className='flex items-center gap-2'>
+                            <CustomAvatar size={18} skin='filled'>
+                              <IconCheck size={18} className='text-secondary' />
+                            </CustomAvatar>
+                            <Typography className='font-medium'>Suspend/Activate</Typography>
+                          </div>
+                        </td>
+                        <td>
+                          <StatusChange route={API_USERS} id={user.id} isActive={user.is_active} />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-              </div>
-            </div>
+              </Grid>
+            </Grid>
           </CardContent>
         </Card>
       </Grid>

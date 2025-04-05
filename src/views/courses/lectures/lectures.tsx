@@ -4,13 +4,11 @@ import React, { useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Button, Card, CardContent, CardHeader, Chip, Grid, IconButton, MenuItem, Pagination } from '@mui/material'
-
-import type { TextFieldProps } from '@mui/material/TextField'
+import { Card, CardContent, CardHeader, Chip, IconButton } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 
 import {
   createColumnHelper,
-  flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
@@ -19,23 +17,22 @@ import {
 
 import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
 
-import classNames from 'classnames'
-
 // Third-party Imports
 import { rankItem } from '@tanstack/match-sorter-utils'
 
 import { toast } from 'react-toastify'
 
 import CustomAvatar from '@/@core/components/mui/Avatar'
-import CustomTextField from '@/@core/components/mui/TextField'
 
 import type { LectureType } from '@/types/lectureType'
-import { getLectures, deleteLecture } from '@/data/courses/getLectures'
-import tableStyles from '@core/styles/table.module.css'
+import { getLectures, deleteLecture } from '@/data/lectures/lecturesQuery'
 
 import StatusChange from './StatusChange'
 import AddLectureDrawer from './AddLectureDrawer'
 import ConfirmDialog from '@/components/ConfirmDialog'
+import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
+import GenericTable from '@/components/GenericTable'
+import TablePaginationComponent from '@/components/TablePaginationComponent'
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
@@ -45,34 +42,15 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed
 }
 
-const DebouncedInput = ({
-  value: initialValue,
-  onChange,
-  debounce = 500,
-  ...props
+export default function CourseLectures({
+  courseId,
+  subCategoryId,
+  categoryId
 }: {
-  value: string | number
-  onChange: (value: string | number) => void
-  debounce?: number
-} & Omit<TextFieldProps, 'onChange'>) => {
-  const [value, setValue] = useState(initialValue)
-
-  useEffect(() => {
-    setValue(initialValue)
-  }, [initialValue])
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      onChange(value)
-    }, debounce)
-
-    return () => clearTimeout(timeout)
-  }, [value])
-
-  return <CustomTextField {...props} value={value} onChange={e => setValue(e.target.value)} />
-}
-
-export default function CourseLectures({ id }: { id: number | undefined }) {
+  courseId: number | undefined
+  subCategoryId: number | undefined
+  categoryId: number | undefined
+}) {
   const [data, setData] = useState<LectureType[]>([])
   const [total, setTotal] = useState<number>(0)
   const [perPage, setPerPage] = useState<number>(10)
@@ -94,7 +72,7 @@ export default function CourseLectures({ id }: { id: number | undefined }) {
     return image ? <CustomAvatar src={image} size={40} /> : null
   }
 
-  const fetchData = async (course: number) => {
+  const fetchData = async (course: number | undefined) => {
     const filterQuery = {
       q: globalFilter,
       perPage: perPage,
@@ -105,6 +83,14 @@ export default function CourseLectures({ id }: { id: number | undefined }) {
 
     if (course) {
       filterQuery.course = course
+
+      if (categoryId) {
+        filterQuery.category = categoryId
+
+        if (subCategoryId) {
+          filterQuery.sub_category = subCategoryId
+        }
+      }
     }
 
     const result = await getLectures(filterQuery)
@@ -126,7 +112,7 @@ export default function CourseLectures({ id }: { id: number | undefined }) {
         setConfirmDialog(false)
       }
     } catch (e) {
-      console.log(e)
+      e
       toast.error('Failed to delete. Please try again.')
     }
   }
@@ -237,109 +223,33 @@ export default function CourseLectures({ id }: { id: number | undefined }) {
     onSortingChange: setSorting
   })
 
-  const pageSize = table.getState().pagination.pageSize
-  const currentPage = page + 1
-  const totalPages = Math.ceil(total / pageSize)
-
   useEffect(() => {
-    fetchData(id)
-  }, [id, page, sorting, globalFilter, addLectureOpen])
+    fetchData(courseId)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  }, [courseId, categoryId, subCategoryId, page, sorting, globalFilter, addLectureOpen, perPage])
 
   return (
     <>
       <Grid container spacing={6}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Card>
             <CardHeader title='Course Lectures' className='pbe-4' />
+
             <CardContent>
-              <div>
-                <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
-                  <CustomTextField
-                    select
-                    value={perPage}
-                    onChange={e => setPerPage(Number(e.target.value))}
-                    className='is-[80px]'
-                  >
-                    {[10, 20, 25, 50].map(pageSize => (
-                      <MenuItem value={pageSize} key={pageSize}>
-                        {pageSize}
-                      </MenuItem>
-                    ))}
-                  </CustomTextField>
-                  <div>
-                    <DebouncedInput
-                      value={globalFilter ?? ''}
-                      onChange={value => setGlobalFilter(String(value))}
-                      placeholder='Search...'
-                      className='is-[300px]'
-                    />
-                    <Button variant='contained' className='ml-3' onClick={() => setAddLectureOpen(!addLectureOpen)}>
-                      Add Lecture
-                    </Button>
-                  </div>
-                </div>
-
-                <div className='overflow-x-auto'>
-                  <table className={tableStyles.table}>
-                    <thead>
-                      {table.getHeaderGroups().map(headerGroup => (
-                        <tr key={headerGroup.id}>
-                          {headerGroup.headers.map(header => (
-                            <th key={header.id}>
-                              {header.isPlaceholder ? null : (
-                                <div
-                                  className={classNames({
-                                    'flex items-center': header.column.getIsSorted(),
-                                    'cursor-pointer select-none': header.column.getCanSort()
-                                  })}
-                                  onClick={header.column.getToggleSortingHandler()}
-                                >
-                                  {flexRender(header.column.columnDef.header, header.getContext())}
-                                  {{
-                                    asc: <i className='tabler-chevron-up text-xl' />,
-                                    desc: <i className='tabler-chevron-down text-xl' />
-                                  }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                                </div>
-                              )}
-                            </th>
-                          ))}
-                        </tr>
-                      ))}
-                    </thead>
-
-                    {table.getRowModel().rows.length === 0 ? (
-                      <tbody>
-                        <tr>
-                          <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                            <strong>No data available</strong>
-                          </td>
-                        </tr>
-                      </tbody>
-                    ) : (
-                      <tbody>
-                        {table.getRowModel().rows.map(row => (
-                          <tr key={row.id}>
-                            {row.getVisibleCells().map(cell => (
-                              <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    )}
-                  </table>
-                </div>
-
-                <div className='flex justify-end items-center mt-4'>
-                  <Pagination
-                    shape='rounded'
-                    color='primary'
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={(_, newPage) => setPage(newPage - 1)}
-                  />
-                </div>
-              </div>
+              <TableRowsNumberAndAddNew
+                addText='Add Lecture'
+                perPage={perPage}
+                setPerPage={setPerPage}
+                globalFilter={globalFilter}
+                setGlobalFilter={setGlobalFilter}
+                addButton
+                addFunction={() => setAddLectureOpen(!addLectureOpen)}
+              />
             </CardContent>
+
+            <GenericTable table={table} />
+
+            <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
           </Card>
         </Grid>
       </Grid>

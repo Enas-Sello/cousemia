@@ -31,11 +31,11 @@ import { toast } from 'react-toastify'
 import CustomTextField from '@/@core/components/mui/TextField'
 
 import type { CourseCategoryType } from '@/types/categoryType'
-import { deleteLecture } from '@/data/courses/getLectures'
+import { deleteLecture } from '@/data/lectures/lecturesQuery'
 import tableStyles from '@core/styles/table.module.css'
 
 import AddLectureDrawer from '@/views/courses/category/AddLectureDrawer'
-import { getSubCategories } from '@/data/courses/getSubCategories'
+import { getSubCategories } from '@/data/categories/getSubCategories'
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
@@ -94,9 +94,7 @@ export default function CourseSubCategory({ id }: { id: number }) {
 
     const result = await getSubCategories(course, filterQuery)
 
-    const { total, categories } = result
-
-    console.log('Categories: ', result)
+    const { total, categories } = result('Categories: ', result)
 
     setData(categories)
     setTotal(total)
@@ -119,7 +117,7 @@ export default function CourseSubCategory({ id }: { id: number }) {
         toast.success('Category deleted successfully')
         setData(prevData => prevData.filter(lecture => lecture.id !== id))
       } catch (e) {
-        console.log(e)
+        e
         toast.error('Failed to delete. Please try again.')
       }
     }

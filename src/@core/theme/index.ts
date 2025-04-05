@@ -1,6 +1,8 @@
 // Next Imports
 import { Montserrat } from 'next/font/google'
 
+// import { Public_Sans } from 'next/font/google'
+
 // MUI Imports
 import type { Theme } from '@mui/material/styles'
 

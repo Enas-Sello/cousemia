@@ -5,27 +5,27 @@ import { toast } from 'react-toastify'
 
 import { Switch } from '@mui/material'
 
-import { updateUserStatus } from '@/data/users/getUsers'
+import { updateUserStatus } from '@/data/users/usersQuery'
 
-export default function StatusChange({ row }: { row: any }) {
-  const id: number = useMemo(() => row.original.id, [row])
-  const [status, setStatus] = useState(row.original.is_active)
+export default function StatusChange({ route, id, isActive }: { route: string; id: number; isActive: boolean }) {
+  const ID = useMemo(() => id, [id])
+  const [status, setStatus] = useState(isActive)
 
-  const statusChange = async (id: number) => {
+  const statusChange = async (ID: number) => {
     if (!status) {
-      updateUserStatus(id, true)
+      updateUserStatus(route, ID, true)
       setStatus(true)
     } else {
-      updateUserStatus(id, false)
+      updateUserStatus(route, ID, false)
       setStatus(false)
     }
 
-    toast.success('User status has been updated')
+    toast.success('status has been updated')
   }
 
   return (
     <>
-      <Switch color='primary' checked={status} onChange={() => statusChange(id)} />
+      <Switch color='success' checked={status} onChange={() => statusChange(ID)} />
     </>
   )
 }

@@ -16,11 +16,18 @@ type RouterLinkProps = LinkProps &
   }
 
 export const RouterLink = forwardRef((props: RouterLinkProps, ref: any) => {
-  // Props
   const { href, className, ...other } = props
+  const basePath = process.env.BASEPATH || '' // Use BASEPATH from env
+  const adjustedHref = `${basePath}${href}` // Prepend basePath to href
 
   return (
-    <Link ref={ref} href={href} className={className} {...other}>
+    <Link
+      ref={ref}
+      href={adjustedHref}
+      className={className}
+      prefetch={true} // Force prefetching even in development
+      {...other}
+    >
       {props.children}
     </Link>
   )

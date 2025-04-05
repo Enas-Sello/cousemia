@@ -1,10 +1,9 @@
 import type { ISODateString, NextAuthOptions } from 'next-auth'
 import CredentialProvider from 'next-auth/providers/credentials'
-
 import type { JWT } from 'next-auth/jwt'
 
-import AxiosRequest from './axios.config'
 import { API_LOGIN } from '@/configs/api'
+import { genericQueryFn } from '@/libs/queryFn'
 
 export interface LoginSession {
   user?: LoggedInUser
@@ -18,7 +17,7 @@ export type LoggedInUser = {
   email?: string | null
   avatar?: string | null
   role?: string | null
-  ability?: [string] | []
+  ability?: { action: string; subject: string }[]
   token?: string | null
 }
 
@@ -26,12 +25,12 @@ export const ApiAuthOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.user = user
+        token.user = user // Include the full user object with role
       }
 
       return token
     },
-    async session({ session, token, user }: { session: LoginSession; token: JWT; user: LoggedInUser }) {
+    async session({ session, token }: { session: LoginSession; token: JWT; user: LoggedInUser }) {
       session.user = token.user as LoggedInUser
 
       return session
@@ -46,24 +45,24 @@ export const ApiAuthOptions: NextAuthOptions = {
         const { email, password } = credentials as { email: string; password: string }
 
         try {
-          const res = await fetch(API_LOGIN, {
+          const res = await genericQueryFn({
+            url: API_LOGIN,
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-          }).then(response => response.json())
+            body: { email, password }
+          })
 
           const data = res.data
           const user = data.user
 
-          user['token'] = data.token
-
           if (user) {
+            user['token'] = data.token
+
             return user
           }
 
           return null
         } catch (error: any) {
-          throw new Error(error)
+          throw new Error(error.message || 'Authentication failed')
         }
       }
     })

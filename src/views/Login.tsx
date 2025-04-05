@@ -1,9 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+// React Imports
+import { useState } from 'react'
 
+// Next Imports
 import { useRouter } from 'next/navigation'
 
+// MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -12,18 +15,27 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
-import classnames from 'classnames'
+import CircularProgress from '@mui/material/CircularProgress'
 import { Alert } from '@mui/material'
-import { signIn } from 'next-auth/react'
+import classnames from 'classnames'
 
+// Third-party Imports
 import { toast } from 'react-toastify'
+import { signIn } from 'next-auth/react'
+import { useMutation } from '@tanstack/react-query'
+import { useForm, Controller } from 'react-hook-form'
+import { valibotResolver } from '@hookform/resolvers/valibot'
+import { object, string, email, minLength } from 'valibot'
 
+// Custom Imports
 import type { SystemMode } from '@core/types'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
 import themeConfig from '@configs/themeConfig'
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
+import { genericQueryFn } from '@/libs/queryFn'
+import { API_LOGIN } from '@/configs/api'
 
 // Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
@@ -49,85 +61,88 @@ const MaskImg = styled('img')({
   zIndex: -1
 })
 
+// Validation Schema
+const schema = object({
+  email: string([email('Invalid email format')]),
+  password: string([minLength(1, 'Password is required')])
+})
+
 const Login = ({ mode }: { mode: SystemMode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
-  const [email, setEmail] = useState('admin@robin-academy.com')
-  const [password, setPassword] = useState('robin123*')
-  const [error, setError] = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [passwordError, setPasswordError] = useState('')
-
-  // Vars
-  const darkImg = '/images/pages/auth-mask-dark.png'
-  const lightImg = '/images/pages/auth-mask-light.png'
-  const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
-  const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
-  const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
-  const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
 
   // Hooks
   const router = useRouter()
   const { settings } = useSettings()
   const theme = useTheme()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
-  const authBackground = useImageVariant(mode, lightImg, darkImg)
+
+  const authBackground = useImageVariant(mode, '/images/pages/auth-mask-light.png', '/images/pages/auth-mask-dark.png')
 
   const characterIllustration = useImageVariant(
     mode,
-    lightIllustration,
-    darkIllustration,
-    borderedLightIllustration,
-    borderedDarkIllustration
+    '/images/illustrations/auth/v2-login-light.png',
+    '/images/illustrations/auth/v2-login-dark.png',
+    '/images/illustrations/auth/v2-login-light-border.png',
+    '/images/illustrations/auth/v2-login-dark-border.png'
   )
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: valibotResolver(schema),
+    defaultValues: {
+      email: 'admin@robin-academy.com',
+      password: 'robin123*'
+    }
+  })
+
+  // React Query Mutation for Login
+  const {
+    mutate,
+    isPending,
+    error: mutationError
+  } = useMutation({
+    mutationFn: (credentials: { email: string; password: string }) =>
+      genericQueryFn({
+        url: API_LOGIN,
+        method: 'POST',
+        body: credentials
+      }),
+    onSuccess: async (data, variables) => {
+      const user = data.data?.user
+
+      if (user) {
+        user.token = data.data?.token // Attach token to user object
+
+        // Call signIn to establish the session
+        const res = await signIn('credentials', {
+          email: variables.email,
+          password: variables.password,
+          redirect: false
+        })
+
+        if (res?.ok) {
+          router.push('/dashboards/ecommerce')
+        } else {
+          toast.error('Failed to establish session. Please try again.')
+        }
+      } else {
+        toast.error('Invalid response from server.')
+      }
+    },
+    onError: (error: Error) => {
+      // Log error for debugging; no need to set state manually
+      console.error('Login error:', error)
+    }
+  })
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
-  const validateEmail = (email: string) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-    return re.test(email)
-  }
-
-  const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    let isValid = true
-
-    // email validate
-    if (!email) {
-      setEmailError('Email is required')
-      isValid = false
-    } else if (!validateEmail(email)) {
-      setEmailError('Invalid email format')
-      isValid = false
-    } else {
-      setEmailError('')
-    }
-
-    // password validate
-    if (!password) {
-      setPasswordError('Password is required')
-      isValid = false
-    } else {
-      setPasswordError('')
-    }
-
-    if (isValid) {
-      const res = await signIn('credentials', {
-        email,
-        password,
-        redirect: false
-      })
-
-      if (res?.ok) {
-        toast.success('Logged in successfully')
-        router.push('/dashboard')
-      }
-
-      if (!res?.ok) {
-        setError('You have entered an invalid username or password')
-      }
-    }
+  const onSubmit = async (data: { email: string; password: string }) => {
+    mutate(data)
   }
 
   return (
@@ -158,46 +173,69 @@ const Login = ({ mode }: { mode: SystemMode }) => {
             <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
             <Typography>Please sign-in to your account and start the adventure</Typography>
           </div>
-          {error && <Alert severity='error'>{error}</Alert>}
-          <form noValidate autoComplete='off' onSubmit={submitHandler} className='flex flex-col gap-5'>
-            <CustomTextField
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              autoFocus
-              fullWidth
-              label='Email'
-              placeholder='Enter your email'
-              error={!!emailError}
-              helperText={emailError}
+          {mutationError && (
+            <Alert severity='error'>
+              {mutationError.message || 'Authentication failed. Please check your credentials.'}
+            </Alert>
+          )}
+          <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-5'>
+            <Controller
+              name='email'
+              control={control}
+              render={({ field }) => (
+                <CustomTextField
+                  {...field}
+                  autoFocus
+                  fullWidth
+                  label='Email'
+                  placeholder='Enter your email'
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                  disabled={isPending}
+                />
+              )}
             />
-            <CustomTextField
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              fullWidth
-              error={!!passwordError}
-              helperText={passwordError}
-              label='Password'
-              placeholder='············'
-              id='outlined-adornment-password'
-              type={isPasswordShown ? 'text' : 'password'}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
-                      <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
+            <Controller
+              name='password'
+              control={control}
+              render={({ field }) => (
+                <CustomTextField
+                  {...field}
+                  fullWidth
+                  label='Password'
+                  placeholder='············'
+                  type={isPasswordShown ? 'text' : 'password'}
+                  error={!!errors.password}
+                  helperText={errors.password?.message}
+                  disabled={isPending}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton
+                          edge='end'
+                          onClick={handleClickShowPassword}
+                          onMouseDown={e => e.preventDefault()}
+                          disabled={isPending}
+                        >
+                          <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              )}
             />
             <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
               <FormControlLabel control={<Checkbox />} label='Remember me' />
-              {/* <Typography className='text-end' color='primary' component={Link}>
-                Forgot password?
-              </Typography> */}
             </div>
-            <Button fullWidth variant='contained' type='submit'>
-              Login
+            <Button
+              fullWidth
+              variant='contained'
+              type='submit'
+              disabled={isPending}
+              startIcon={isPending ? <CircularProgress size={20} /> : null}
+            >
+              {isPending ? 'Logging in...' : 'Login'}
             </Button>
           </form>
         </div>

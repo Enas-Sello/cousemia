@@ -2,11 +2,21 @@ import React from 'react'
 
 import { notFound } from 'next/navigation'
 
-import { getUser } from '@/data/users/getUsers'
+// MUI Imports
+import Grid from '@mui/material/Grid2'
+
+// api call
+import { Typography } from '@mui/material'
+
+import { getUser } from '@/data/users/usersQuery'
+
+//types import
 import type { UserType } from '@/types/usertTypes'
-import { Grid } from '@mui/material'
+
+// Component Imports
 import UserOverview from '@/views/users/UserOverview'
 import UserCourses from '@/views/users/UserCourses'
+import UserDevices from '@/views/users/UserDevices'
 
 export default async function page({ params }: { params: { id: number } }) {
   const user: UserType = (await getUser(params.id)) as UserType
@@ -17,10 +27,19 @@ export default async function page({ params }: { params: { id: number } }) {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={12} lg={4} md={5}>
+      <Grid size={{ xs: 12 }}>
         <UserOverview user={user} />
       </Grid>
-      <Grid item xs={12} lg={8} md={7}>
+      <Grid size={{ xs: 12 }}>
+        <Typography variant='h5' component='h5' className='self-start mb-2' color='secondary.dark'>
+          Allowed Devices
+        </Typography>
+        <UserDevices devices={user.devices} />
+      </Grid>
+      <Grid size={{ xs: 12 }}>
+        <Typography variant='h5' component='h5' className='self-start mb-2' color='secondary.dark'>
+          Bought Courses
+        </Typography>
         <UserCourses user={user} />
       </Grid>
     </Grid>

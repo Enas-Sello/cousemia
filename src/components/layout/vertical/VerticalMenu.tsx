@@ -11,6 +11,23 @@ import { useTheme } from '@mui/material/styles'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
 // Type Imports
+import {
+  IconHome,
+  IconStack,
+  IconBook,
+  IconNotebook,
+  IconBookmark,
+  IconChartBar,
+  IconDatabase,
+  IconMap,
+  IconMap2,
+  IconHeartbeat,
+  IconCurrencyDollar,
+  IconDeviceDesktop,
+  IconHelpCircle,
+  IconFileText
+} from '@tabler/icons-react'
+
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
@@ -85,28 +102,68 @@ const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
       >
         <SubMenu
           label={dictionary['navigation'].dashboards}
-          icon={<i className='tabler-smart-home' />}
+          icon={<IconHome size={24} stroke={1.5} />}
           suffix={<CustomChip label='2' size='small' color='error' round='true' />}
+          defaultOpen={true}
         >
           {/* <MenuItem href={`/${locale}/dashboards`}>{dictionary['navigation'].eCommerce}</MenuItem> */}
           <MenuItem href={`/${locale}/dashboards/ecommerce`}>{dictionary['navigation'].eCommerce}</MenuItem>
           <MenuItem href={`/${locale}/dashboards/analytics`}>{dictionary['navigation'].analytics}</MenuItem>
         </SubMenu>
         <MenuSection label={dictionary['navigation'].appsPages}>
-          <MenuItem href={`/${locale}/apps/courses`} icon={<i className='tabler-books' />}>
+          <MenuItem href={`/${locale}/study/courses`} icon={<IconStack size={23} stroke={1} />}>
             Courses
           </MenuItem>
-          <MenuItem href='/lectures' icon={<i className='tabler-vocabulary' />}>
+          <MenuItem href={`/${locale}/study/lectures`} icon={<IconBook size={23} stroke={1} />}>
             Lectures
           </MenuItem>
-          <MenuItem href='/specialities' icon={<i className='tabler-tags' />}>
-            Specialities
+
+          <MenuItem href={`/${locale}/study/nots`} icon={<IconNotebook size={23} stroke={1} />}>
+            Nots
+          </MenuItem>
+          <MenuItem href={`/${locale}/study/questionsAnswer`} icon={<IconBookmark size={23} stroke={1} />}>
+            Questions & Answers
+          </MenuItem>
+          <MenuItem href={`/${locale}/study/flashCards`} icon={<IconChartBar size={23} stroke={1} />}>
+            Flash Cards
+          </MenuItem>
+          <MenuItem href={`/${locale}/study/categories`} icon={<IconDatabase size={23} stroke={1} />}>
+            Categories
           </MenuItem>
         </MenuSection>
 
         <MenuSection label='Users Management'>
-          <MenuItem href='/users' icon={<i className='tabler-users' />}>
+          <MenuItem href={`/${locale}/users`} icon={<i className='tabler-users' />}>
             Users
+          </MenuItem>
+        </MenuSection>
+        <MenuSection label='Utilities'>
+          <MenuItem href={`/${locale}/utilitie/countries`} icon={<IconMap size={23} stroke={1} />}>
+            Countries
+          </MenuItem>
+          <MenuItem href={`/${locale}/utilitie/hostCourse`} icon={<IconMap2 size={23} stroke={1} />}>
+            Host Your Course
+          </MenuItem>
+          <MenuItem href={`/${locale}/utilitie/specialities`} icon={<IconHeartbeat size={23} stroke={1} />}>
+            Specialties
+          </MenuItem>
+          <MenuItem href={`/${locale}/utilitie/events`} icon={<IconStack size={23} stroke={1} />}>
+            Events
+          </MenuItem>
+          <MenuItem href={`/${locale}/utilitie/offers`} icon={<IconCurrencyDollar size={23} stroke={1} />}>
+            Offers
+          </MenuItem>
+          <MenuItem href={`/${locale}/utilitie/config`} icon={<IconDeviceDesktop size={23} stroke={1} />}>
+            Config
+          </MenuItem>
+          <MenuItem href={`/${locale}/utilitie/aboutUs`} icon={<IconHelpCircle size={23} stroke={1} />}>
+            About Us
+          </MenuItem>
+          <MenuItem href={`/${locale}/utilitie/termsConditions`} icon={<IconFileText size={23} stroke={1} />}>
+            Terms & Conditions
+          </MenuItem>
+          <MenuItem href={`/${locale}/utilitie/privacyPolicy`} icon={<IconFileText size={23} stroke={1} />}>
+            Privacy Policy
           </MenuItem>
         </MenuSection>
       </Menu>

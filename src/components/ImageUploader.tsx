@@ -25,14 +25,13 @@ const ImageUploader = ({ setThumb }: { setThumb: (thumb: string) => void }) => {
   })
 
   const img = files.map((file: FileProp, index) => {
-    const thumb = URL.createObjectURL(file as any)
-    console.log(thumb)
+    const thumb = URL.createObjectURL(file as any)(thumb)
 
     return <CustomAvatar key={index} src={thumb} size={200} variant='square' className='rounded-lg' />
   })
 
   useEffect(() => {
-    console.log(files)
+    files
   }, ['files'])
 
   return (

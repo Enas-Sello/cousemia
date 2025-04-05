@@ -6,17 +6,14 @@ import { useState, useMemo, useEffect } from 'react'
 // MUI Imports
 import Typography from '@mui/material/Typography'
 import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
 import MenuItem from '@mui/material/MenuItem'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 
 // Third-party Imports
-import classnames from 'classnames'
 import { rankItem } from '@tanstack/match-sorter-utils'
 import {
   createColumnHelper,
-  flexRender,
   getCoreRowModel,
   useReactTable,
   getFilteredRowModel,
@@ -27,25 +24,26 @@ import {
   getSortedRowModel
 } from '@tanstack/react-table'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
-import type { RankingInfo } from '@tanstack/match-sorter-utils'
 
 // Type Imports
-import type { ThemeColor } from '@core/types'
+import { Button, IconButton } from '@mui/material'
+
+import { toast } from 'react-toastify'
+
+import { IconTrash } from '@tabler/icons-react'
 
 // Component Imports
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
 // Style Imports
-import tableStyles from '@core/styles/table.module.css'
 import TablePaginationComponent from './TablePaginationComponent'
 import UserCourseAdd from './UserCourseAdd'
-import { Button, IconButton } from '@mui/material'
-import { CourseType } from '@/types/courseType'
+import type { CourseType } from '@/types/courseType'
 import DeleteDialog from './DeleteDialog'
-import { UserType } from '@/types/usertTypes'
-import { deleteUserCourse } from '@/data/courses/getCourses'
-import { toast } from 'react-toastify'
+import type { UserType } from '@/types/usertTypes'
+import { deleteUserCourse } from '@/data/courses/coursesQuery'
+import GenericTable from '@/components/GenericTable'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -111,6 +109,8 @@ const UserCourses = ({ user }: { user: UserType }) => {
   const [userId, setUserId] = useState<number>()
   const [courseId, setCourseId] = useState<number>()
 
+  // const [deleteItem, setDeleteItem] = useState<boolean>(false)
+
   // Hooks
   const columns = useMemo<ColumnDef<CourseType, any>[]>(
     () => [
@@ -118,24 +118,24 @@ const UserCourses = ({ user }: { user: UserType }) => {
         header: 'Image',
         cell: ({ row }) => (
           <div className='flex items-center gap-4'>
-            <CustomAvatar src={row.original.image} size={34} />
+            <CustomAvatar src={row.original.image} size={30} />
           </div>
         )
       }),
       columnHelper.accessor('title_en', {
         header: 'Title En',
-        cell: ({ row }) => <Typography color='text.primary'>{row.original.title_en}</Typography>
+        cell: ({ row }) => <Typography color='text.secondary'>{row.original.title_en}</Typography>
       }),
       columnHelper.accessor('bought_on', {
         header: 'Bought On',
-        cell: ({ row }) => <Typography color='text.primary'>{row.original.bought_on}</Typography>
+        cell: ({ row }) => <Typography color='text.secondary'>{row.original.bought_on}</Typography>
       }),
       columnHelper.accessor('id', {
         header: 'Actions',
         cell: ({ row }) => (
           <>
             <IconButton onClick={() => handleDeleteModal(row.original.id, user.id)}>
-              <i className='tabler-trash text-[22px] text-textSecondary' />
+              <IconTrash size={18} className='text-secondary' />
             </IconButton>
           </>
         )
@@ -153,17 +153,23 @@ const UserCourses = ({ user }: { user: UserType }) => {
   const handleDelete = () => {
     try {
       deleteUserCourse(courseId, userId)
+
+      // setDeleteItem(true)
       toast.success('Course has been deleted from user.')
       const updatedList = data.filter(item => item.id != courseId)
+
       setData(updatedList)
     } catch (error) {
       toast.error('Course dose not deleted!')
     }
+
     handleCloseModal()
   }
 
   const handleCloseModal = () => {
     setOpenModal(false)
+
+    // setDeleteItem(false)
     setCourseId(0)
     setCourseId(0)
   }
@@ -199,7 +205,6 @@ const UserCourses = ({ user }: { user: UserType }) => {
 
   return (
     <Card>
-      <CardHeader title='Bought Courses' className='flex flex-wrap gap-4' />
       <div className='flex items-center justify-between p-6 gap-4'>
         <div className='flex items-center gap-2'>
           <Typography>Show</Typography>
@@ -225,61 +230,8 @@ const UserCourses = ({ user }: { user: UserType }) => {
           </Button>
         </div>
       </div>
-      <div className='overflow-x-auto'>
-        <table className={tableStyles.table}>
-          <thead>
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <>
-                        <div
-                          className={classnames({
-                            'flex items-center': header.column.getIsSorted(),
-                            'cursor-pointer select-none': header.column.getCanSort()
-                          })}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {{
-                            asc: <i className='tabler-chevron-up text-xl' />,
-                            desc: <i className='tabler-chevron-down text-xl' />
-                          }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                        </div>
-                      </>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          {table.getFilteredRowModel().rows.length === 0 ? (
-            <tbody>
-              <tr>
-                <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                  No data available
-                </td>
-              </tr>
-            </tbody>
-          ) : (
-            <tbody>
-              {table
-                .getRowModel()
-                .rows.slice(0, table.getState().pagination.pageSize)
-                .map(row => {
-                  return (
-                    <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
-                      {row.getVisibleCells().map(cell => (
-                        <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                      ))}
-                    </tr>
-                  )
-                })}
-            </tbody>
-          )}
-        </table>
-      </div>
+      <GenericTable table={table} />
+
       <TablePagination
         component={() => <TablePaginationComponent table={table} />}
         count={table.getFilteredRowModel().rows.length}
@@ -296,6 +248,7 @@ const UserCourses = ({ user }: { user: UserType }) => {
         setData={setData}
       />
       <DeleteDialog open={openModal} handleClose={handleCloseModal} handleDelete={handleDelete} />
+      {/* <DeleteDialog open={deleteItem} handleClose={handleCloseModal} /> */}
     </Card>
   )
 }

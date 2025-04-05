@@ -7,6 +7,7 @@ import NotFound from '@views/NotFound'
 import { getServerMode, getSystemMode } from '@core/utils/serverHelpers'
 
 const NotFoundPage = () => {
+
   // Vars
   const direction = 'ltr'
   const mode = getServerMode()

@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 
 import { Switch } from '@mui/material'
 
-import { updateLectureStatus } from '@/data/courses/getLectures'
+import { updateLectureStatus } from '@/data/lectures/lecturesQuery'
 
 export default function StatusChange({ row }: { row: any }) {
   const id: number = useMemo(() => row.original.id, [row])
