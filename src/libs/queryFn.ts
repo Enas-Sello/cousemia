@@ -11,8 +11,8 @@ type QueryFnOptions = {
 
 // Generic query function for React Query
 export const genericQueryFn = async ({ url, method = 'GET', queryParams = {}, body, headers }: QueryFnOptions) => {
+
   try {
-    
     // Build query string for GET requests
     let finalUrl = url
 

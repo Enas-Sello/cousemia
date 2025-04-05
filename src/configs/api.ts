@@ -31,5 +31,5 @@ export const API_OFFERS = API_URL + '/offers'
 
 //media
 export const API_MEDIA = API_URL + '/media'
-export const API_MEDIA_PDF = API_URL + '/upload-pdf'
+export const API_MEDIA_PDF =  '/upload-pdf'
 export const API_MEDIA_VIDEO = API_URL + '/upload-video'

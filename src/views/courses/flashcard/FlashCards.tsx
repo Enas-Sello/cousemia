@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 import { Card, CardContent, CardHeader, Chip, IconButton } from '@mui/material'
 import Grid from '@mui/material/Grid2'
+import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -13,16 +14,14 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
-import { rankItem } from '@tanstack/match-sorter-utils'
 import { toast } from 'react-toastify'
+import { rankItem } from '@tanstack/match-sorter-utils'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import type { FlashCardType } from '@/types/flashCardType'
 import { deleteFlashCard, getFlashCards } from '@/data/flashCards/flashCardsQuery'
-
 import StatusChange from './StatusChange'
-import AddFlashCardDrawer from './AddFlashCardDrawer' // Renamed for clarity
+import AddFlashCardDrawer from './AddFlashCardDrawer'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
@@ -54,22 +53,15 @@ export default function FlashCards({
   // State for table controls
   const [perPage, setPerPage] = useState<number>(10)
   const [page, setPage] = useState<number>(0)
-
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      desc: true,
-      id: 'id'
-    }
-  ])
-
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'id', desc: true }])
   const [globalFilter, setGlobalFilter] = useState('')
   const [addFlashCardOpen, setAddFlashCardOpen] = useState(false)
   const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
   const [selectedFlashCardId, setSelectedFlashCardId] = useState<number | null>(null)
 
-  // React Query: Fetch flash cards
   const queryClient = useQueryClient()
 
+  // Fetch flash cards using React Query
   const queryKey = ['flashCards', courseId, subCategoryId, categoryId, page, perPage, sorting, globalFilter]
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -95,20 +87,16 @@ export default function FlashCards({
         }
       }
 
-      const result = await getFlashCards(filterQuery)
-
-      return result // { flashCards: FlashCardType[], total: number }
+      return getFlashCards(filterQuery)
     },
     placeholderData: keepPreviousData
   })
 
-  // React Query: Delete flash card mutation
+  // Mutation for deleting a flash card
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteFlashCard(id),
     onSuccess: (_, id) => {
       toast.success('Flash Card deleted successfully')
-
-      // Optimistically update the UI by filtering out the deleted flash card
       queryClient.setQueryData(queryKey, (oldData: { flashCards: FlashCardType[]; total: number } | undefined) => {
         if (!oldData) return { flashCards: [], total: 0 }
 
@@ -117,8 +105,6 @@ export default function FlashCards({
           total: oldData.total - 1
         }
       })
-
-      // Invalidate the query to refetch the latest data
       queryClient.invalidateQueries({ queryKey })
       setConfirmDialog(false)
       setSelectedFlashCardId(null)
@@ -149,6 +135,7 @@ export default function FlashCards({
     setSelectedFlashCardId(null)
   }
 
+  // Define table columns
   const columns = useMemo<ColumnDef<FlashCardType, any>[]>(
     () => [
       columnHelper.accessor('id', {
@@ -222,6 +209,7 @@ export default function FlashCards({
     []
   )
 
+  // Initialize the table with react-table
   const table = useReactTable({
     data: data?.flashCards || [],
     columns,
