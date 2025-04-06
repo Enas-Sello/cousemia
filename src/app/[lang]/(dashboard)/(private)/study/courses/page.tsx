@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Card, CardContent, IconButton } from '@mui/material'
+import { Card, CardContent, IconButton, Tooltip } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import type { FilterFn, ColumnDef, SortingState } from '@tanstack/react-table'
 import {
@@ -19,7 +19,6 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import 'animate.css'
 
-import StatusChanger from '@/components/StatusChanger'
 import GenericTable from '@/components/GenericTable'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
@@ -28,11 +27,13 @@ import ConfirmDialog from '@/components/ConfirmDialog'
 import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
 import { getAvatar } from '@/libs/helpers/getAvatar'
-import { getCourses, updateCourse, deleteCourse } from '@/data/courses/coursesQuery'
+import { getCourses, deleteCourse } from '@/data/courses/coursesQuery'
 import { getSpecialties } from '@/data/specialties/specialtiesQuery'
 import { getAdmin } from '@/data/getAdmin'
 import type { CourseType, StatusType } from '@/types/courseType'
 import CourseFilters from '@/components/CourseFilters'
+
+// import StatusChanger from '@/components/StatusChanger'
 
 // Custom fuzzy filter for Tanstack Table
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -111,18 +112,6 @@ export default function CourseList() {
     placeholderData: keepPreviousData
   })
 
-  // Mutation for updating course status
-  const updateCourseMutation = useMutation({
-    mutationFn: ({ id, is_active }: { id: number; is_active: boolean }) => updateCourse(id, { is_active: !is_active }),
-    onSuccess: () => {
-      toast.success('Course status updated successfully')
-      queryClient.invalidateQueries({ queryKey })
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data.message || 'Failed to update course status.')
-    }
-  })
-
   // Mutation for deleting a course
   const deleteCourseMutation = useMutation({
     mutationFn: (courseId: number) => deleteCourse(courseId),
@@ -146,14 +135,6 @@ export default function CourseList() {
       setSelectedCourseId(null)
     }
   })
-
-  // Memoize the handleStatusUpdate function using useCallback
-  const handleStatusUpdate = useCallback(
-    (id: number, isActive: boolean) => {
-      updateCourseMutation.mutate({ id, is_active: isActive })
-    },
-    [updateCourseMutation]
-  )
 
   // Handle delete confirmation
   const handleDeleteConfirm = (id: number) => {
@@ -185,7 +166,7 @@ export default function CourseList() {
     () => [
       columnHelper.accessor('image', {
         id: 'image',
-        header: 'Cover Image',
+        header: 'Image',
         cell: ({ row }) => <div className='flex items-center gap-4'>{getAvatar({ image: row.original.image })}</div>
       }),
       columnHelper.accessor('title_en', {
@@ -206,10 +187,11 @@ export default function CourseList() {
           </div>
         )
       }),
-      columnHelper.accessor('admin_name', {
-        id: 'admin_name',
-        header: 'Admin Name'
-      }),
+
+      // columnHelper.accessor('admin_name', {
+      //   id: 'admin_name',
+      //   header: 'Admin Name'
+      // }),
       columnHelper.accessor('speciality', {
         id: 'speciality',
         header: 'Speciality'
@@ -218,85 +200,86 @@ export default function CourseList() {
         id: 'price',
         header: 'Price'
       }),
+      columnHelper.accessor('price_after_discount', {
+        id: 'price_after_discount',
+        header: 'After Discount'
+      }),
+
       columnHelper.display({
         header: 'Actions',
         id: 'actions',
         cell: ({ row }) => (
-          <div>
-            <IconButton>
-              <Link href={`/study/courses/edit/${row.original.id}`} className='flex'>
-                <i className='tabler-edit text-[18px] text-textSecondary' />
-              </Link>
-            </IconButton>
-            <IconButton>
-              <Link href='#' className='flex'>
-                <i className='tabler-star text-[18px] text-textSecondary' />
-              </Link>
-            </IconButton>
-            <IconButton>
-              <Link href={`/study/courses/${row.original.id}`} className='flex'>
-                <i className='tabler-eye text-[18px] text-textSecondary' />
-              </Link>
-            </IconButton>
-            <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
-              <Link href='#' className='flex' onClick={e => e.preventDefault()}>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Tooltip title='Edit Course' arrow>
+              <IconButton>
+                <Link href={`/study/courses/edit/${row.original.id}`}>
+                  <i className='tabler-edit text-[18px] text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='View Reviews' arrow>
+              <IconButton>
+                <Link href={`/study/courses/review/${row.original.id}`}>
+                  <i className='tabler-star text-[18px] text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='View Course' arrow>
+              <IconButton>
+                <Link href={`/study/courses/${row.original.id}`}>
+                  <i className='tabler-eye text-[18px] text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Delete Course' arrow>
+              <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
                 <i className='tabler-trash text-[18px] text-textSecondary' />
-              </Link>
-            </IconButton>
+              </IconButton>
+            </Tooltip>
           </div>
-        )
-      }),
-      columnHelper.accessor('price_after_discount', {
-        id: 'price_after_discount',
-        header: 'Price After Discount'
-      }),
-      columnHelper.accessor('lectures_count', {
-        id: 'lectures_count',
-        header: 'Lectures Count'
-      }),
-      columnHelper.accessor('notes_count', {
-        id: 'notes_count',
-        header: 'Notes Count'
-      }),
-      columnHelper.accessor('flashcards_count', {
-        id: 'flashcards_count',
-        header: 'Flashcards Count'
-      }),
-      columnHelper.accessor('questions_count', {
-        id: 'questions_count',
-        header: 'Questions Count'
-      }),
-      columnHelper.accessor('rate', {
-        id: 'rate',
-        header: 'Rate',
-        cell: ({ row }) => (
-          <div className='flex items-center'>
-            {[1, 2, 3, 4, 5].map((rate, index) => (
-              <i
-                key={index}
-                className={`tabler-star${row.original.rate >= rate ? '-filled' : ''} size-4 mr-2 ${
-                  row.original.rate >= rate ? 'bg-red-500' : ''
-                }`}
-              />
-            ))}
-            <span>({row.original.rate})</span>
-          </div>
-        )
-      }),
-      columnHelper.display({
-        id: 'status',
-        header: 'Is Active',
-        cell: ({ row }) => (
-          <StatusChanger
-            status={row.original.is_active}
-            action={() => handleStatusUpdate(row.original.id, row.original.is_active)}
-
-            // isLoading={updateCourseMutation.isLoading && updateCourseMutation.variables?.id === row.original.id}
-          />
         )
       })
+
+      // columnHelper.accessor('lectures_count', {
+      //   id: 'lectures_count',
+      //   header: 'Lectures Count'
+      // }),
+      // columnHelper.accessor('notes_count', {
+      //   id: 'notes_count',
+      //   header: 'Notes Count'
+      // }),
+      // columnHelper.accessor('flashcards_count', {
+      //   id: 'flashcards_count',
+      //   header: 'Flashcards Count'
+      // }),
+      // columnHelper.accessor('questions_count', {
+      //   id: 'questions_count',
+      //   header: 'Questions Count'
+      // }),
+      // columnHelper.accessor('rate', {
+      //   id: 'rate',
+      //   header: 'Rate',
+      //   cell: ({ row }) => (
+      //     <div className='flex items-center'>
+      //       {[1, 2, 3, 4, 5].map((rate, index) => (
+      //         <i
+      //           key={index}
+      //           className={`tabler-star${row.original.rate >= rate ? '-filled' : ''} size-4 mr-2 ${
+      //             row.original.rate >= rate ? 'bg-red-500' : ''
+      //           }`}
+      //         />
+      //       ))}
+      //       <span>({row.original.rate})</span>
+      //     </div>
+      //   )
+      // }),
+      // columnHelper.display({
+      //   id: 'status',
+      //   header: 'Is Active',
+      //   cell: ({ row }) => <StatusChanger row={row} type='course' />
+      // })
     ],
-    [handleStatusUpdate]
+    []
   )
 
   // Initialize the table with react-table

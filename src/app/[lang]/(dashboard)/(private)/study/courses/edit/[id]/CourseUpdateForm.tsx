@@ -14,15 +14,11 @@ import 'react-datepicker/dist/react-datepicker.css'
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
-import { getCourse, updateCourse } from '@/data/courses/coursesQuery'
+import { updateCourse } from '@/data/courses/coursesQuery'
 import { getSpecialties } from '@/data/specialties/specialtiesQuery'
 import type { CourseFormType } from '@/types/courseType'
 import type { SpecialityType } from '@/types/specialitiesType'
 import Loading from '@/components/loading'
-
-type Props = {
-  id: number
-}
 
 interface CourseFormData extends CourseFormType {
   title_en: string
@@ -39,18 +35,10 @@ interface CourseFormData extends CourseFormType {
   cover_image?: File | string
 }
 
-export default function CourseUpdateForm({ id }: Props) {
+export default function CourseUpdateForm({ courseData, isCourseLoading }: any) {
   const [previewImage, setPreviewImage] = useState<string | null>(null)
   const queryClient = useQueryClient()
   const router = useRouter()
-
-  // Fetch course data using React Query
-  const { data: course, isLoading: isCourseLoading } = useQuery({
-    queryKey: ['course', id],
-    queryFn: () => getCourse(id)
-  })
-
-  const courseData = course?.data
 
   // Fetch specialties for the dropdown
   const { data: specialtiesData, isLoading: isSpecialtiesLoading } = useQuery({
@@ -160,11 +148,11 @@ export default function CourseUpdateForm({ id }: Props) {
         data.append('image', formData.cover_image)
       }
 
-      return updateCourse(id, data)
+      return updateCourse(courseData?.id, data)
     },
     onSuccess: () => {
       toast.success('Course updated successfully')
-      queryClient.invalidateQueries({ queryKey: ['course', id] })
+      queryClient.invalidateQueries({ queryKey: ['course', courseData?.id] })
       queryClient.invalidateQueries({ queryKey: ['courses'] })
       router.push('/study/courses')
     },

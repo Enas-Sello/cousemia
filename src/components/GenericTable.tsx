@@ -16,7 +16,6 @@ import tableStyles from '@core/styles/table.module.css'
 
 interface GenericTableProps<TData> {
   table: Table<TData> // Pass the table instance as a prop
-  
 }
 
 const GenericTable = <TData,>({ table }: GenericTableProps<TData>) => {
@@ -24,7 +23,7 @@ const GenericTable = <TData,>({ table }: GenericTableProps<TData>) => {
 
   return (
     <div className='overflow-x-auto'>
-      <table className={`${tableStyles.table}  text-success`}>
+      <table className={`${tableStyles.table}`}>
         <thead>
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
@@ -32,8 +31,9 @@ const GenericTable = <TData,>({ table }: GenericTableProps<TData>) => {
                 <th
                   key={header.id}
                   style={{
-                    backgroundColor: theme.palette.secondary.light,
-                    color: theme.palette.secondary.main
+                    backgroundColor: theme.palette.secondary.light
+
+                    // color: theme.palette.secondary.main
                   }}
                 >
                   {header.isPlaceholder ? null : (
