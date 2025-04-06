@@ -38,8 +38,7 @@ export default function ShowCourse({ params }: { params: { id: number } }) {
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12 }}>
-        <Button variant='contained' onClick={() => router.back()}>
-          <IconArrowLeft />
+        <Button variant='outlined' startIcon={<IconArrowLeft />} onClick={() => router.back()}>
           Go Back
         </Button>
       </Grid>
@@ -79,7 +78,7 @@ export default function ShowCourse({ params }: { params: { id: number } }) {
               />
             </Box>
             <Typography variant='button' gutterBottom>
-              StatusChanger : <StatusChanger row={courseData} type='course' />
+              Change Status : <StatusChanger row={courseData} type='course' />
             </Typography>
           </div>
 

@@ -1,0 +1,275 @@
+'use client'
+
+import React, { useMemo, useState } from 'react'
+
+import Link from 'next/link'
+
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { Card, CardContent, CardHeader, Chip, IconButton, Tooltip, CircularProgress, Alert, Box } from '@mui/material'
+import Grid from '@mui/material/Grid2'
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
+import { rankItem } from '@tanstack/match-sorter-utils'
+import { toast } from 'react-toastify'
+
+import CustomAvatar from '@/@core/components/mui/Avatar'
+import { getLectures, deleteLecture } from '@/data/lectures/lecturesQuery'
+import AddLectureDrawer from './AddLectureDrawer'
+import ConfirmDialog from '@/components/ConfirmDialog'
+import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
+import GenericTable from '@/components/GenericTable'
+import TablePaginationComponent from '@/components/TablePaginationComponent'
+import StatusChanger from '@/components/StatusChanger'
+import type { LectureType } from '@/types/lectureType'
+
+// Custom fuzzy filter for Tanstack Table
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  const itemRank = rankItem(row.getValue(columnId), value)
+
+  addMeta({ itemRank })
+
+  return itemRank.passed
+}
+
+const columnHelper = createColumnHelper<LectureType>()
+
+export default function Lectures({
+  courseId,
+  subCategoryId,
+  categoryId
+}: {
+  courseId: number | undefined
+  subCategoryId: number | undefined
+  categoryId: number | undefined
+}) {
+  // State for table controls
+  const [perPage, setPerPage] = useState<number>(10)
+  const [page, setPage] = useState<number>(0)
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'id', desc: true }])
+  const [globalFilter, setGlobalFilter] = useState('')
+  const [addLectureOpen, setAddLectureOpen] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState(false)
+  const [deleteId, setDeleteId] = useState<number | undefined>(undefined)
+
+  // Fetch lectures using React Query
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['lectures', courseId, categoryId, subCategoryId, page, perPage, sorting, globalFilter],
+    queryFn: () => {
+      const filterQuery: Record<string, any> = {
+        q: globalFilter,
+        perPage,
+        page: page === 0 ? 1 : page + 1,
+        sortBy: sorting[0]?.id || 'id',
+        sortDesc: sorting[0]?.desc ? 'true' : 'false'
+      }
+
+      if (courseId) {
+        filterQuery.course = courseId
+
+        if (categoryId) {
+          filterQuery.category = categoryId
+
+          if (subCategoryId) {
+            filterQuery.sub_category = subCategoryId
+          }
+        }
+      }
+
+      return getLectures(filterQuery)
+    },
+    placeholderData: keepPreviousData
+  })
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = (id: number) => {
+    setDeleteId(id)
+    setConfirmDialog(true)
+  }
+
+  const handleDeleteDialogClose = () => {
+    setDeleteId(undefined)
+    setConfirmDialog(false)
+  }
+
+  const handleDeleteAction = async () => {
+    if (!deleteId) return
+
+    try {
+      await deleteLecture(deleteId)
+      toast.success('Lecture deleted successfully')
+      refetch() // Refetch the data to update the table
+      setConfirmDialog(false)
+    } catch (error) {
+      toast.error('Failed to delete lecture. Please try again.')
+      console.error('Delete error:', error)
+    }
+  }
+
+  // Get avatar for the video thumbnail
+  const getAvatar = (image?: string) => {
+    return image ? <CustomAvatar src={image} size={40} /> : null
+  }
+
+  // Define table columns
+  const columns = useMemo<ColumnDef<LectureType, any>[]>(
+    () => [
+      // columnHelper.accessor('id', {
+      //   id: 'id',
+      //   header: 'ID'
+      // }),
+      columnHelper.display({
+        header: 'Video Thumb',
+        cell: ({ row }) => <div className='flex items-center gap-4'>{getAvatar(row.original.image)}</div>
+      }),
+      columnHelper.accessor('title_en', {
+        header: 'Title EN'
+      }),
+      columnHelper.accessor('title_ar', {
+        header: 'Title AR'
+      }),
+
+      // columnHelper.accessor('course', {
+      //   header: 'Course'
+      // }),
+      // columnHelper.accessor('category', {
+      //   header: 'Category'
+      // }),
+      // columnHelper.accessor('sub_category', {
+      //   header: 'Sub Category'
+      // }),
+      columnHelper.accessor('created_by', {
+        header: 'Created By'
+      }),
+      columnHelper.accessor('created_at', {
+        header: 'Created At',
+        cell: ({ row }) =>
+          new Date(row.original.created_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })
+      }),
+      columnHelper.display({
+        header: 'Is Active',
+        cell: ({ row }) => <StatusChanger row={row} type='Lecture' />
+      }),
+      columnHelper.accessor('is_free_content', {
+        header: 'Is Free Content',
+        cell: ({ row }) => (
+          <Chip
+            variant='tonal'
+            label={row.original.is_free_content ? 'Free Content' : 'Paid Content'}
+            color={row.original.is_free_content ? 'success' : 'warning'}
+            size='small'
+          />
+        )
+      }),
+
+      columnHelper.display({
+        id: 'actions',
+        header: 'Actions',
+        cell: ({ row }) => (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Tooltip title='Edit Lecture' arrow>
+              <IconButton>
+                <Link href={`/study/lectures/edit/${row.original.id}`}>
+                  <i className='tabler-edit text-[18px] text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='View lectures' arrow>
+              <IconButton>
+                <Link href={`/study/lectures/${row.original.id}`}>
+                  <i className='tabler-eye text-[18px] text-textSecondary' />
+                </Link>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Delete Lecture' arrow>
+              <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
+                <i className='tabler-trash text-[18px] text-textSecondary' />
+              </IconButton>
+            </Tooltip>
+          </div>
+        )
+      })
+    ],
+    []
+  )
+
+  // Initialize the table with react-table
+  const table = useReactTable({
+    data: data?.lectures || [],
+    columns,
+    filterFns: { fuzzy: fuzzyFilter },
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
+    manualPagination: true,
+    getSortedRowModel: getSortedRowModel(),
+    pageCount: data ? Math.ceil(data.total / perPage) : 0,
+    state: {
+      globalFilter,
+      sorting,
+      pagination: {
+        pageIndex: page,
+        pageSize: perPage
+      }
+    },
+    onSortingChange: setSorting
+  })
+
+  // Handle loading and error states
+  if (isLoading && !data) {
+    return (
+      <Box display='flex' justifyContent='center' alignItems='center' minHeight='50vh'>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box display='flex' justifyContent='center' alignItems='center' minHeight='50vh'>
+        <Alert severity='error'>Failed to load lectures.</Alert>
+      </Box>
+    )
+  }
+
+  return (
+    <>
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12 }}>
+          <Card>
+            <CardHeader title='Course Lectures' className='pbe-4' />
+            <CardContent>
+              <TableRowsNumberAndAddNew
+                addText='Add Lecture'
+                perPage={perPage}
+                setPerPage={setPerPage}
+                globalFilter={globalFilter}
+                setGlobalFilter={setGlobalFilter}
+                addButton
+                addFunction={() => setAddLectureOpen(true)}
+              />
+            </CardContent>
+            <GenericTable table={table} />
+            <TablePaginationComponent table={table} total={data?.total || 0} page={page} setPage={setPage} />
+          </Card>
+        </Grid>
+      </Grid>
+      <AddLectureDrawer open={addLectureOpen} handleClose={() => setAddLectureOpen(false)} />
+      <ConfirmDialog
+        handleAction={handleDeleteAction}
+        handleClose={handleDeleteDialogClose}
+        open={confirmDialog}
+        closeText='Cancel'
+      />
+    </>
+  )
+}

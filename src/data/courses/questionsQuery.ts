@@ -3,6 +3,7 @@ import { genericQueryFn } from '@/libs/queryFn'
 
 // Fetch questions with optional query parameters
 export const getQuestions = async (queryString: Record<string, any> = {}): Promise<any> => {
+
   return genericQueryFn({
     url: API_QUESTIONS,
     method: 'GET',
@@ -15,8 +16,7 @@ export const createQuestion = async (body: any): Promise<void> => {
   return genericQueryFn({
     url: `${API_QUESTIONS}`,
     method: 'POST',
-    body: body,
-   
+    body: body
   })
 }
 

@@ -1,12 +1,30 @@
 import { API_URL, API_LECTURES, API_COURSES_LECTURES } from '@/configs/api'
 import { genericQueryFn } from '@/libs/queryFn'
+import type { LectureResponse, LecturesResponse } from '@/types/lectureType'
 
 // Fetch lectures with optional query parameters
-export const getLectures = async (queryString: Record<string, any> = {}): Promise<any> => {
+export const getLectures = async (queryString: Record<string, any> = {}): Promise<LecturesResponse> => {
   return genericQueryFn({
     url: API_LECTURES,
     method: 'GET',
     queryParams: queryString
+  })
+}
+
+// Fetch a single lectures by ID
+export const getLecture = async (id: number): Promise<LectureResponse> => {
+  return genericQueryFn({
+    url: `${API_LECTURES}/${id}`,
+    method: 'GET'
+  })
+}
+
+// Update lecture
+export const updateLecture = async (id: number, data: FormData): Promise<any> => {
+  return genericQueryFn({
+    url: `${API_LECTURES}/${id}`,
+    method: 'PUT',
+    body: data
   })
 }
 
