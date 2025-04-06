@@ -4,12 +4,14 @@ import {
   API_USERS,
   API_URL,
   API_GET_COURSE_IMAGES,
-  API_CATEGORIES_COURSE_By_ID
+  API_CATEGORIES_COURSE_By_ID,
+  API_COURSE_REVIEW
 } from '@/configs/api'
 import { genericQueryFn } from '@/libs/queryFn'
 import type { CourseType } from '@/types/courseType'
 
 import type { ImageType } from '@/types/imageType'
+import type { CourseReviewResponse } from '@/types/reviews'
 
 // Fetch all courses with optional query parameters
 export const getCourses = async (
@@ -30,7 +32,6 @@ export const getCourse = async (id: number): Promise<CourseType> => {
   })
 }
 
-
 // Delete a single course by ID
 export const deleteCourse = async (id: number): Promise<CourseType> => {
   return genericQueryFn({
@@ -40,7 +41,7 @@ export const deleteCourse = async (id: number): Promise<CourseType> => {
 }
 
 // Update a course by ID
-export const updateCourse = async (id: number, course: Record<string, any>): Promise<CourseType> => {
+export const updateCourse = async (id: number, course: any): Promise<CourseType> => {
   return genericQueryFn({
     url: `${API_COURSES}/${id}`,
     method: 'PUT',
@@ -48,6 +49,16 @@ export const updateCourse = async (id: number, course: Record<string, any>): Pro
   })
 }
 
+// courses review
+export const getCourseReview = async (id: number, queryString: Record<string, any>): Promise<CourseReviewResponse> => {
+  return genericQueryFn({
+    url: `${API_COURSE_REVIEW}/${id}`,
+    method: 'GET',
+    queryParams: queryString
+  })
+}
+
+//////////////
 // Assign courses to a user
 export const courseAssignToUser = async (userId: number, courseIds: number[]): Promise<any> => {
   await genericQueryFn({

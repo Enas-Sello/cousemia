@@ -8,6 +8,7 @@ export const API_GET_COURSE_IMAGES = API_URL + '/get-course-images'
 export const API_COURSES_LECTURES = API_URL + '/course-lectures'
 export const API_COURSE_CATEGORIES = API_URL + '/course-categories'
 export const API_CATEGORIES_COURSE_By_ID = API_URL + '/get-course-by-category-id'
+export const API_COURSE_REVIEW= API_URL + '/course-reviews'
 
 
 export const API_LECTURES = API_URL + '/lectures'

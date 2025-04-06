@@ -75,13 +75,6 @@ export default function Specialities() {
     setTotal(total)
   }
 
-  const statusUpdate = async (id: number, status: boolean) => {
-    status = status ? false : true
-    const updated = await statusUpdateSpecialties(id, status)
-
-    fetchData()
-    toast.success(updated.data.message)
-  }
 
   const columnHelper = createColumnHelper<SpecialityType>()
 
@@ -110,12 +103,7 @@ export default function Specialities() {
     columnHelper.display({
       id: 'status',
       header: 'Is Active',
-      cell: ({ row }) => (
-        <StatusChanger
-          status={row.original.is_active}
-          action={() => statusUpdate(row.original.id, row.original.is_active)}
-        />
-      )
+      cell: ({ row }) => <StatusChanger row={row} type='specialities' />
     }),
     columnHelper.display({
       id: 'actions',

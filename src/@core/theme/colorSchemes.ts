@@ -173,7 +173,9 @@ const colorSchemes = (skin: Skin): Theme['colorSchemes'] => {
         },
         secondary: {
           main: '#808390',
-          light: '#999CA6',
+          light: '#343d55',
+
+          // light: '#999CA6',
           dark: '#737682',
           contrastText: '#FFF',
           lighterOpacity: 'rgb(var(--mui-palette-secondary-mainChannel) / 0.08)',
