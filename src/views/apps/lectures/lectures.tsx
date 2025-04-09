@@ -27,6 +27,8 @@ import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 import StatusChanger from '@/components/StatusChanger'
 import type { LectureType } from '@/types/lectureType'
+import Loading from '@/components/loading'
+import ErrorBox from '@/components/ErrorBox'
 
 // Custom fuzzy filter for Tanstack Table
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -157,7 +159,13 @@ export default function Lectures({
       }),
       columnHelper.display({
         header: 'Is Active',
-        cell: ({ row }) => <StatusChanger row={row} type='Lecture' />
+        cell: ({ row }) => (
+          <Chip
+            label={row.original.is_active ? 'Active' : 'Inactive'}
+            color={row.original.is_active ? 'success' : 'error'}
+            variant='tonal'
+          />
+        )
       }),
       columnHelper.accessor('is_free_content', {
         header: 'Is Free Content',
@@ -226,19 +234,11 @@ export default function Lectures({
 
   // Handle loading and error states
   if (isLoading && !data) {
-    return (
-      <Box display='flex' justifyContent='center' alignItems='center' minHeight='50vh'>
-        <CircularProgress />
-      </Box>
-    )
+    return <Loading />
   }
 
   if (error) {
-    return (
-      <Box display='flex' justifyContent='center' alignItems='center' minHeight='50vh'>
-        <Alert severity='error'>Failed to load lectures.</Alert>
-      </Box>
-    )
+    return <ErrorBox error={error} refetch={refetch} />
   }
 
   return (

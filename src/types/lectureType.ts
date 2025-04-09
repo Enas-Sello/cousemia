@@ -1,4 +1,6 @@
 export type LectureType = {
+  image_id: undefined
+  video_type: string
   category_id: number
   admin_id: number
   sub_category_id: number
@@ -36,4 +38,19 @@ export interface LectureResponse {
   data: LectureType
   message: string
   status_code: number
+}
+
+export interface LectureFormData {
+  title_en: string
+  title_ar: string
+  video_type: string
+  url: string
+  description_en: string
+  description_ar: string
+  course_id: number | undefined
+  category_id: number | undefined
+  sub_category_id: number | undefined
+  is_active: boolean
+  is_free_content: boolean
+  image?: File | string
 }

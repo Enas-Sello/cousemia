@@ -84,7 +84,6 @@ export default function ShowLecture({ params }: { params: { id: number } }) {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue)
   }
-
   return (
     <Box sx={{ padding: { xs: 2, sm: 4 } }}>
       <Grid container spacing={6}>

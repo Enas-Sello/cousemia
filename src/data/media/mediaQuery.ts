@@ -19,7 +19,6 @@ export const uploadImage = async (file: File): Promise<{ id: number; url: string
     }
   })
 
-  console.log('🚀 ~ uploadImage ~ response:', response)
 
   return { id: response.data.id, url: response.data.url }
 }

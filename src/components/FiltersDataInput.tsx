@@ -1,6 +1,5 @@
 'use client'
 
-import type { ChangeEvent } from 'react'
 import React from 'react'
 
 import { useQuery } from '@tanstack/react-query'
@@ -9,18 +8,20 @@ import Grid from '@mui/material/Grid2'
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/categoriesQuerys'
+import { getCourses } from '@/data/courses/coursesQuery'
 import type { CourseType } from '@/types/courseType'
 import type { CategoryType } from '@/types/categoryType'
-import { getCourses } from '@/data/courses/coursesQuery'
+import ErrorBox from './ErrorBox'
 
 interface FiltersDataInputProps {
   courseId: number | undefined
   categoryId: number | undefined
-  subCategory?: boolean | true
+  subCategory?: boolean
+  setCourseId: (id: number | undefined) => void
   setCategoryId: (id: number | undefined) => void
   setSubCategoryId?: (id: number | undefined) => void
-  setCourseId: (id: number | undefined) => void
-  drawer?: boolean | false
+  drawer?: boolean
+  subCategoryId?: number | undefined
 }
 
 const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
@@ -29,7 +30,8 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
   categoryId,
   setCategoryId,
   setSubCategoryId,
-  drawer
+  drawer = false,
+  subCategoryId
 }) => {
   // Fetch courses
   const {
@@ -64,11 +66,28 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
   })
 
   // Handle error states
-  if (coursesError) return <div>Error loading courses: {coursesError.message}</div>
+  // if (coursesError) return <ErrorBox error={coursesError} />
 
   // Determine grid size based on drawer prop
   const gridSize = drawer ? { xs: 12 } : { xs: 12, sm: 6, md: 4 }
+  // Add placeholders for missing categories and subcategories
+  const categoriesWithPlaceholder = categoryData?.data || []
+  if (categoryId && !categoriesWithPlaceholder.some(cat => cat.value === categoryId)) {
+    categoriesWithPlaceholder.unshift({
+      value: categoryId,
+      label: `Unknown Category (${categoryId})`,
+      parent_category: ''
+    })
+  }
 
+  const subCategoriesWithPlaceholder = subCategoryData?.data || []
+  if (subCategoryId && !subCategoriesWithPlaceholder.some(sub => sub.value === subCategoryId)) {
+    subCategoriesWithPlaceholder.unshift({
+      value: subCategoryId,
+      label: `Unknown Subcategory (${subCategoryId})`,
+      parent_category: ''
+    })
+  }
   return (
     <Grid container spacing={drawer ? 0 : 6} className='mb-6'>
       <Grid size={{ xs: 12 }}>
@@ -80,24 +99,29 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
                   boxShadow: 'none',
                   '& .MuiCardContent-root': {
                     paddingLeft: 0,
-                    paddingright: 0
+                    paddingRight: 0
                   }
                 }
               : undefined
           }
         >
           {!drawer && <CardHeader title='Filters' className='pbe-4' />}
-          <CardContent >
+          <CardContent>
             <Grid container spacing={drawer ? 3 : 6}>
               {/* Courses Autocomplete */}
               <Grid size={gridSize}>
                 <Autocomplete
                   id='courses'
                   options={courseData?.courses || []}
-                  onChange={(event: ChangeEvent<{}>, newValue) => setCourseId(newValue?.id ?? 0)}
+                  value={courseData?.courses.find(course => course.id === courseId) || null}
+                  onChange={(event, newValue) => {
+                    setCourseId(newValue?.id ?? undefined)
+                    setCategoryId(undefined)
+                    if (setSubCategoryId) setSubCategoryId(undefined)
+                  }}
                   renderTags={(tagValue, getTagProps) =>
                     tagValue.map((option: CourseType, index) => (
-                      <Chip {...getTagProps({ index })} key={index} label={option.title_en} />
+                      <Chip {...getTagProps({ index })} key={option.id} label={option.title_en} />
                     ))
                   }
                   getOptionLabel={option => option.title_en || ''}
@@ -117,7 +141,7 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
                       }
                     />
                   )}
-                  disabled={coursesLoading}
+                  disabled={!!coursesError || coursesLoading}
                 />
               </Grid>
 
@@ -126,11 +150,15 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
                 <Grid size={gridSize}>
                   <Autocomplete
                     id='categories'
-                    options={categoryData?.data || []}
-                    onChange={(event: ChangeEvent<{}>, newValue) => setCategoryId(newValue?.value ?? undefined)}
+                    options={categoriesWithPlaceholder}
+                    value={categoriesWithPlaceholder.find(category => category.value === categoryId) || null}
+                    onChange={(event, newValue) => {
+                      setCategoryId(newValue?.value ?? undefined)
+                      if (setSubCategoryId) setSubCategoryId(undefined)
+                    }}
                     renderTags={(tagValue, getTagProps) =>
                       tagValue.map((option: CategoryType, index) => (
-                        <Chip {...getTagProps({ index })} key={index} label={option.label} />
+                        <Chip {...getTagProps({ index })} key={option.value} label={option.label} />
                       ))
                     }
                     getOptionLabel={option => option.label || ''}
@@ -162,11 +190,14 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
                 <Grid size={gridSize}>
                   <Autocomplete
                     id='sub-categories'
-                    options={subCategoryData?.data || []}
-                    onChange={(event: ChangeEvent<{}>, newValue) => setSubCategoryId?.(newValue?.value ?? undefined)}
+                    options={subCategoriesWithPlaceholder}
+                    value={
+                      subCategoriesWithPlaceholder.find(subCategory => subCategory.value === subCategoryId) || null
+                    }
+                    onChange={(event, newValue) => setSubCategoryId?.(newValue?.value ?? undefined)}
                     renderTags={(tagValue, getTagProps) =>
                       tagValue.map((option: CategoryType, index) => (
-                        <Chip {...getTagProps({ index })} key={index} label={option.label} />
+                        <Chip {...getTagProps({ index })} key={option.value} label={option.label} />
                       ))
                     }
                     getOptionLabel={option => option.label || ''}
@@ -189,6 +220,7 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
                       />
                     )}
                     disabled={subCategoriesLoading}
+                    noOptionsText={subCategoriesWithPlaceholder.length === 0 ? 'No subcategories available' : undefined}
                   />
                 </Grid>
               )}
