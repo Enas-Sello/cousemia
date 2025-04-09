@@ -2,10 +2,8 @@
 
 import React, { useMemo, useState } from 'react'
 
-import Link from 'next/link'
-
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Card, CardContent, Chip, IconButton, Tooltip } from '@mui/material'
+import { Card, CardContent, Chip } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
   createColumnHelper,
@@ -28,6 +26,9 @@ import TablePaginationComponent from '@/components/TablePaginationComponent'
 import type { LectureType } from '@/types/lectureType'
 import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
+import EditButton from '@/components/EditButton'
+import ViewButton from '@/components/ViewButton'
+import DeleteButton from '@/components/DeleteButton'
 
 // Custom fuzzy filter for Tanstack Table
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -163,6 +164,7 @@ export default function Lectures({
             label={row.original.is_active ? 'Active' : 'Inactive'}
             color={row.original.is_active ? 'success' : 'error'}
             variant='tonal'
+            size='small'
           />
         )
       }),
@@ -182,26 +184,14 @@ export default function Lectures({
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => (
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <Tooltip title='Edit Lecture' arrow>
-              <IconButton>
-                <Link href={`/study/lectures/edit/${row.original.id}`}>
-                  <i className='tabler-edit text-[18px] text-textSecondary' />
-                </Link>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='View lectures' arrow>
-              <IconButton>
-                <Link href={`/study/lectures/${row.original.id}`}>
-                  <i className='tabler-eye text-[18px] text-textSecondary' />
-                </Link>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Delete Lecture' arrow>
-              <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
-                <i className='tabler-trash text-[18px] text-textSecondary' />
-              </IconButton>
-            </Tooltip>
+          <div className='flex items-center gap-1'>
+            <EditButton Tooltiptitle='Edit Lecture' link={`/study/lectures/edit/${row.original.id}`} />
+            <ViewButton Tooltiptitle='view Lectures' link={`/study/lectures/${row.original.id}`} />
+            <DeleteButton
+              Tooltiptitle='Delete lectures'
+              deleteConfirm={() => handleDeleteConfirm(row.original.id)}
+              id={row.original.id}
+            />
           </div>
         )
       })

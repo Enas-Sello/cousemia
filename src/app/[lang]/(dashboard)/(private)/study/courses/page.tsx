@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Card, CardContent, IconButton, Tooltip } from '@mui/material'
+import { Card, CardContent, Chip, IconButton, Tooltip } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import type { FilterFn, ColumnDef, SortingState } from '@tanstack/react-table'
 import {
@@ -33,6 +33,9 @@ import { getAdmin } from '@/data/getAdmin'
 import type { CourseType, StatusType } from '@/types/courseType'
 import CourseFilters from '@/components/CourseFilters'
 import PageHeader from '@/components/PageHeader'
+import EditButton from '@/components/EditButton'
+import ViewButton from '@/components/ViewButton'
+import DeleteButton from '@/components/DeleteButton'
 
 // import StatusChanger from '@/components/StatusChanger'
 
@@ -205,19 +208,24 @@ export default function CourseList() {
         id: 'price_after_discount',
         header: 'After Discount'
       }),
-
+      columnHelper.display({
+        header: 'Is Active',
+        cell: ({ row }) => (
+          <Chip
+            label={row.original.is_active ? 'Active' : 'Inactive'}
+            color={row.original.is_active ? 'success' : 'error'}
+            variant='tonal'
+            size='small'
+          />
+        )
+      }),
       columnHelper.display({
         header: 'Actions',
         id: 'actions',
         cell: ({ row }) => (
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <Tooltip title='Edit Course' arrow>
-              <IconButton>
-                <Link href={`/study/courses/edit/${row.original.id}`}>
-                  <i className='tabler-edit text-[18px] text-textSecondary' />
-                </Link>
-              </IconButton>
-            </Tooltip>
+          <div className='flex items-center gap-1'>
+            <EditButton Tooltiptitle='Edit Course' link={`/study/courses/edit/${row.original.id}`} />
+
             <Tooltip title='View Reviews' arrow>
               <IconButton>
                 <Link href={`/study/courses/review/${row.original.id}`}>
@@ -225,18 +233,13 @@ export default function CourseList() {
                 </Link>
               </IconButton>
             </Tooltip>
-            <Tooltip title='View Course' arrow>
-              <IconButton>
-                <Link href={`/study/courses/${row.original.id}`}>
-                  <i className='tabler-eye text-[18px] text-textSecondary' />
-                </Link>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Delete Course' arrow>
-              <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
-                <i className='tabler-trash text-[18px] text-textSecondary' />
-              </IconButton>
-            </Tooltip>
+            <ViewButton Tooltiptitle='view Courses' link={`/study/courses/${row.original.id}`} />
+
+            <DeleteButton
+              Tooltiptitle='Delete Course'
+              deleteConfirm={() => handleDeleteConfirm(row.original.id)}
+              id={row.original.id}
+            />
           </div>
         )
       })

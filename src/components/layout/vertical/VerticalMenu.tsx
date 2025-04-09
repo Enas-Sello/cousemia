@@ -118,8 +118,8 @@ const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
             Lectures
           </MenuItem>
 
-          <MenuItem href={`/${locale}/study/nots`} icon={<IconNotebook size={23} stroke={1} />}>
-            Nots
+          <MenuItem href={`/${locale}/study/notes`} icon={<IconNotebook size={23} stroke={1} />}>
+            Notes
           </MenuItem>
           <MenuItem href={`/${locale}/study/questionsAnswer`} icon={<IconBookmark size={23} stroke={1} />}>
             Questions & Answers

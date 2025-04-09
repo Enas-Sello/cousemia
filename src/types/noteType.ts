@@ -1,3 +1,5 @@
+import type { SubCategory } from './lectureType'
+
 export type NoteType = {
   id: number
   title_en: string
@@ -15,11 +17,15 @@ export type NoteType = {
   status: string
   created_at: string
   created_by: string
+  subs?: SubCategory[]
 }
 
 export interface NotesResponse {
   total: number
   notes: NoteType[]
+}
+export interface NoteResponse {
+  data: NoteType
 }
 export interface NotesProps {
   courseId: number | undefined

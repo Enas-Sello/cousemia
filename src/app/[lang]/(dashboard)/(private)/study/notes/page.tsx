@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 import FiltersDataInput from '@/components/FiltersDataInput'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
-import Notes from '@/views/courses/note/Notes'
+import Notes from '@/views/courses/notes/Notes'
 import PageHeader from '@/components/PageHeader'
 
 export default function NotesList() {
