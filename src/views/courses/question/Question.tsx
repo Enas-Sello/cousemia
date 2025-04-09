@@ -4,7 +4,9 @@ import React, { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Card, CardContent, CardHeader, Chip, IconButton } from '@mui/material'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import { Card, CardContent, Chip, IconButton } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
   createColumnHelper,
@@ -15,11 +17,9 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
 import { rankItem } from '@tanstack/match-sorter-utils'
-import { toast } from 'react-toastify'
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import type { QuestionType } from '@/types/questionType'
-
+import type { QuestionProps, QuestionType } from '@/types/questionType'
+import { deleteQuestion, getQuestions } from '@/data/courses/questionsQuery'
 import StatusChange from './StatusChange'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
@@ -27,10 +27,9 @@ import TablePaginationComponent from '@/components/TablePaginationComponent'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
-import { deleteQuestion, getQuestions } from '@/data/courses/questionsQuery'
 
-// Custom fuzzy filter for Tanstack Table
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+// Define the fuzzy filter for global search
+const fuzzyFilter: FilterFn<QuestionType> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
 
   addMeta({ itemRank })
@@ -38,36 +37,18 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed
 }
 
-// Table setup
-const columnHelper = createColumnHelper<QuestionType>()
+// Define the props for the Question component
 
-export default function Question({
-  courseId,
-  subCategoryId,
-  categoryId
-}: {
-  courseId: number | undefined
-  subCategoryId: number | undefined
-  categoryId: number | undefined
-}) {
-  // State for table controls
-  const [perPage, setPerPage] = useState<number>(10)
-  const [page, setPage] = useState<number>(0)
-
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      desc: true,
-      id: 'id'
-    }
-  ])
-
+export default function Question({ courseId, subCategoryId, categoryId }: QuestionProps) {
+  const queryClient = useQueryClient()
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'id', desc: true }])
   const [globalFilter, setGlobalFilter] = useState('')
-  const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
+  const [page, setPage] = useState(0)
+  const [perPage, setPerPage] = useState(10)
+  const [confirmDialog, setConfirmDialog] = useState(false)
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null)
 
-  // React Query: Fetch questions
-  const queryClient = useQueryClient()
-
+  // Fetch questions using useQuery
   const queryKey = ['questions', courseId, subCategoryId, categoryId, page, perPage, sorting, globalFilter]
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -93,20 +74,22 @@ export default function Question({
         }
       }
 
-      const result = await getQuestions(filterQuery)
-
-      return result // { questions: QuestionType[], total: number }
+      return await getQuestions(filterQuery)
     },
     placeholderData: keepPreviousData
   })
 
-  // React Query: Delete question mutation
+  // Extract questions and total from the query result
+  const questions = data?.questions ?? []
+  const total = data?.total ?? 0
+
+  // Mutation for deleting a question
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteQuestion(id),
     onSuccess: (_, id) => {
       toast.success('Question deleted successfully')
 
-      // Optimistically update the UI by filtering out the deleted question
+      // Optimistically update the UI
       queryClient.setQueryData(queryKey, (oldData: { questions: QuestionType[]; total: number } | undefined) => {
         if (!oldData) return { questions: [], total: 0 }
 
@@ -122,7 +105,7 @@ export default function Question({
       setSelectedQuestionId(null)
     },
     onError: () => {
-      toast.error('Failed to delete. Please try again.')
+      toast.error('Failed to delete question. Please try again.')
       setConfirmDialog(false)
       setSelectedQuestionId(null)
     }
@@ -134,7 +117,7 @@ export default function Question({
     setConfirmDialog(true)
   }
 
-  // Handle dialog action (delete)
+  // Handle delete action
   const handleDialogAction = () => {
     if (selectedQuestionId !== null) {
       deleteMutation.mutate(selectedQuestionId)
@@ -147,37 +130,46 @@ export default function Question({
     setSelectedQuestionId(null)
   }
 
+  // Define table columns
+  const columnHelper = createColumnHelper<QuestionType>()
+
   const columns = useMemo<ColumnDef<QuestionType, any>[]>(
     () => [
       columnHelper.accessor('title_en', {
-        cell: info => (
+        header: 'Title (English)',
+        cell: ({ getValue }) => (
           <div style={{ width: '350px', whiteSpace: 'normal', wordWrap: 'break-word' }}>
-            <p>{info.getValue().length > 50 ? `${info.getValue().substring(0, 50)}...` : info.getValue()}</p>
+            <p>{getValue().length > 50 ? `${getValue().substring(0, 50)}...` : getValue()}</p>
           </div>
-        ),
-        header: () => <div style={{ width: '350px' }}>Title En</div>
+        )
       }),
       columnHelper.accessor('course', {
-        header: 'Course'
+        header: 'Course',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('category', {
-        header: 'Category'
+        header: 'Category',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('sub_category', {
-        header: 'Sub Category'
+        header: 'Sub Category',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('created_by', {
-        header: 'Created By'
+        header: 'Created By',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('created_at', {
-        header: 'Created At'
+        header: 'Created At',
+        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
+      }),
+      columnHelper.accessor('title_ar', {
+        header: 'Title (Arabic)',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.display({
         header: 'Is Active',
         cell: ({ row }) => <StatusChange row={row} />
-      }),
-      columnHelper.accessor('title_ar', {
-        header: 'Title Ar'
       }),
       columnHelper.accessor('is_free_content', {
         header: 'Is Free Content',
@@ -193,16 +185,14 @@ export default function Question({
       columnHelper.display({
         header: 'Actions',
         cell: ({ row }) => (
-          <div>
+          <div className='flex gap-2'>
             <IconButton>
               <Link href={`/study/questionsAnswer/edit/${row.original.id}`} className='flex'>
                 <i className='tabler-edit text-[22px] text-textSecondary' />
               </Link>
             </IconButton>
             <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
-              <Link href='#' className='flex' onClick={e => e.preventDefault()}>
-                <i className='tabler-trash text-[22px] text-textSecondary' />
-              </Link>
+              <i className='tabler-trash text-[22px] text-textSecondary' />
             </IconButton>
           </div>
         )
@@ -211,16 +201,16 @@ export default function Question({
     []
   )
 
+  // Initialize the table
   const table = useReactTable({
-    data: data?.questions || [],
+    data: questions,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    manualPagination: true,
     getSortedRowModel: getSortedRowModel(),
-    pageCount: data ? Math.round(data.total / perPage) : 0,
+    manualPagination: true,
+    pageCount: Math.ceil(total / perPage),
     state: {
       globalFilter,
       sorting,
@@ -229,6 +219,7 @@ export default function Question({
         pageSize: perPage
       }
     },
+    onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting
   })
 
@@ -246,7 +237,6 @@ export default function Question({
       <Grid container spacing={6}>
         <Grid size={{ xs: 12 }}>
           <Card>
-            <CardHeader title='Course Questions' className='pbe-4' />
             <CardContent>
               <TableRowsNumberAndAddNew
                 addText='Add Question'
@@ -260,7 +250,7 @@ export default function Question({
               />
             </CardContent>
             <GenericTable table={table} />
-            <TablePaginationComponent table={table} total={data?.total || 0} page={page} setPage={setPage} />
+            <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
           </Card>
         </Grid>
       </Grid>

@@ -49,6 +49,7 @@ export const genericQueryFn = async ({ url, method = 'GET', queryParams = {}, bo
 
     // Return the response data
     return response.data
+    
   } catch (error: any) {
     // React Query expects errors to be thrown for proper error handling
     throw new Error(error.response?.data?.message || error.message || 'An error occurred')

@@ -11,7 +11,6 @@ import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/c
 import { getCourses } from '@/data/courses/coursesQuery'
 import type { CourseType } from '@/types/courseType'
 import type { CategoryType } from '@/types/categoryType'
-import ErrorBox from './ErrorBox'
 
 interface FiltersDataInputProps {
   courseId: number | undefined
@@ -70,8 +69,10 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
 
   // Determine grid size based on drawer prop
   const gridSize = drawer ? { xs: 12 } : { xs: 12, sm: 6, md: 4 }
+
   // Add placeholders for missing categories and subcategories
   const categoriesWithPlaceholder = categoryData?.data || []
+
   if (categoryId && !categoriesWithPlaceholder.some(cat => cat.value === categoryId)) {
     categoriesWithPlaceholder.unshift({
       value: categoryId,
@@ -81,6 +82,7 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
   }
 
   const subCategoriesWithPlaceholder = subCategoryData?.data || []
+
   if (subCategoryId && !subCategoriesWithPlaceholder.some(sub => sub.value === subCategoryId)) {
     subCategoriesWithPlaceholder.unshift({
       value: subCategoryId,
@@ -88,6 +90,7 @@ const FiltersDataInput: React.FC<FiltersDataInputProps> = ({
       parent_category: ''
     })
   }
+
   return (
     <Grid container spacing={drawer ? 0 : 6} className='mb-6'>
       <Grid size={{ xs: 12 }}>

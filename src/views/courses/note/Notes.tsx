@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Card, CardContent, CardHeader, Chip, IconButton } from '@mui/material'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import { Card, CardContent, Chip, IconButton } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -14,27 +15,22 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-
 import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
-
-// Third-party Imports
 import { rankItem } from '@tanstack/match-sorter-utils'
 
-import { toast } from 'react-toastify'
-
-import type { LectureType } from '@/types/lectureType'
-import { deleteLecture } from '@/data/lectures/lecturesQuery'
-
+import type { NotesProps, NoteType } from '@/types/noteType'
+import { getNotes, deleteNote } from '@/data/notes/notesQuery' // Renamed deleteLecture to deleteNote
 import StatusChange from './StatusChange'
-import AddLectureDrawer from './AddLectureDrawer'
 import ConfirmDialog from '@/components/ConfirmDialog'
-import { getNotes } from '@/data/notes/notesQuery'
-import type { NoteType } from '@/types/noteType'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
+import AddNoteDrawer from './AddNoteDrawer'
+import Loading from '@/components/loading'
+import ErrorBox from '@/components/ErrorBox'
 
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+// Define the fuzzy filter for global search
+const fuzzyFilter: FilterFn<NoteType> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
 
   addMeta({ itemRank })
@@ -42,121 +38,129 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed
 }
 
-export default function Notes({
-  courseId,
-  subCategoryId,
-  categoryId
-}: {
-  courseId: number | undefined
-  subCategoryId: number | undefined
-  categoryId: number | undefined
-}) {
-  const [data, setData] = useState<LectureType[]>([])
-  const [total, setTotal] = useState<number>(0)
-  const [perPage, setPerPage] = useState<number>(10)
-  const [page, setPage] = useState<number>(0)
+// Define the props for the Notes component
 
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      desc: true,
-      id: ''
-    }
-  ])
-
-  const [addLectureOpen, setAddLectureOpen] = useState(false)
+export default function Notes({ courseId, subCategoryId, categoryId }: NotesProps) {
+  const queryClient = useQueryClient()
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'id', desc: true }])
   const [globalFilter, setGlobalFilter] = useState('')
-
-  const fetchData = async (course: number | undefined) => {
-    const filterQuery = {
-      q: globalFilter,
-      perPage: perPage,
-      page: page === 0 ? 1 : page + 1,
-      sortBy: sorting[0]?.id || 'id',
-      sortDesc: sorting[0]?.desc ? true : 'asc'
-    } as { [key: string]: any }
-
-    if (course) {
-      filterQuery.course = course
-
-      if (categoryId) {
-        filterQuery.category = categoryId
-
-        if (subCategoryId) {
-          filterQuery.sub_category = subCategoryId
-        }
-      }
-    }
-
-    const result = await getNotes(filterQuery)
-
-    const { total, notes } = result
-
-    setData(notes)
-    setTotal(total)
-  }
-
-  const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
+  const [page, setPage] = useState(0)
+  const [perPage, setPerPage] = useState(10)
+  const [addNoteOpen, setAddNoteOpen] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState(false)
   const [deleteId, setDeleteId] = useState<number | undefined>(undefined)
 
-  const deleteAction = async () => {
-    try {
-      if (deleteId) {
-        await deleteLecture(deleteId)
-        toast.success('Lecture deleted successfully')
-        setData(prevData => prevData.filter(lecture => lecture.id !== deleteId))
-        setConfirmDialog(false)
+  // Fetch notes using useQuery
+  const {
+    data: notesData,
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['notes', courseId, categoryId, subCategoryId, page, perPage, sorting, globalFilter, addNoteOpen],
+    queryFn: async () => {
+      const filterQuery: { [key: string]: any } = {
+        q: globalFilter,
+        perPage,
+        page: page === 0 ? 1 : page + 1,
+        sortBy: sorting[0]?.id || 'id',
+        sortDesc: sorting[0]?.desc ? true : 'asc'
       }
-    } catch (e) {
-      e
-      toast.error('Failed to delete. Please try again.')
+
+      if (courseId) {
+        filterQuery.course = courseId
+
+        if (categoryId) {
+          filterQuery.category = categoryId
+
+          if (subCategoryId) {
+            filterQuery.sub_category = subCategoryId
+          }
+        }
+      }
+
+      const result = await getNotes(filterQuery)
+
+      return result
+    }
+  })
+
+  // Extract notes and total from the query result
+  const notes = notesData?.notes ?? []
+  const total = notesData?.total ?? 0
+
+  // Mutation for deleting a note
+  const deleteNoteMutation = useMutation({
+    mutationFn: (id: number) => deleteNote(id), // Renamed deleteLecture to deleteNote
+    onSuccess: () => {
+      toast.success('Note deleted successfully')
+      queryClient.invalidateQueries({ queryKey: ['notes'] })
+      setConfirmDialog(false)
+    },
+    onError: () => {
+      toast.error('Failed to delete note. Please try again.')
+    }
+  })
+
+  // Handle delete confirmation
+  const deleteConfirm = (id: number) => {
+    setDeleteId(id)
+    setConfirmDialog(true)
+  }
+
+  // Handle delete dialog close
+  const deleteDialogClose = () => {
+    setDeleteId(undefined)
+    setConfirmDialog(false)
+  }
+
+  // Handle delete action
+  const deleteAction = () => {
+    if (deleteId) {
+      deleteNoteMutation.mutate(deleteId)
     }
   }
 
-  const deleteConfirm = async (id: number) => {
-    setConfirmDialog(true)
-    setDeleteId(id)
-  }
-
-  const deleteDialogClose = () => {
-    setDeleteId(undefined)
-    setConfirmDialog(!confirmDialog)
-  }
-
+  // Define table columns
   const columnHelper = createColumnHelper<NoteType>()
 
   const columns = useMemo<ColumnDef<NoteType, any>[]>(
     () => [
       columnHelper.accessor('id', {
-        header: 'Id'
+        header: 'ID',
+        cell: ({ getValue }) => getValue()
       }),
       columnHelper.accessor('title_en', {
-        header: 'Title En'
+        header: 'Title (English)',
+        cell: ({ getValue }) => getValue()
       }),
       columnHelper.accessor('course', {
-        header: 'Course'
+        header: 'Course',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('category', {
-        header: 'Category'
+        header: 'Category',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('sub_category', {
-        header: 'Sub Category'
+        header: 'Sub Category',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('created_by', {
-        header: 'Created By'
+        header: 'Created By',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('created_at', {
-        header: 'Created At'
+        header: 'Created At',
+        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
       }),
       columnHelper.accessor('title_ar', {
-        header: 'Title Ar'
+        header: 'Title (Arabic)',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.display({
         header: 'Is Active',
-        cell: ({ row }) => (
-          <>
-            <StatusChange row={row} />
-          </>
-        )
+        cell: ({ row }) => <StatusChange row={row} />
       }),
       columnHelper.accessor('is_free_content', {
         header: 'Is Free Content',
@@ -173,17 +177,14 @@ export default function Notes({
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => (
-          <div>
+          <div className='flex gap-2'>
             <IconButton>
-              <Link href='#' className='flex'>
+              <Link href={`/study/notes/edit/${row.original.id}`} className='flex'>
                 <i className='tabler-edit text-[22px] text-textSecondary' />
               </Link>
             </IconButton>
-
             <IconButton onClick={() => deleteConfirm(row.original.id)}>
-              <Link href='#' className='flex'>
-                <i className='tabler-trash text-[22px] text-textSecondary' />
-              </Link>
+              <i className='tabler-trash text-[22px] text-textSecondary' />
             </IconButton>
           </div>
         )
@@ -192,16 +193,16 @@ export default function Notes({
     []
   )
 
+  // Initialize the table
   const table = useReactTable({
-    data,
+    data: notes,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    manualPagination: true,
     getSortedRowModel: getSortedRowModel(),
-    pageCount: Math.round(total / perPage),
+    manualPagination: true,
+    pageCount: Math.ceil(total / perPage),
     state: {
       globalFilter,
       sorting,
@@ -210,19 +211,23 @@ export default function Notes({
         pageSize: perPage
       }
     },
+    onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting
   })
 
-  useEffect(() => {
-    fetchData(courseId)
-  }, [courseId, categoryId, subCategoryId, page, sorting, globalFilter, addLectureOpen])
+  if (isLoading) {
+    return <Loading />
+  }
+
+  if (error) {
+    return <ErrorBox error={error} refetch={refetch} />
+  }
 
   return (
     <>
       <Grid container spacing={6}>
         <Grid size={{ xs: 12 }}>
           <Card>
-            <CardHeader title='Course Notes' className='pbe-4' />
             <CardContent>
               <TableRowsNumberAndAddNew
                 addText='Add Note'
@@ -231,21 +236,20 @@ export default function Notes({
                 globalFilter={globalFilter}
                 setGlobalFilter={setGlobalFilter}
                 addButton
-                addFunction={() => setAddLectureOpen(!addLectureOpen)}
+                addFunction={() => setAddNoteOpen(true)}
               />
             </CardContent>
             <GenericTable table={table} />
-
             <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
           </Card>
         </Grid>
       </Grid>
-      <AddLectureDrawer open={addLectureOpen} handleClose={() => setAddLectureOpen(!addLectureOpen)} />
+      <AddNoteDrawer open={addNoteOpen} handleClose={() => setAddNoteOpen(false)} />
       <ConfirmDialog
         handleAction={deleteAction}
         handleClose={deleteDialogClose}
         open={confirmDialog}
-        closeText={'Cancel'}
+        closeText='Cancel'
       />
     </>
   )

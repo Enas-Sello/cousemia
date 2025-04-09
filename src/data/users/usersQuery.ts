@@ -4,7 +4,7 @@ import { API_USERS } from '@/configs/api'
 import { genericQueryFn } from '@/libs/queryFn'
 
 // Fetch users with query parameters
-const getUsers = async (
+export const getUsers = async (
   q: string = '',
   perPage: number = 10,
   page: number = 1,
@@ -29,8 +29,6 @@ const getUsers = async (
     queryParams
   })
 }
-
-export default getUsers
 
 // Update user status (active/inactive)
 export const updateUserStatus = async (route: string, Id: number, status: boolean): Promise<any> => {

@@ -74,7 +74,7 @@ const schema = object({
   // video_thumb: string([minLength(1, 'This field is required')])
 })
 
-const AddLectureDrawer = ({ open, handleClose }: Props) => {
+const AddNoteDrawer = ({ open, handleClose }: Props) => {
   const [formData, setFormData] = useState<FormDataType>(initialData)
 
   const [videoTypeOptions, setVideoTypeOptions] = useState([
@@ -543,4 +543,4 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
   )
 }
 
-export default AddLectureDrawer
+export default AddNoteDrawer

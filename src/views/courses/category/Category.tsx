@@ -4,7 +4,9 @@ import React, { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Card, CardContent, CardHeader, IconButton, Tooltip } from '@mui/material'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import { Card, CardContent, IconButton, Tooltip } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
   createColumnHelper,
@@ -14,14 +16,11 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
-import { toast } from 'react-toastify'
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { IconPlus, IconBook, IconDeviceLaptop, IconChartBar, IconEdit, IconTrash } from '@tabler/icons-react'
 
 import type { CourseCategoryType } from '@/types/categoryType'
 import { deleteCategory, getCategories } from '@/data/categories/categoriesQuerys'
-
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
@@ -31,37 +30,25 @@ import ErrorBox from '@/components/ErrorBox'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import AddFlashCardDrawer from '../flashcard/AddFlashCardDrawer'
 
-// Table setup
-const columnHelper = createColumnHelper<CourseCategoryType>()
-
-export default function CourseCategory({
-  courseId,
-  categoryId
-}: {
+// Define the props for the CourseCategory component
+interface CourseCategoryProps {
   courseId: number | undefined
   categoryId: number | undefined
-}) {
-  // State for table controls
-  const [selectedCategoryIdForFlashCard, setSelectedCategoryIdForFlashCard] = useState<number | null>(null)
-  const [perPage, setPerPage] = useState<number>(10)
-  const [page, setPage] = useState<number>(0)
+}
 
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      desc: true,
-      id: 'id'
-    }
-  ])
-
-  const [globalFilter, setGlobalFilter] = useState('')
-  const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
-  const [addFlashCardOpen, setAddFlashCardOpen] = useState(false)
-
-  // React Query: Fetch categories
+export default function CourseCategory({ courseId, categoryId }: CourseCategoryProps) {
   const queryClient = useQueryClient()
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'id', desc: true }])
+  const [globalFilter, setGlobalFilter] = useState('')
+  const [page, setPage] = useState(0)
+  const [perPage, setPerPage] = useState(10)
+  const [addFlashCardOpen, setAddFlashCardOpen] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState(false)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
+  const [selectedCategoryIdForFlashCard, setSelectedCategoryIdForFlashCard] = useState<number | null>(null)
 
-  const queryKey = ['categories', courseId, categoryId, page, perPage, sorting, globalFilter]
+  // Fetch categories using useQuery
+  const queryKey = ['categories', courseId, categoryId, page, perPage, sorting, globalFilter, addFlashCardOpen]
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey,
@@ -82,20 +69,22 @@ export default function CourseCategory({
         }
       }
 
-      const result = await getCategories(filterQuery)
-
-      return result
+      return await getCategories(filterQuery) // { categories: CourseCategoryType[], total: number }
     },
     placeholderData: keepPreviousData
   })
 
-  // React Query: Delete category mutation
+  // Extract categories and total from the query result
+  const categories = data?.categories ?? []
+  const total = data?.total ?? 0
+
+  // Mutation for deleting a category
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteCategory(id),
     onSuccess: (_, id) => {
       toast.success('Category deleted successfully')
 
-      // Optimistically update the UI by filtering out the deleted category
+      // Optimistically update the UI
       queryClient.setQueryData(queryKey, (oldData: { categories: CourseCategoryType[]; total: number } | undefined) => {
         if (!oldData) return { categories: [], total: 0 }
 
@@ -107,13 +96,8 @@ export default function CourseCategory({
 
       // Invalidate the query to refetch the latest data
       queryClient.invalidateQueries({ queryKey })
-      setConfirmDialog(false) // Close the dialog
-      setSelectedCategoryId(null) // Reset the selected category
-    },
-    onError: () => {
-      toast.error('Failed to delete. Please try again.')
-      setConfirmDialog(false) // Close the dialog on error
-      setSelectedCategoryId(null) // Reset the selected category
+      setConfirmDialog(false)
+      setSelectedCategoryId(null)
     }
   })
 
@@ -123,7 +107,7 @@ export default function CourseCategory({
     setConfirmDialog(true)
   }
 
-  // Handle dialog action (delete)
+  // Handle delete action
   const handleDialogAction = () => {
     if (selectedCategoryId !== null) {
       deleteMutation.mutate(selectedCategoryId)
@@ -136,77 +120,75 @@ export default function CourseCategory({
     setSelectedCategoryId(null)
   }
 
-  // Handle add flash card by categoryID
+  // Handle add flashcard by category ID
   const handleAddFlashCard = (id: number) => {
     setSelectedCategoryIdForFlashCard(id)
     setAddFlashCardOpen(true)
   }
 
+  // Define table columns
+  const columnHelper = createColumnHelper<CourseCategoryType>()
+
   const columns = useMemo<ColumnDef<CourseCategoryType, any>[]>(
     () => [
       columnHelper.accessor('course_name', {
-        header: 'Course Name'
+        header: 'Course Name',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('title_en', {
-        header: 'Title En'
+        header: 'Title (English)',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('title_ar', {
-        header: 'Title Ar'
+        header: 'Title (Arabic)',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.display({
-        id: 'actions',
         header: 'Actions',
         cell: ({ row }) => (
-          <div className='flex'>
-            {/* add question to category */}
+          <div className='flex gap-1'>
+            {/* Add Question to Category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Question</span>} arrow>
               <IconButton>
-                <Link href={`/study/questionsAnswer/create?categoryId=${row.original.id}`} className='flex'>
+                <Link href={`/study/questionsAnswer/create?categoryId=${row.original.id}`}>
                   <IconPlus size={18} className='text-textSecondary' />
                 </Link>
               </IconButton>
             </Tooltip>
-            {/* add note to  category */}
+            {/* Add Note to Category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Note</span>} arrow>
               <IconButton>
-                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                <Link href={`/study/notes/create?categoryId=${row.original.id}`}>
                   <IconBook size={18} className='text-textSecondary' />
                 </Link>
               </IconButton>
             </Tooltip>
-            {/* add lectcher to  category */}
+            {/* Add Lecture to Category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Lecture</span>} arrow>
               <IconButton>
-                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                <Link href={`/study/lectures/create?categoryId=${row.original.id}`}>
                   <IconDeviceLaptop size={18} className='text-textSecondary' />
                 </Link>
               </IconButton>
             </Tooltip>
-            {/* add flashCard to  category */}
-            <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Flash Card</span>} arrow>
-              <IconButton>
-                <IconChartBar
-                  onClick={() => handleAddFlashCard(row.original.id)}
-                  size={18}
-                  className='text-textSecondary'
-                />
+            {/* Add Flashcard to Category */}
+            <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Add Flashcard</span>} arrow>
+              <IconButton onClick={() => handleAddFlashCard(row.original.id)}>
+                <IconChartBar size={18} className='text-textSecondary' />
               </IconButton>
             </Tooltip>
-            {/* edit category */}
-
+            {/* Edit Category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Edit</span>} arrow>
               <IconButton>
-                <Link href={`/study/categories/edit/${row.original.id}`} className='flex'>
+                <Link href={`/study/categories/edit/${row.original.id}`}>
                   <IconEdit size={18} className='text-textSecondary' />
                 </Link>
               </IconButton>
             </Tooltip>
-            {/* delet category */}
+            {/* Delete Category */}
             <Tooltip placement='top' title={<span style={{ fontSize: '12px' }}>Delete</span>} arrow>
               <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
-                <Link href='#' className='flex'>
-                  <IconTrash size={18} className='text-textSecondary' />
-                </Link>
+                <IconTrash size={18} className='text-textSecondary' />
               </IconButton>
             </Tooltip>
           </div>
@@ -216,16 +198,16 @@ export default function CourseCategory({
     []
   )
 
+  // Initialize the table
   const table = useReactTable({
-    data: data?.categories || [],
+    data: categories,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    manualPagination: true,
     getSortedRowModel: getSortedRowModel(),
-    pageCount: data ? Math.round(data.total / perPage) : 0,
+    manualPagination: true,
+    pageCount: Math.ceil(total / perPage),
     state: {
       globalFilter,
       sorting,
@@ -234,6 +216,7 @@ export default function CourseCategory({
         pageSize: perPage
       }
     },
+    onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting
   })
 
@@ -251,30 +234,33 @@ export default function CourseCategory({
       <Grid container spacing={6}>
         <Grid size={{ xs: 12 }}>
           <Card>
-            <CardHeader title='Course Categories' className='pbe-4' />
             <CardContent>
               <TableRowsNumberAndAddNew
+                addText='Add Category'
                 perPage={perPage}
                 setPerPage={setPerPage}
                 globalFilter={globalFilter}
                 setGlobalFilter={setGlobalFilter}
+                addButton
+                type='link'
+                href={`/study/categories/create${courseId ? `?courseId=${courseId}` : ''}`}
               />
             </CardContent>
             <GenericTable table={table} />
-            <TablePaginationComponent table={table} total={data?.total || 0} page={page} setPage={setPage} />
+            <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
           </Card>
         </Grid>
       </Grid>
       <AddFlashCardDrawer
         open={addFlashCardOpen}
-        handleClose={() => setAddFlashCardOpen(!addFlashCardOpen)}
+        handleClose={() => setAddFlashCardOpen(false)}
         coursCategoryId={selectedCategoryIdForFlashCard}
       />
       <ConfirmDialog
         handleAction={handleDialogAction}
         handleClose={handleDialogClose}
         open={confirmDialog}
-        closeText={'Cancel'}
+        closeText='Cancel'
       />
     </>
   )

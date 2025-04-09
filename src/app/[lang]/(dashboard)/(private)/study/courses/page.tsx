@@ -32,6 +32,7 @@ import { getSpecialties } from '@/data/specialties/specialtiesQuery'
 import { getAdmin } from '@/data/getAdmin'
 import type { CourseType, StatusType } from '@/types/courseType'
 import CourseFilters from '@/components/CourseFilters'
+import PageHeader from '@/components/PageHeader'
 
 // import StatusChanger from '@/components/StatusChanger'
 
@@ -322,6 +323,7 @@ export default function CourseList() {
 
   return (
     <AnimationContainer>
+      <PageHeader title='Courses' breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Courses' }]} />{' '}
       <Grid container spacing={6} sx={{ marginBottom: '2rem' }}>
         <Grid size={{ xs: 12 }}>
           <CourseFilters

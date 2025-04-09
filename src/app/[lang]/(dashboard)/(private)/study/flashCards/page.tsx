@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import FiltersDataInput from '@/components/FiltersDataInput'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 import FlashCards from '@/views/courses/flashcard/FlashCards'
+import PageHeader from '@/components/PageHeader'
 
 export default function FlashCardsList() {
   const [courseId, setCourseId] = useState<number>()
@@ -12,6 +13,13 @@ export default function FlashCardsList() {
 
   return (
     <AnimationContainer>
+      <PageHeader
+        title='Flashcards'
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Flashcards' } 
+        ]}
+      />
       <FiltersDataInput
         courseId={courseId}
         categoryId={categoryId}

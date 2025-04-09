@@ -23,3 +23,9 @@ export type QuestionType = {
   created_at: string
   created_by: string
 }
+
+export interface QuestionProps {
+  courseId: number | undefined
+  subCategoryId: number | undefined
+  categoryId: number | undefined
+}

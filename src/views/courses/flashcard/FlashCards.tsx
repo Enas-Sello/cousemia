@@ -4,9 +4,10 @@ import React, { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Card, CardContent, CardHeader, Chip, IconButton } from '@mui/material'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import { Card, CardContent, Chip, IconButton } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -14,9 +15,8 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import { toast } from 'react-toastify'
+import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
 import { rankItem } from '@tanstack/match-sorter-utils'
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import type { FlashCardType } from '@/types/flashCardType'
 import { deleteFlashCard, getFlashCards } from '@/data/flashCards/flashCardsQuery'
@@ -29,8 +29,8 @@ import ConfirmDialog from '@/components/ConfirmDialog'
 import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
 
-// Custom fuzzy filter for Tanstack Table
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+// Define the fuzzy filter for global search
+const fuzzyFilter: FilterFn<FlashCardType> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
 
   addMeta({ itemRank })
@@ -38,31 +38,35 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed
 }
 
-// Table setup
-const columnHelper = createColumnHelper<FlashCardType>()
-
-export default function FlashCards({
-  courseId,
-  subCategoryId,
-  categoryId
-}: {
+// Define the props for the FlashCards component
+interface FlashCardsProps {
   courseId: number | undefined
   subCategoryId: number | undefined
   categoryId: number | undefined
-}) {
-  // State for table controls
-  const [perPage, setPerPage] = useState<number>(10)
-  const [page, setPage] = useState<number>(0)
+}
+
+export default function FlashCards({ courseId, subCategoryId, categoryId }: FlashCardsProps) {
+  const queryClient = useQueryClient()
   const [sorting, setSorting] = useState<SortingState>([{ id: 'id', desc: true }])
   const [globalFilter, setGlobalFilter] = useState('')
+  const [page, setPage] = useState(0)
+  const [perPage, setPerPage] = useState(10)
   const [addFlashCardOpen, setAddFlashCardOpen] = useState(false)
-  const [confirmDialog, setConfirmDialog] = useState<boolean>(false)
+  const [confirmDialog, setConfirmDialog] = useState(false)
   const [selectedFlashCardId, setSelectedFlashCardId] = useState<number | null>(null)
 
-  const queryClient = useQueryClient()
-
-  // Fetch flash cards using React Query
-  const queryKey = ['flashCards', courseId, subCategoryId, categoryId, page, perPage, sorting, globalFilter]
+  // Fetch flashcards using useQuery
+  const queryKey = [
+    'flashCards',
+    courseId,
+    subCategoryId,
+    categoryId,
+    page,
+    perPage,
+    sorting,
+    globalFilter,
+    addFlashCardOpen
+  ]
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey,
@@ -87,16 +91,22 @@ export default function FlashCards({
         }
       }
 
-      return getFlashCards(filterQuery)
+      return await getFlashCards(filterQuery) // { flashCards: FlashCardType[], total: number }
     },
     placeholderData: keepPreviousData
   })
 
-  // Mutation for deleting a flash card
+  // Extract flashcards and total from the query result
+  const flashCards = data?.flashCards ?? []
+  const total = data?.total ?? 0
+
+  // Mutation for deleting a flashcard
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteFlashCard(id),
     onSuccess: (_, id) => {
-      toast.success('Flash Card deleted successfully')
+      toast.success('Flashcard deleted successfully')
+
+      // Optimistically update the UI
       queryClient.setQueryData(queryKey, (oldData: { flashCards: FlashCardType[]; total: number } | undefined) => {
         if (!oldData) return { flashCards: [], total: 0 }
 
@@ -105,12 +115,14 @@ export default function FlashCards({
           total: oldData.total - 1
         }
       })
+
+      // Invalidate the query to refetch the latest data
       queryClient.invalidateQueries({ queryKey })
       setConfirmDialog(false)
       setSelectedFlashCardId(null)
     },
     onError: () => {
-      toast.error('Failed to delete. Please try again.')
+      toast.error('Failed to delete flashcard. Please try again.')
       setConfirmDialog(false)
       setSelectedFlashCardId(null)
     }
@@ -122,7 +134,7 @@ export default function FlashCards({
     setConfirmDialog(true)
   }
 
-  // Handle dialog action (delete)
+  // Handle delete action
   const handleDialogAction = () => {
     if (selectedFlashCardId !== null) {
       deleteMutation.mutate(selectedFlashCardId)
@@ -136,41 +148,49 @@ export default function FlashCards({
   }
 
   // Define table columns
+  const columnHelper = createColumnHelper<FlashCardType>()
+
   const columns = useMemo<ColumnDef<FlashCardType, any>[]>(
     () => [
       columnHelper.accessor('id', {
-        header: 'Id'
+        header: 'ID',
+        cell: ({ getValue }) => getValue()
       }),
       columnHelper.accessor('front_en', {
-        cell: info => (
+        header: 'Front (English)',
+        cell: ({ getValue }) => (
           <div style={{ width: '150px', whiteSpace: 'normal', wordWrap: 'break-word' }}>
-            <p>{info.getValue().length > 50 ? `${info.getValue().substring(0, 50)}...` : info.getValue()}</p>
+            <p>{getValue().length > 50 ? `${getValue().substring(0, 50)}...` : getValue()}</p>
           </div>
-        ),
-        header: () => <div style={{ width: '150px' }}>Front En</div>
+        )
       }),
       columnHelper.accessor('back_en', {
-        cell: info => (
+        header: 'Back (English)',
+        cell: ({ getValue }) => (
           <div style={{ width: '200px', whiteSpace: 'normal', wordWrap: 'break-word' }}>
-            <p>{info.getValue().length > 50 ? `${info.getValue().substring(0, 50)}...` : info.getValue()}</p>
+            <p>{getValue().length > 50 ? `${getValue().substring(0, 50)}...` : getValue()}</p>
           </div>
-        ),
-        header: () => <div style={{ width: '200px' }}>Back En</div>
+        )
       }),
       columnHelper.accessor('course', {
-        header: 'Course'
+        header: 'Course',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('category', {
-        header: 'Category'
+        header: 'Category',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('sub_category', {
-        header: 'Sub Category'
+        header: 'Sub Category',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('created_by', {
-        header: 'Created By'
+        header: 'Created By',
+        cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.accessor('created_at', {
-        header: 'Created At'
+        header: 'Created At',
+        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
       }),
       columnHelper.display({
         header: 'Is Active',
@@ -188,19 +208,16 @@ export default function FlashCards({
         )
       }),
       columnHelper.display({
-        id: 'actions',
         header: 'Actions',
         cell: ({ row }) => (
-          <div>
+          <div className='flex gap-2'>
             <IconButton>
               <Link href={`/study/flashCards/edit/${row.original.id}`} className='flex'>
                 <i className='tabler-edit text-[22px] text-textSecondary' />
               </Link>
             </IconButton>
             <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
-              <Link href='#' className='flex' onClick={e => e.preventDefault()}>
-                <i className='tabler-trash text-[22px] text-textSecondary' />
-              </Link>
+              <i className='tabler-trash text-[22px] text-textSecondary' />
             </IconButton>
           </div>
         )
@@ -209,17 +226,16 @@ export default function FlashCards({
     []
   )
 
-  // Initialize the table with react-table
+  // Initialize the table
   const table = useReactTable({
-    data: data?.flashCards || [],
+    data: flashCards,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    manualPagination: true,
     getSortedRowModel: getSortedRowModel(),
-    pageCount: data ? Math.round(data.total / perPage) : 0,
+    manualPagination: true,
+    pageCount: Math.ceil(total / perPage),
     state: {
       globalFilter,
       sorting,
@@ -228,6 +244,7 @@ export default function FlashCards({
         pageSize: perPage
       }
     },
+    onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting
   })
 
@@ -245,25 +262,24 @@ export default function FlashCards({
       <Grid container spacing={6}>
         <Grid size={{ xs: 12 }}>
           <Card>
-            <CardHeader title='Course Flashcards' className='pbe-4' />
             <CardContent>
               <TableRowsNumberAndAddNew
-                addText='Add Flash Card'
+                addText='Add Flashcard'
                 perPage={perPage}
                 setPerPage={setPerPage}
                 globalFilter={globalFilter}
                 setGlobalFilter={setGlobalFilter}
                 addButton
                 type='button'
-                addFunction={() => setAddFlashCardOpen(!addFlashCardOpen)}
+                addFunction={() => setAddFlashCardOpen(true)}
               />
             </CardContent>
             <GenericTable table={table} />
-            <TablePaginationComponent table={table} total={data?.total || 0} page={page} setPage={setPage} />
+            <TablePaginationComponent table={table} total={total} page={page} setPage={setPage} />
           </Card>
         </Grid>
       </Grid>
-      <AddFlashCardDrawer open={addFlashCardOpen} handleClose={() => setAddFlashCardOpen(!addFlashCardOpen)} />
+      <AddFlashCardDrawer open={addFlashCardOpen} handleClose={() => setAddFlashCardOpen(false)} />
       <ConfirmDialog
         handleAction={handleDialogAction}
         handleClose={handleDialogClose}

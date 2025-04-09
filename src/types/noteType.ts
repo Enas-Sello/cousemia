@@ -16,3 +16,13 @@ export type NoteType = {
   created_at: string
   created_by: string
 }
+
+export interface NotesResponse {
+  total: number
+  notes: NoteType[]
+}
+export interface NotesProps {
+  courseId: number | undefined
+  subCategoryId: number | undefined
+  categoryId: number | undefined
+}

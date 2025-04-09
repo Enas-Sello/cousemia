@@ -5,7 +5,7 @@ import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Card, CardContent, CardHeader, Chip, IconButton, Tooltip, CircularProgress, Alert, Box } from '@mui/material'
+import { Card, CardContent, Chip, IconButton, Tooltip } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
   createColumnHelper,
@@ -25,7 +25,6 @@ import ConfirmDialog from '@/components/ConfirmDialog'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
-import StatusChanger from '@/components/StatusChanger'
 import type { LectureType } from '@/types/lectureType'
 import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
@@ -246,7 +245,6 @@ export default function Lectures({
       <Grid container spacing={6}>
         <Grid size={{ xs: 12 }}>
           <Card>
-            <CardHeader title='Course Lectures' className='pbe-4' />
             <CardContent>
               <TableRowsNumberAndAddNew
                 addText='Add Lecture'

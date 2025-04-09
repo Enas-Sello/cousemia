@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import FiltersDataInput from '@/components/FiltersDataInput'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 import Question from '@/views/courses/question/Question'
+import PageHeader from '@/components/PageHeader'
 
 export default function QuestionsAnswer() {
   const [courseId, setCourseId] = useState<number>()
@@ -12,6 +13,8 @@ export default function QuestionsAnswer() {
 
   return (
     <AnimationContainer>
+      <PageHeader title='Questions' breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Questions' }]} />
+
       <FiltersDataInput
         courseId={courseId}
         categoryId={categoryId}
