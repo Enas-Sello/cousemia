@@ -19,6 +19,7 @@ export const LectureFormSchema = v.object({
 
   is_active: v.boolean(),
   is_free_content: v.boolean(),
+
   // image: v.string([
   //   v.minLength(1, 'A cover image is required'),
   //   v.regex(/^\d+$/, 'Image ID must be a valid number') // Ensure the image ID is a string of digits

@@ -29,6 +29,9 @@ export const API_COUNTRIES = API_URL + '/countries'
 export const API_HOSTCOURSE = API_URL + '/host-course-requests'
 export const API_EVENTS = API_URL + '/events'
 export const API_OFFERS = API_URL + '/offers'
+export const API_ABOUT_US = API_URL + '/about-us'
+export const API_TERMS = API_URL + '/terms-and-conditions'
+export const API_POLICY = API_URL + '/privacy-policy'
 
 //media
 export const API_MEDIA = API_URL + '/media'
