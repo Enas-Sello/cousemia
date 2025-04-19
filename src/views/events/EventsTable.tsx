@@ -24,11 +24,10 @@ import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 import { getAvatar } from '@/libs/helpers/getAvatar'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
-import StatusChange from '../users/StatusChange'
 import Loading from '@/components/loading'
 import AddEventDrawer from './AddEventDrawer'
 import ConfirmDialog from '@/components/ConfirmDialog'
-import { API_EVENTS } from '@/configs/api'
+import IsActive from '@/components/IsActive'
 
 const columnHelper = createColumnHelper<Event>()
 
@@ -150,7 +149,9 @@ const EventsTable = ({ status }: { status: string }) => {
     columnHelper.display({
       id: 'is_active',
       header: 'Is Active',
-      cell: ({ row }) => <StatusChange route={API_EVENTS} id={row.original.id} isActive={row.original.is_active} />
+
+      // cell: ({ row }) => <StatusChange route={API_EVENTS} id={row.original.id} isActive={row.original.is_active} />
+      cell: ({ row }) => <IsActive is_active={row.original.is_active}/>
     }),
     columnHelper.display({
       id: 'actions',

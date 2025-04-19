@@ -86,7 +86,8 @@ const HostCourseTable = () => {
       id: 'about_course',
       header: 'About Course',
       cell: ({ row }) => (
-        <div className='truncate max-w-xs' title={row.original.about_course}>
+        <div className='w-xs text-wrap' title={row.original.about_course}>
+        {/* <div className='truncate max-w-xs' title={row.original.about_course}> */}
           {row.original.about_course}
         </div>
       )
@@ -124,7 +125,6 @@ const HostCourseTable = () => {
               perPage={perPage}
               setPerPage={setPerPage}
               setGlobalFilter={setGlobalFilter}
-              addButton
             />
           </CardContent>
           {isLoading && <Loading />}

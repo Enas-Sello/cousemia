@@ -21,3 +21,12 @@ export type Ability = {
   subject: string
 }
 
+
+export type UsersResponse = {
+  users: UserType[];
+  total: number;
+};
+
+export type UserResponse = {
+  data: UserType;
+};

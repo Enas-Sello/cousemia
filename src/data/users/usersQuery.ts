@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 
 import { API_USERS } from '@/configs/api'
 import { genericQueryFn } from '@/libs/queryFn'
+import type { UserType } from '@/types/usertTypes';
 
 // Fetch users with query parameters
 export const getUsers = async (
@@ -12,7 +13,7 @@ export const getUsers = async (
   sortDesc: string = 'true',
   verified: string = '',
   status: string = ''
-): Promise<{ users: any[]; total: number }> => {
+): Promise<{ users: UserType[]; total: number }> => {
   const queryParams = {
     q,
     perPage,
@@ -31,7 +32,7 @@ export const getUsers = async (
 }
 
 // Update user status (active/inactive)
-export const updateUserStatus = async (route: string, Id: number, status: boolean): Promise<any> => {
+export const updateUserStatus = async (route: string, Id: number, status: boolean): Promise<void> => {
   return genericQueryFn({
     url: `${route}/${Id}`,
     method: 'PUT',
@@ -40,7 +41,7 @@ export const updateUserStatus = async (route: string, Id: number, status: boolea
 }
 
 // Fetch a single user by ID
-export const getUser = async (userId: number): Promise<any> => {
+export const getUser = async (userId: number): Promise<UserType> => {
   try {
     const response = await genericQueryFn({
       url: `${API_USERS}/${userId}`,

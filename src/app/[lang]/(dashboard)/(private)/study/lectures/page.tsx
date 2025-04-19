@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 
-import Lectures from '@/views/apps/lectures/lectures'
+import Lectures from '@/views/lectures/lectures'
 import FiltersDataInput from '@/components/FiltersDataInput'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 import PageHeader from '@/components/PageHeader'

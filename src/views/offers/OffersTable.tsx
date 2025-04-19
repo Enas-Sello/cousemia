@@ -24,12 +24,11 @@ import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 import { getAvatar } from '@/libs/helpers/getAvatar'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
-import StatusChange from '../users/StatusChange'
 import Loading from '@/components/loading'
 import AddOffersDrawer from './AddOffersDrawer'
 import ConfirmDialog from '@/components/ConfirmDialog'
-import { API_OFFERS } from '@/configs/api'
 import ErroBox from '@/components/ErrorBox'
+import IsActive from '@/components/IsActive'
 
 const columnHelper = createColumnHelper<Offer>()
 
@@ -165,7 +164,9 @@ const OffersTable = ({ status }: { status: string }) => {
     columnHelper.display({
       id: 'is_active',
       header: 'Is Active',
-      cell: ({ row }) => <StatusChange route={API_OFFERS} id={row.original.id} isActive={row.original.is_active} />
+
+      // cell: ({ row }) => <StatusChange route={API_OFFERS} id={row.original.id} isActive={row.original.is_active} />
+      cell:({row})=><IsActive is_active={row.original.is_active} />
     }),
     columnHelper.display({
       id: 'actions',

@@ -24,11 +24,10 @@ import { getAvatar } from '@/libs/helpers/getAvatar'
 
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
-import StatusChange from '../users/StatusChange'
 import Loading from '@/components/loading'
 import AddCountryDrawer from './AddCountryDrawer'
 import ConfirmDialog from '@/components/ConfirmDialog'
-import { API_COUNTRIES } from '@/configs/api'
+import IsActive from '@/components/IsActive'
 
 interface CountryType {
   id: number
@@ -152,7 +151,8 @@ const CountriesTable = ({ status }: { status: string }) => {
       header: 'Is Active',
       cell: ({ row }) => (
         <>
-          <StatusChange route={API_COUNTRIES} id={row.original.id} isActive={row.original.is_active} />
+        <IsActive is_active={row.original.is_active}/>
+          {/* <StatusChange route={API_COUNTRIES} id={row.original.id} isActive={row.original.is_active} /> */}
         </>
       )
     }),

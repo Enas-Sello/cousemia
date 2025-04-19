@@ -11,7 +11,8 @@ import Divider from '@mui/material/Divider'
 import { Controller, useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import { object, minLength, string, number, url, minValue } from 'valibot'
-import type { Input } from 'valibot'
+
+// import type { Input } from 'valibot'
 
 import { toast } from 'react-toastify'
 
@@ -57,7 +58,7 @@ const initialData = {
   image_src: ''
 }
 
-type FormData = Input<typeof schema>
+// type FormData = Input<typeof schema>
 
 const schema = object({
   title_en: string([minLength(1, 'This field is required')]),
@@ -83,6 +84,8 @@ const AddNoteDrawer = ({ open, handleClose }: Props) => {
     { value: 'upload', label: 'Upload video' },
     { value: 'url', label: 'Insert a URL' }
   ])
+
+  console.log("🚀 ~ AddNoteDrawer ~ setVideoTypeOptions:", setVideoTypeOptions)
 
   const [courseOptions, setCourseOptions] = useState([])
   const [categoriesOptions, setCategoriesOptions] = useState([])
