@@ -8,10 +8,9 @@ import { useForm, Controller } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import { object, string, boolean, minLength } from 'valibot'
 import { toast } from 'react-toastify'
-import { Typography, Card, CardContent, TextField, Switch, Button, CircularProgress, Box } from '@mui/material'
+import { Typography, Card, CardContent, Switch, Button, CircularProgress, Box } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
-import MediaUploader from '@/components/MediaUploader'
 import { getCountryByID, updateCountry } from '@/data/countries/countriesQuery'
 import CustomTextField from '@/@core/components/mui/TextField'
 
@@ -53,7 +52,7 @@ const EditCountry = () => {
   const country = countryResponse?.data
 
   // Form setup
-  const { control, handleSubmit, reset, setValue, watch } = useForm<FormDataType>({
+  const { control, handleSubmit, reset } = useForm<FormDataType>({
     resolver: valibotResolver(schema),
     defaultValues: {
       title_en: '',

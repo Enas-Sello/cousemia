@@ -27,7 +27,7 @@ export const DebouncedInput = ({
     }, debounce)
 
     return () => clearTimeout(timeout)
-  }, [value])
+  }, [debounce, onChange, value])
 
   return <CustomTextField {...props} value={value} onChange={e => setValue(e.target.value)} />
 }

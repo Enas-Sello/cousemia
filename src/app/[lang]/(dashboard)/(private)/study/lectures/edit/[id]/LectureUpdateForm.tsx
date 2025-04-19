@@ -1,13 +1,16 @@
 'use client'
 
 import React, { useEffect } from 'react'
+
 import { useRouter } from 'next/navigation'
+
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { Button, Card, CardContent, Alert } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { Controller, useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
+
 import CustomTextField from '@/@core/components/mui/TextField'
 import { updateLecture } from '@/data/lectures/lecturesQuery'
 import type { LectureType } from '@/types/lectureType'
@@ -43,6 +46,7 @@ export default function LectureUpdateForm({ lectureData }: { lectureData: Lectur
   const {
     control,
     handleSubmit,
+
     //@ts-ignore
     formState: { errors },
     reset,
@@ -96,6 +100,7 @@ export default function LectureUpdateForm({ lectureData }: { lectureData: Lectur
   const updateLectureMutation = useMutation({
     mutationFn: (formData: LectureFormData) => {
       const data = new FormData()
+
       data.append('title_en', formData.title_en)
       if (formData.title_ar) data.append('title_ar', formData.title_ar)
       data.append('video_type', formData.video_type)
@@ -107,7 +112,8 @@ export default function LectureUpdateForm({ lectureData }: { lectureData: Lectur
       if (formData.sub_category_id) data.append('sub_category_id', formData.sub_category_id.toString())
       data.append('is_active', formData.is_active ? '1' : '0')
       data.append('is_free_content', formData.is_free_content ? '1' : '0')
-      if (formData.image) data.append('image', formData.image) 
+      if (formData.image) data.append('image', formData.image)
+ 
       if (lectureData?.id === undefined) {
         throw new Error('Lecture ID is undefined')
       }

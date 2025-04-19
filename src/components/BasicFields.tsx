@@ -1,6 +1,7 @@
-import CustomTextField from '@/@core/components/mui/TextField'
 import Grid from '@mui/material/Grid2'
 import { Controller } from 'react-hook-form'
+
+import CustomTextField from '@/@core/components/mui/TextField'
 
 const BasicFields: React.FC<{
   control: any
@@ -82,4 +83,5 @@ const BasicFields: React.FC<{
     </Grid>
   </>
 )
+
 export default BasicFields

@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // MUI Imports
 import Button from '@mui/material/Button'
@@ -23,7 +23,9 @@ const AddNewSpecialities = ({ open, handleClose }: Props) => {
   const [thumb, setThumb] = useState<string>('')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()('thumb link: ', thumb)('submit form')
+    e.preventDefault()
+    console.log('thumb link: ', thumb)
+    console.log('submit form')
     handleClose()
   }
 

@@ -126,6 +126,7 @@ export default function RichTextEditor({
             modules={QUILL_MODULES}
             formats={QUILL_FORMATS}
             style={{ height: '300px', marginBottom: '40px' }}
+            
             //@ts-expect-error
             ref={quillRef}
           />

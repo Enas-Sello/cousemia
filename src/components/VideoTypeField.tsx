@@ -1,7 +1,9 @@
+import { Controller } from 'react-hook-form'
+
+import Grid from '@mui/material/Grid2'
+
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
 import CustomTextField from '@/@core/components/mui/TextField'
-import { Controller } from 'react-hook-form'
-import Grid from '@mui/material/Grid2'
 
 const VideoTypeField: React.FC<{
   control: any
@@ -36,4 +38,5 @@ const VideoTypeField: React.FC<{
     </Grid>
   )
 }
+
 export default VideoTypeField

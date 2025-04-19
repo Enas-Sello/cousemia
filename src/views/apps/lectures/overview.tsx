@@ -19,6 +19,8 @@ export default function CourseOverview({ courseId }: { courseId: number }) {
 
   useEffect(() => {
     fetchCourse()
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

@@ -195,7 +195,7 @@ export default function CourseCategory({ courseId, categoryId }: CourseCategoryP
         )
       })
     ],
-    []
+    [columnHelper]
   )
 
   // Initialize the table

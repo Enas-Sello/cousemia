@@ -90,6 +90,9 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   const {
     control,
     handleSubmit,
+
+        //@ts-ignore
+
     formState: { errors }
   } = useForm({
     resolver: valibotResolver(schema),

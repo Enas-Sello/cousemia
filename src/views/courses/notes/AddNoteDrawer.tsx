@@ -75,6 +75,8 @@ const schema = object({
 })
 
 const AddNoteDrawer = ({ open, handleClose }: Props) => {
+    //@ts-ignore
+
   const [formData, setFormData] = useState<FormDataType>(initialData)
 
   const [videoTypeOptions, setVideoTypeOptions] = useState([
@@ -93,8 +95,11 @@ const AddNoteDrawer = ({ open, handleClose }: Props) => {
     control,
     reset,
     handleSubmit,
+
+    //@ts-ignore
+
     formState: { errors }
-  } = useForm<FormData>({
+  } = useForm<FormDataType>({
     resolver: valibotResolver(schema),
     defaultValues: {
       title_en: '',
@@ -107,6 +112,9 @@ const AddNoteDrawer = ({ open, handleClose }: Props) => {
       category_id: 0,
       sub_category_id: 0,
       is_free_content: '',
+
+    //@ts-ignore
+
       video_thumb: ''
     }
   })
@@ -201,7 +209,8 @@ const AddNoteDrawer = ({ open, handleClose }: Props) => {
     const { data } = result
 
     const options = data.map((category: any) => ({ value: category.value, label: category.label }))
-
+    
+    //@ts-ignore
     setCategoriesOptions(options)
   }
 
@@ -217,12 +226,16 @@ const AddNoteDrawer = ({ open, handleClose }: Props) => {
 
   useEffect(() => {
     if (formData.course_id) {
+    //@ts-ignore
+
       fetchCategoryList(parseInt(formData.course_id))
     }
   }, [formData.course_id])
 
   useEffect(() => {
     if (formData.course_id && formData.category_id) {
+    //@ts-ignore
+
       fetchSubCategoryList(parseInt(formData.course_id), parseInt(formData.category_id))
     }
   }, [formData.category_id, formData.course_id])
@@ -437,8 +450,9 @@ const AddNoteDrawer = ({ open, handleClose }: Props) => {
                 getOptionLabel={(option: any) => option.label || ''}
                 value={courseOptions.find((option: any) => option.value === field.value) || 0}
                 onChange={(event, newValue) => {
-                  field.onChange(newValue ? newValue.value : 0)
-                  setFormData(prev => ({ ...prev, course_id: newValue ? newValue.value : '' }))
+                  field.onChange(newValue ? newValue.valueOf : 0)
+
+                  // setFormData(prev => ({ ...prev, course_id: newValue ? newValue.value : '' }))
                 }}
                 renderInput={params => (
                   <CustomTextField
@@ -464,8 +478,9 @@ const AddNoteDrawer = ({ open, handleClose }: Props) => {
                   getOptionLabel={(option: any) => option.label || ''}
                   value={categoriesOptions.find((option: any) => option.value === field.value) || 0}
                   onChange={(event, newValue) => {
-                    field.onChange(newValue ? newValue.value : 0)
-                    setFormData(prev => ({ ...prev, category_id: newValue ? newValue.value : '' }))
+                    field.onChange(newValue ? newValue.valueOf : 0)
+
+                    // setFormData(prev => ({ ...prev, category_id: newValue ? newValue.value : '' }))
                   }}
                   renderInput={params => (
                     <CustomTextField
@@ -492,8 +507,9 @@ const AddNoteDrawer = ({ open, handleClose }: Props) => {
                   getOptionLabel={(option: any) => option.label || ''}
                   value={subCategoryOptions.find((option: any) => option.value === field.value) || 0}
                   onChange={(event, newValue) => {
-                    field.onChange(newValue ? newValue.value : 0)
-                    setFormData(prev => ({ ...prev, sub_category_id: newValue ? newValue.value : '' }))
+                    field.onChange(newValue ? newValue.valueOf : 0)
+
+                    // setFormData(prev => ({ ...prev, sub_category_id: newValue ? newValue.value : '' }))
                   }}
                   renderInput={params => (
                     <CustomTextField

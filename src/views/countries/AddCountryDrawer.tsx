@@ -1,13 +1,13 @@
 'use client'
-import { useState } from 'react'
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+// import { useState } from 'react'
+
+// import { useQueryClient } from '@tanstack/react-query'
 import { boolean, minLength, minValue, number, object, string } from 'valibot'
 import { Controller, useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
-import { Box, Divider, Drawer, FormHelperText, IconButton, TextField, Typography } from '@mui/material'
+import { Box, Divider, Drawer, IconButton, Typography } from '@mui/material'
 
-import { useDropzone } from 'react-dropzone'
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import MediaUploader from '@/components/MediaUploader'
@@ -26,13 +26,13 @@ type FormDataType = {
   flagUrl?: string // To store the uploaded flag URL for preview
 }
 
-const initialData = {
-  title_en: '',
-  title_ar: '',
-  is_active: true,
-  country_code: +20,
-  flag: ''
-}
+// const initialData = {
+//   title_en: '',
+//   title_ar: '',
+//   is_active: true,
+//   country_code: +20,
+//   flag: ''
+// }
 
 const schema = object({
   title_en: string([minLength(1, 'This field is required')]),
@@ -42,17 +42,21 @@ const schema = object({
 })
 
 const AddCountryDrawer = ({ open, handleClose }: AddNewProps) => {
-  const queryClient = useQueryClient()
-  const [formData, setFormData] = useState<FormDataType>(initialData)
-  const [videoUploading, setVideoUploading] = useState(false)
-  const [imageUploading, setImageUploading] = useState(false)
+  // const queryClient = useQueryClient()
+
+  // const [formData, setFormData] = useState<FormDataType>(initialData)
+  // const [videoUploading, setVideoUploading] = useState(false)
+  // const [imageUploading, setImageUploading] = useState(false)
 
   const {
     control,
-    handleSubmit,
+
+    // handleSubmit,
+    //@ts-ignore
     formState: { errors },
     reset,
-    setError,
+
+    // setError,
     setValue,
     watch
   } = useForm<FormDataType>({
@@ -70,7 +74,9 @@ const AddCountryDrawer = ({ open, handleClose }: AddNewProps) => {
   const flagUrl = watch('flagUrl')
 
   // Handle file upload (for flag image)
+  
   const handleUpload = async (file: File, type: 'image' | 'video') => {
+    console.log("🚀 ~ handleUpload ~ type:", type)
     const data = new FormData()
 
     data.append('name', 'flag-image')

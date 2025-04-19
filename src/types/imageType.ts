@@ -1,4 +1,4 @@
-import { UseFormReturn, UseFormSetValue } from "react-hook-form"
+import type { UseFormSetValue } from "react-hook-form";
 
 export type ImageType = {
   id: number

@@ -86,7 +86,8 @@ export const deleteUserCourse = async (courseId: number | undefined, userId: num
 }
 
 // Fetch the list of all courses
-export const getCourseList = async (): Promise<CourseType[]> => {
+// export const getCourseList = async (): Promise<CourseType[]> => {
+export const getCourseList = async (): Promise<any> => {
   return genericQueryFn({
     url: API_ALL_COURSES,
     method: 'GET'

@@ -4,5 +4,9 @@ export type SpecialityType = {
   title_ar: string
   image: string
   is_active: boolean
-  status: string
+status: 'active' | 'not_active';
 }
+export type SpecialitiesResponse = {
+  specialities: SpecialityType[];
+  total: number;
+};

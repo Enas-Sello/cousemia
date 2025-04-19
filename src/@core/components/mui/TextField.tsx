@@ -1,6 +1,7 @@
 'use client'
 
 // React Imports
+import type { ChangeEvent} from 'react';
 import React, { forwardRef } from 'react'
 
 import { styled } from '@mui/material/styles'
@@ -12,13 +13,13 @@ import TextField from '@mui/material/TextField'
 interface CustomTextFieldRadioProps {
   label: string
   value: string
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void
   options: { value: string; label: string }[]
   error?: boolean
   helperText?: string
 }
 
-export const CustomTextFieldRadio = React.forwardRef<HTMLFieldSetElement, CustomTextFieldRadioProps>(
+export const CustomTextFieldRadio = forwardRef<HTMLFieldSetElement, CustomTextFieldRadioProps>(
   ({ label, value, onChange, options, error = false, helperText = '' }, ref) => {
     return (
       <FormControl component='fieldset' error={error} ref={ref}>

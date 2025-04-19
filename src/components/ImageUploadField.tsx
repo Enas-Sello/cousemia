@@ -1,12 +1,14 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { Typography, Button, CircularProgress } from '@mui/material'
 import { Controller } from 'react-hook-form'
+
 import { uploadImage } from '@/data/media/mediaQuery'
-import { ImageUploadFieldProps, UploadedImage } from '@/types/imageType'
+import type { ImageUploadFieldProps, UploadedImage } from '@/types/imageType'
 
 const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   control,
@@ -17,6 +19,7 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
 }) => {
   // State for the preview image (local preview before upload)
   const [previewImage, setPreviewImage] = useState<string | null>(initialImageUrl || null)
+
   // State for tracking upload status
   const [isUploading, setIsUploading] = useState(false)
 
@@ -44,13 +47,16 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   // Handle image selection and upload
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+
     if (!file) return
 
     // Create a local preview
     const reader = new FileReader()
+
     reader.onloadend = () => {
       setPreviewImage(reader.result as string)
     }
+
     reader.readAsDataURL(file)
 
     uploadImageMutation.mutate(file)

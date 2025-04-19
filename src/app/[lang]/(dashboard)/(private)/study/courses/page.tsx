@@ -4,9 +4,9 @@ import React, { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Card, CardContent, Chip, IconButton, Tooltip } from '@mui/material'
+import { Card, CardContent, IconButton, Tooltip } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import type { FilterFn, ColumnDef, SortingState } from '@tanstack/react-table'
+import type {  ColumnDef, SortingState } from '@tanstack/react-table'
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -15,7 +15,6 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 import { toast } from 'react-toastify'
-import { rankItem } from '@tanstack/match-sorter-utils'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import 'animate.css'
 
@@ -36,17 +35,11 @@ import PageHeader from '@/components/PageHeader'
 import EditButton from '@/components/EditButton'
 import ViewButton from '@/components/ViewButton'
 import DeleteButton from '@/components/DeleteButton'
+import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
+import IsActive from '@/components/IsActive'
 
 // import StatusChanger from '@/components/StatusChanger'
 
-// Custom fuzzy filter for Tanstack Table
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), value)
-
-  addMeta({ itemRank })
-
-  return itemRank.passed
-}
 
 // Table setup
 const columnHelper = createColumnHelper<CourseType>()
@@ -211,12 +204,8 @@ export default function CourseList() {
       columnHelper.display({
         header: 'Is Active',
         cell: ({ row }) => (
-          <Chip
-            label={row.original.is_active ? 'Active' : 'Inactive'}
-            color={row.original.is_active ? 'success' : 'error'}
-            variant='tonal'
-            size='small'
-          />
+                  <IsActive is_active={row.original.is_active}/>
+         
         )
       }),
       columnHelper.display({

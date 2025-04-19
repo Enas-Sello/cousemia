@@ -141,7 +141,7 @@ const UserCourses = ({ user }: { user: UserType }) => {
         )
       })
     ],
-    []
+    [user.id]
   )
 
   const handleDeleteModal = (courseId: number, userId: number) => {

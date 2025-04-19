@@ -1,8 +1,9 @@
 import { API_SPECIALTIES } from '@/configs/api'
 import { genericQueryFn } from '@/libs/queryFn'
+import type { SpecialitiesResponse } from '@/types/specialitiesType'
 
 // Fetch specialties with optional query parameters
-export const getSpecialties = async (queryString: Record<string, any> = {}): Promise<any> => {
+export const getSpecialties = async (queryString: Record<string, any> = {}): Promise<SpecialitiesResponse> => {
   return genericQueryFn({
     url: API_SPECIALTIES,
     method: 'GET',
@@ -18,3 +19,11 @@ export const statusUpdateSpecialties = async (id: number, status: boolean): Prom
     body: { is_active: status }
   })
 }
+
+// delete specialty function
+export const deleteSpecialty = async (specialtyId: number): Promise<any> => {
+  return genericQueryFn({
+    url: `${API_SPECIALTIES}/${specialtyId}`,
+    method: 'DELETE',
+  });
+};

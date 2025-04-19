@@ -223,7 +223,7 @@ export default function FlashCards({ courseId, subCategoryId, categoryId }: Flas
         )
       })
     ],
-    []
+    [columnHelper]
   )
 
   // Initialize the table

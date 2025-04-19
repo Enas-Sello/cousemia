@@ -51,6 +51,8 @@ export default function CourseUpdateForm({ courseData, isCourseLoading }: any) {
   const {
     control,
     handleSubmit,
+
+    //@ts-ignore
     formState: { errors },
     reset,
     setValue,

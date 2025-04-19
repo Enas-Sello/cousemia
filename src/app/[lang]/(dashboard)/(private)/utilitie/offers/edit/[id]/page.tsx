@@ -11,7 +11,7 @@ import { toast } from 'react-toastify'
 import { Typography, Card, CardContent, Switch, Button, CircularProgress, Box } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
-import MediaUploader from '@/components/MediaUploader'
+// import MediaUploader from '@/components/MediaUploader'
 import type { SelectedCourse } from '@/data/offers/offersQuery'
 import { fetchOfferById, updateOffer } from '@/data/offers/offersQuery'
 import CustomTextField from '@/@core/components/mui/TextField'
@@ -62,7 +62,7 @@ const EditOffer = () => {
   const offer = offerResponse?.data
 
   // Form setup
-  const { control, handleSubmit, reset, setValue, watch } = useForm<FormDataType>({
+  const { control, handleSubmit, reset } = useForm<FormDataType>({
     resolver: valibotResolver(schema),
     defaultValues: {
       title_en: '',
@@ -98,7 +98,7 @@ const EditOffer = () => {
     }
   }, [offer, reset])
 
-  const imageUrl = watch('image_url')
+  // const imageUrl = watch('image_url')
 
   // Mutation for updating the offer
   const updateMutation = useMutation({
@@ -182,14 +182,14 @@ const EditOffer = () => {
   }
 
   // Handle image upload (mock function - replace with your actual upload logic)
-  const uploadOfferImage = async (file: File) => {
-    const formData = new FormData()
+  // const uploadOfferImage = async (file: File) => {
+  //   const formData = new FormData()
 
-    formData.append('media', file)
+  //   formData.append('media', file)
 
-    // Replace with your actual API call to upload the image
-    return { url: URL.createObjectURL(file), id: 'mock-id' } // Mock response
-  }
+  //   // Replace with your actual API call to upload the image
+  //   return { url: URL.createObjectURL(file), id: 'mock-id' } // Mock response
+  // }
 
   return (
     <Box sx={{ p: 3 }}>

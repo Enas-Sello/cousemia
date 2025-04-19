@@ -13,13 +13,13 @@ import { valibotResolver } from '@hookform/resolvers/valibot'
 import { object, minLength, string, number, url, minValue } from 'valibot'
 import type { Input } from 'valibot'
 
-import { toast } from 'react-toastify'
+// import { toast } from 'react-toastify'
 
 import CustomTextField, { CustomTextFieldRadio } from '@core/components/mui/TextField'
 import { getCourseList } from '@/data/courses/coursesQuery'
 import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/categoriesQuerys'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
-import { uploadLectureImage, uploadLectureVideo, storeLecture } from '@/data/lectures/lecturesQuery'
+import { uploadLectureImage, uploadLectureVideo } from '@/data/lectures/lecturesQuery'
 
 type Props = {
   open: boolean
@@ -75,12 +75,15 @@ const schema = object({
 })
 
 const AddLectureDrawer = ({ open, handleClose }: Props) => {
+  //@ts-ignore
   const [formData, setFormData] = useState<FormDataType>(initialData)
-
+  
   const [videoTypeOptions, setVideoTypeOptions] = useState([
     { value: 'upload', label: 'Upload video' },
     { value: 'url', label: 'Insert a URL' }
   ])
+
+  console.log("🚀 ~ AddLectureDrawer ~ setVideoTypeOptions:", setVideoTypeOptions)
 
   const [courseOptions, setCourseOptions] = useState([])
   const [categoriesOptions, setCategoriesOptions] = useState([])
@@ -92,7 +95,11 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
   const {
     control,
     reset,
-    handleSubmit,
+
+    // handleSubmit,
+
+  //@ts-ignore
+
     formState: { errors }
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
@@ -107,6 +114,9 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
       category_id: 0,
       sub_category_id: 0,
       is_free_content: '',
+
+          //@ts-ignore
+
       video_thumb: ''
     }
   })
@@ -202,6 +212,8 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
 
     const options = data.map((category: any) => ({ value: category.value, label: category.label }))
 
+
+//@ts-ignore
     setCategoriesOptions(options)
   }
 
@@ -217,12 +229,16 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
 
   useEffect(() => {
     if (formData.course_id) {
+//@ts-ignore
+
       fetchCategoryList(parseInt(formData.course_id))
     }
   }, [formData.course_id])
 
   useEffect(() => {
     if (formData.course_id && formData.category_id) {
+//@ts-ignore
+
       fetchSubCategoryList(parseInt(formData.course_id), parseInt(formData.category_id))
     }
   }, [formData.category_id, formData.course_id])
@@ -231,36 +247,36 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
     fetchCourseList()
   }, [])
 
-  const onSubmit = async (data: FormDataType) => {
-    try {
-      const finalData = {
-        title_en: data.title_en,
-        title_ar: data.title_ar,
-        description_en: data.description_en,
-        description_ar: data.description_ar,
-        is_free_content: data.is_free_content,
-        video_thumb: formData.video_thumb,
-        course_id: data.course_id,
-        category_id: data.category_id,
-        sub_category_id: data.sub_category_id,
-        video: null,
-        path: data.path,
-        file: {
-          $path: ''
-        },
-        image_src: formData.image_src,
-        video_type: data.video_type
-      }
+  // const onSubmit = async (data: FormDataType) => {
+  //   try {
+  //     const finalData = {
+  //       title_en: data.title_en,
+  //       title_ar: data.title_ar,
+  //       description_en: data.description_en,
+  //       description_ar: data.description_ar,
+  //       is_free_content: data.is_free_content,
+  //       video_thumb: formData.video_thumb,
+  //       course_id: data.course_id,
+  //       category_id: data.category_id,
+  //       sub_category_id: data.sub_category_id,
+  //       video: null,
+  //       path: data.path,
+  //       file: {
+  //         $path: ''
+  //       },
+  //       image_src: formData.image_src,
+  //       video_type: data.video_type
+  //     }
 
-      const uploadResponse = await storeLecture(finalData)
+  //     const uploadResponse = await storeLecture(finalData)
 
-      toast.success(`${uploadResponse.message}`)
-      reset()
-      handleClose()
-    } catch (error) {
-      console.error('Error during lecture store:', error)
-    }
-  }
+  //     toast.success(`${uploadResponse.message}`)
+  //     reset()
+  //     handleClose()
+  //   } catch (error) {
+  //     console.error('Error during lecture store:', error)
+  //   }
+  // }
 
   return (
     <Drawer
@@ -279,7 +295,8 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
       </div>
       <Divider />
       <div>
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6 p-6'>
+        
+        <form className='flex flex-col gap-6 p-6'>
           <Controller
             name='title_en'
             control={control}
@@ -437,8 +454,9 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
                 getOptionLabel={(option: any) => option.label || ''}
                 value={courseOptions.find((option: any) => option.value === field.value) || 0}
                 onChange={(event, newValue) => {
-                  field.onChange(newValue ? newValue.value : 0)
-                  setFormData(prev => ({ ...prev, course_id: newValue ? newValue.value : '' }))
+                  field.onChange(newValue ? newValue : 0)
+
+                  // setFormData(prev => ({ ...prev, course_id: newValue ? newValue : '' }))
                 }}
                 renderInput={params => (
                   <CustomTextField
@@ -464,8 +482,9 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
                   getOptionLabel={(option: any) => option.label || ''}
                   value={categoriesOptions.find((option: any) => option.value === field.value) || 0}
                   onChange={(event, newValue) => {
-                    field.onChange(newValue ? newValue.value : 0)
-                    setFormData(prev => ({ ...prev, category_id: newValue ? newValue.value : '' }))
+                    field.onChange(newValue ? newValue : 0)
+
+                    // setFormData(prev => ({ ...prev, category_id: newValue ? newValue : '' }))
                   }}
                   renderInput={params => (
                     <CustomTextField
@@ -492,8 +511,9 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
                   getOptionLabel={(option: any) => option.label || ''}
                   value={subCategoryOptions.find((option: any) => option.value === field.value) || 0}
                   onChange={(event, newValue) => {
-                    field.onChange(newValue ? newValue.value : 0)
-                    setFormData(prev => ({ ...prev, sub_category_id: newValue ? newValue.value : '' }))
+                    field.onChange(newValue ? newValue : 0)
+
+                    // setFormData(prev => ({ ...prev, sub_category_id: newValue ? newValue : '' }))
                   }}
                   renderInput={params => (
                     <CustomTextField

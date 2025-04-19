@@ -198,7 +198,7 @@ export default function Question({ courseId, subCategoryId, categoryId }: Questi
         )
       })
     ],
-    []
+    [columnHelper]
   )
 
   // Initialize the table

@@ -67,7 +67,7 @@ const DebouncedInput = ({
     }, debounce)
 
     return () => clearTimeout(timeout)
-  }, [value])
+  }, [debounce, onChange, value])
 
   return <CustomTextField {...props} value={value} onChange={e => setValue(e.target.value)} />
 }
@@ -136,9 +136,10 @@ export default function CourseSubCategory({ id }: { id: number }) {
       columnHelper.accessor('title_ar', {
         header: 'Title Ar'
       }),
-      columnHelper.accessor('parent_category', {
-        header: 'Parent Category'
-      }),
+
+      // columnHelper.accessor('parent_category', {
+      //   header: 'Parent Category'
+      // }),
       columnHelper.display({
         id: 'actions',
         header: 'Actions',
@@ -159,7 +160,7 @@ export default function CourseSubCategory({ id }: { id: number }) {
         )
       })
     ],
-    []
+    [columnHelper]
   )
 
   const table = useReactTable({
@@ -189,6 +190,7 @@ export default function CourseSubCategory({ id }: { id: number }) {
 
   useEffect(() => {
     fetchData(id)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, page, sorting, globalFilter, addLectureOpen])
 
   return (

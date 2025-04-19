@@ -72,6 +72,8 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
     control,
     reset,
     handleSubmit,
+
+    //@ts-ignore
     formState: { errors },
     setError,
     watch,
@@ -92,6 +94,9 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
       video_thumb: null,
       video_thumb_url: '',
       video: null,
+      
+
+    //@ts-ignore
       video_url: ''
     }
   })

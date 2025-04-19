@@ -57,6 +57,7 @@ export default function AddFlashCardDrawer({ open, handleClose, coursCategoryId 
     if (courseData?.data?.course_id) {
       setCourseId(courseData?.data?.course_id)
     }
+
     if (coursCategoryId) {
       setCategoryId(coursCategoryId)
     }

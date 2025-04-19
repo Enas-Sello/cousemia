@@ -1,7 +1,9 @@
-import CustomAvatar from '@/@core/components/mui/Avatar'
-import { Box } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+
+import { Box } from '@mui/material'
 import { useDropzone } from 'react-dropzone'
+
+import CustomAvatar from '@/@core/components/mui/Avatar'
 
 type FileProp = {
   name: string
@@ -9,10 +11,19 @@ type FileProp = {
   size: number
 }
 
+
 const ImageUploader = ({ setThumb }: { setThumb: (thumb: string) => void }) => {
+  
   // States
   const [files, setFiles] = useState<File[]>([])
   const [image, setImage] = useState<string>('')
+  
+  console.log("🚀 ~ setThumb:", setThumb)
+console.log("🚀 ~ setImage:", setImage)
+console.log("🚀 ~ image:", image)
+
+
+
   // Hooks
   const { getRootProps, getInputProps } = useDropzone({
     multiple: false,
@@ -25,6 +36,8 @@ const ImageUploader = ({ setThumb }: { setThumb: (thumb: string) => void }) => {
   })
 
   const img = files.map((file: FileProp, index) => {
+    //@ts-ignore
+    //@ts-expect-error
     const thumb = URL.createObjectURL(file as any)(thumb)
 
     return <CustomAvatar key={index} src={thumb} size={200} variant='square' className='rounded-lg' />
@@ -32,7 +45,7 @@ const ImageUploader = ({ setThumb }: { setThumb: (thumb: string) => void }) => {
 
   useEffect(() => {
     files
-  }, ['files'])
+  }, [files])
 
   return (
     <Box {...getRootProps({ className: 'dropzone' })} {...(files.length && { sx: { height: 200 } })}>

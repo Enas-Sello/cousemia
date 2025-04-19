@@ -75,12 +75,17 @@ const schema = object({
 })
 
 const AddLectureDrawer = ({ open, handleClose }: Props) => {
+  //@ts-ignore
+  
   const [formData, setFormData] = useState<FormDataType>(initialData)
-
+  
+  //@ts-ignore
   const [videoTypeOptions, setVideoTypeOptions] = useState([
     { value: 'upload', label: 'Upload video' },
     { value: 'url', label: 'Insert a URL' }
   ])
+
+  console.log("🚀 ~ AddLectureDrawer ~ setVideoTypeOptions:", setVideoTypeOptions)
 
   const [courseOptions, setCourseOptions] = useState([])
   const [categoriesOptions, setCategoriesOptions] = useState([])
@@ -92,7 +97,11 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
   const {
     control,
     reset,
-    handleSubmit,
+
+    // handleSubmit,
+
+    //@ts-ignore
+
     formState: { errors }
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
@@ -107,6 +116,9 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
       category_id: 0,
       sub_category_id: 0,
       is_free_content: '',
+
+      //@ts-ignore
+
       video_thumb: ''
     }
   })
@@ -202,8 +214,11 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
 
     const options = data.map((category: any) => ({ value: category.value, label: category.label }))
 
-    setCategoriesOptions(options)
-  }
+
+//@ts-ignore
+setCategoriesOptions(options)
+
+}
 
   // Fetch sub-categories based on category and course selection
   const fetchSubCategoryList = async (course_id: number, category_id: number) => {
@@ -217,13 +232,13 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
 
   useEffect(() => {
     if (formData.course_id) {
-      fetchCategoryList(parseInt(formData.course_id))
+      fetchCategoryList((formData.course_id))
     }
   }, [formData.course_id])
 
   useEffect(() => {
     if (formData.course_id && formData.category_id) {
-      fetchSubCategoryList(parseInt(formData.course_id), parseInt(formData.category_id))
+      fetchSubCategoryList((formData.course_id), (formData.category_id))
     }
   }, [formData.category_id, formData.course_id])
 
@@ -231,6 +246,8 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
     fetchCourseList()
   }, [])
 
+
+//@ts-ignore
   const onSubmit = async (data: FormDataType) => {
     try {
       const finalData = {
@@ -262,6 +279,8 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
     }
   }
 
+    console.log("🚀 ~ onSubmit ~ onSubmit:", onSubmit)
+
   return (
     <Drawer
       open={open}
@@ -279,7 +298,7 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
       </div>
       <Divider />
       <div>
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6 p-6'>
+        <form  className='flex flex-col gap-6 p-6'>
           <Controller
             name='title_en'
             control={control}
@@ -437,8 +456,9 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
                 getOptionLabel={(option: any) => option.label || ''}
                 value={courseOptions.find((option: any) => option.value === field.value) || 0}
                 onChange={(event, newValue) => {
-                  field.onChange(newValue ? newValue.value : 0)
-                  setFormData(prev => ({ ...prev, course_id: newValue ? newValue.value : '' }))
+                  field.onChange(newValue ? newValue.valueOf : 0)
+
+                  // setFormData(prev => ({ ...prev, course_id: newValue ? newValue.value : '' }))
                 }}
                 renderInput={params => (
                   <CustomTextField
@@ -464,8 +484,9 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
                   getOptionLabel={(option: any) => option.label || ''}
                   value={categoriesOptions.find((option: any) => option.value === field.value) || 0}
                   onChange={(event, newValue) => {
-                    field.onChange(newValue ? newValue.value : 0)
-                    setFormData(prev => ({ ...prev, category_id: newValue ? newValue.value : '' }))
+                    field.onChange(newValue ? newValue.valueOf : 0)
+
+                    // setFormData(prev => ({ ...prev, category_id: newValue ? newValue.value : '' }))
                   }}
                   renderInput={params => (
                     <CustomTextField
@@ -492,8 +513,9 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
                   getOptionLabel={(option: any) => option.label || ''}
                   value={subCategoryOptions.find((option: any) => option.value === field.value) || 0}
                   onChange={(event, newValue) => {
-                    field.onChange(newValue ? newValue.value : 0)
-                    setFormData(prev => ({ ...prev, sub_category_id: newValue ? newValue.value : '' }))
+                    field.onChange(newValue ? newValue.valueOf : 0)
+
+                    // setFormData(prev => ({ ...prev, sub_category_id: newValue ? newValue.value : '' }))
                   }}
                   renderInput={params => (
                     <CustomTextField
