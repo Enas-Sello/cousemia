@@ -9,6 +9,7 @@ import { getCourse } from '@/data/courses/coursesQuery'
 import StatusChanger from '@/components/StatusChanger'
 import DetailsSkeleton from '@/components/DetaileSkeleton'
 import PageHeader from '@/components/PageHeader'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 
 export default function ShowCourse({ params }: { params: { id: number } }) {
   const { data: course, isLoading: isCourseLoading } = useQuery({
@@ -31,9 +32,9 @@ export default function ShowCourse({ params }: { params: { id: number } }) {
   }
 
   return (
-    <>
+    <AnimationContainer>
       <PageHeader
-        title={`Lecture: ${courseData.title_en}`}
+        title={`Courses`}
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'courses', href: '/study/courses' },
@@ -41,16 +42,6 @@ export default function ShowCourse({ params }: { params: { id: number } }) {
         ]}
         showBackButton={true}
 
-        // actions={
-        //   <Box sx={{ display: 'flex', gap: 2 }}>
-        //     <Button variant='contained' color='primary' onClick={() => router.push(`/study/notes/edit/${note.id}`)}>
-        //       Edit Note
-        //     </Button>
-        //     <Button variant='outlined' color='error' onClick={handleDeleteConfirm} disabled={deleteMutation.isPending}>
-        //       {deleteMutation.isPending ? 'Deleting...' : 'Delete Note'}
-        //     </Button>
-        //   </Box>
-        // }
       />
 
       <Grid container spacing={6}>
@@ -116,7 +107,12 @@ export default function ShowCourse({ params }: { params: { id: number } }) {
             {/* Course Metadata */}
             <Stack direction='row' spacing={2} alignItems='center'>
               <Typography variant='body2' color='text.secondary'>
-                Expires: {new Date(courseData.expire_date).toLocaleDateString()}
+                Expires : {new Date(courseData.expire_date).toLocaleDateString()}
+              </Typography>
+            </Stack>
+            <Stack direction='row' spacing={2} alignItems='center'>
+              <Typography variant='body2' color='text.secondary'>
+                Rating : 
               </Typography>
               <Rating value={courseData.rate} readOnly precision={0.5} />
             </Stack>
@@ -172,6 +168,6 @@ export default function ShowCourse({ params }: { params: { id: number } }) {
           </Stack>
         </Grid>
       </Grid>
-    </>
+    </AnimationContainer>
   )
 }

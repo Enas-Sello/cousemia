@@ -126,6 +126,7 @@ export default function Lectures({
       //   header: 'ID'
       // }),
       columnHelper.display({
+        id: 'image',
         header: 'Video Thumb',
         cell: ({ row }) => <div className='flex items-center gap-4'>{getAvatar(row.original.image)}</div>
       }),
@@ -230,6 +231,7 @@ export default function Lectures({
     return <ErrorBox error={error} refetch={refetch} />
   }
 
+  
   return (
     <>
       <Grid container spacing={6}>

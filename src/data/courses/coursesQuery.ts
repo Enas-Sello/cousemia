@@ -8,7 +8,7 @@ import {
   API_COURSE_REVIEW
 } from '@/configs/api'
 import { genericQueryFn } from '@/libs/queryFn'
-import type { CourseType } from '@/types/courseType'
+import type { courseResponse, CoursesResponse, CourseType } from '@/types/courseType'
 
 import type { ImageType } from '@/types/imageType'
 import type { CourseReviewResponse } from '@/types/reviews'
@@ -16,7 +16,7 @@ import type { CourseReviewResponse } from '@/types/reviews'
 // Fetch all courses with optional query parameters
 export const getCourses = async (
   queryString: Record<string, any> = {}
-): Promise<{ courses: CourseType[]; total: number }> => {
+): Promise<CoursesResponse> => {
   return genericQueryFn({
     url: API_COURSES,
     method: 'GET',
@@ -25,7 +25,7 @@ export const getCourses = async (
 }
 
 // Fetch a single course by ID
-export const getCourse = async (id: number): Promise<CourseType> => {
+export const getCourse = async (id: number): Promise<courseResponse> => {
   return genericQueryFn({
     url: `${API_COURSES}/${id}`,
     method: 'GET'

@@ -19,6 +19,7 @@ import { getSpecialties } from '@/data/specialties/specialtiesQuery'
 import type { CourseFormType } from '@/types/courseType'
 import type { SpecialityType } from '@/types/specialitiesType'
 import Loading from '@/components/loading'
+import PageHeader from '@/components/PageHeader'
 
 interface CourseFormData extends CourseFormType {
   title_en: string
@@ -176,6 +177,17 @@ export default function CourseUpdateForm({ courseData, isCourseLoading }: any) {
   const selectedSpecialty = specialties.find((specialty: SpecialityType) => specialty.id === watch('speciality_id'))
 
   return (
+    <>
+     <PageHeader
+        title={`Courses`}
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'courses', href: '/study/courses' },
+          { label: courseData.title_en }
+        ]}
+        showBackButton={true}
+      />
+
     <Card>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -467,5 +479,6 @@ export default function CourseUpdateForm({ courseData, isCourseLoading }: any) {
         </form>
       </CardContent>
     </Card>
+    </>
   )
 }

@@ -22,6 +22,8 @@ import TablePaginationComponent from '@/components/TablePaginationComponent'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import { getCourseReview } from '@/data/courses/coursesQuery'
 import type { CourseReviewResponse, ReviewType } from '@/types/reviews'
+import PageHeader from '@/components/PageHeader'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 
 // Custom fuzzy filter for Tanstack Table
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -120,7 +122,18 @@ const Review = ({ params }: { params: { id: number } }) => {
   }
 
   return (
-    <>
+    <AnimationContainer>
+      <PageHeader
+        title={`Courses`}
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'courses', href: '/study/courses' },
+          { label:'review' }
+        ]}
+        showBackButton={true}
+
+    
+      />
       <Grid container spacing={6}>
         <Grid size={{ xs: 12 }}>
           <Card>
@@ -138,7 +151,7 @@ const Review = ({ params }: { params: { id: number } }) => {
           </Card>
         </Grid>
       </Grid>
-    </>
+    </AnimationContainer>
   )
 }
 

@@ -1,5 +1,4 @@
 export type CourseType = {
-  data: any
   id: number
   title_en: string
   title_ar: string
@@ -23,7 +22,9 @@ export type CourseType = {
   questions_count: number
   flash_cards_count: number
 }
-
+export type courseResponse={
+  data:CourseType
+}
 export type CourseFormType = {
   title_en: string
   title_ar: string
@@ -36,4 +37,9 @@ export type CourseFormType = {
 export type StatusType = {
   label: string
   value: number
+}
+
+export interface CoursesResponse {
+  total: number
+  courses: CourseType[]
 }
