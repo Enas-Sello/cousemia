@@ -105,7 +105,7 @@ export default function Lectures({
     try {
       await deleteLecture(deleteId)
       toast.success('Lecture deleted successfully')
-      refetch() // Refetch the data to update the table
+      refetch()
       setConfirmDialog(false)
     } catch (error) {
       toast.error('Failed to delete lecture. Please try again.')
@@ -121,10 +121,10 @@ export default function Lectures({
   // Define table columns
   const columns = useMemo<ColumnDef<LectureType, any>[]>(
     () => [
-      // columnHelper.accessor('id', {
-      //   id: 'id',
-      //   header: 'ID'
-      // }),
+      columnHelper.accessor('id', {
+        id: 'id',
+        header: 'ID'
+      }),
       columnHelper.display({
         id: 'image',
         header: 'Video Thumb',
