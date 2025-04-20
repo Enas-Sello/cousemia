@@ -21,6 +21,7 @@ import {
 } from '@tanstack/react-table'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
+
 import 'animate.css'
 
 import { getCourses, deleteCourse } from '@/data/courses/coursesQuery'

@@ -56,8 +56,6 @@ export default function RichTextEditor({
     control,
     handleSubmit,
     reset,
-
-    //@ts-expect-error
     formState: { errors }
   } = useForm<FormDataType>({ resolver: valibotResolver(editorSchema), defaultValues: { content: '' } })
 
