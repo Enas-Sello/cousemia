@@ -1,11 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 
+import { useDropzone } from 'react-dropzone'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { Typography, Button, CircularProgress } from '@mui/material'
+import { Typography, Button, CircularProgress, Box } from '@mui/material'
 import { Controller } from 'react-hook-form'
+
+import { IconCloudUpload } from '@tabler/icons-react'
 
 import { uploadImage } from '@/data/media/mediaQuery'
 import type { ImageUploadFieldProps, UploadedImage } from '@/types/imageType'
@@ -17,50 +20,50 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   setValue,
   label = 'Image Preview'
 }) => {
-  // State for the preview image (local preview before upload)
   const [previewImage, setPreviewImage] = useState<string | null>(initialImageUrl || null)
-
-  // State for tracking upload status
   const [isUploading, setIsUploading] = useState(false)
 
-  // Mutation for uploading the image
   const uploadImageMutation = useMutation({
     mutationFn: (file: File) => uploadImage(file),
-    onMutate: () => {
-      setIsUploading(true)
-    },
+    onMutate: () => setIsUploading(true),
     onSuccess: (data: UploadedImage) => {
-      setValue(fieldName, data.url, { shouldValidate: true }) 
-      setPreviewImage(data.url) 
+      setValue(fieldName, data.url, { shouldValidate: true })
+      setPreviewImage(data.url)
       toast.success('Image uploaded successfully')
     },
     onError: () => {
       toast.error('Failed to upload image. Please try again.')
-      setPreviewImage(initialImageUrl || null) 
-      setValue(fieldName, undefined, { shouldValidate: true }) 
+      setPreviewImage(initialImageUrl || null)
+      setValue(fieldName, undefined, { shouldValidate: true })
     },
-    onSettled: () => {
-      setIsUploading(false)
-    }
+    onSettled: () => setIsUploading(false)
   })
 
-  // Handle image selection and upload
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0]
 
     if (!file) return
 
-    // Create a local preview
+    // Create preview
     const reader = new FileReader()
 
-    reader.onloadend = () => {
+    reader.onload = () => {
       setPreviewImage(reader.result as string)
     }
 
     reader.readAsDataURL(file)
 
     uploadImageMutation.mutate(file)
-  }
+  }, [])
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png', '.webp']
+    },
+    maxFiles: 1,
+    disabled: isUploading
+  })
 
   return (
     <Controller
@@ -68,37 +71,86 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
       control={control}
       rules={{ required: 'A cover image is required' }}
       render={({ fieldState: { error } }) => (
-        <div>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Typography variant='h6'>{label}</Typography>
+
+          {/* Preview area */}
           {previewImage ? (
-            <img
+            <Box
+              component="img"
               src={previewImage}
               alt={label}
-              style={{ width: '200px', marginBottom: '10px', objectFit: 'contain' }}
+              sx={{
+                width: '100%',
+                maxWidth: 300,
+                maxHeight: 200,
+                objectFit: 'contain',
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'divider'
+              }}
             />
           ) : (
             <Typography variant='body2' color='textSecondary'>
-              No image selected.
+              No image selected
             </Typography>
           )}
+
+          {/* Dropzone area */}
+          <Box
+            {...getRootProps()}
+            sx={{
+              border: '2px dashed',
+              borderColor: isDragActive ? 'primary.main' : 'divider',
+              borderRadius: 1,
+              p: 3,
+              textAlign: 'center',
+              cursor: 'pointer',
+              backgroundColor: isDragActive ? 'action.hover' : 'background.paper',
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <input {...getInputProps()} />
+            {isUploading ? (
+              <CircularProgress size={24} />
+            ) : (
+              <>
+                <IconCloudUpload size={32} style={{ marginBottom: 8 }} />
+                <Typography>
+                  {isDragActive ? 'Drop the image here' : 'Drag & drop an image here, or click to select'}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                  Only JPEG, JPG, PNG, WEBP files are accepted
+                </Typography>
+              </>
+            )}
+          </Box>
+
+          {/* Error message */}
           {error && (
             <Typography variant='body2' color='error'>
               {error.message}
             </Typography>
           )}
-          <Typography variant='body2' color='textSecondary'>
-            Only images are accepted.
-          </Typography>
-          <Button
-            variant='contained'
-            component='label'
-            disabled={isUploading}
-            startIcon={isUploading ? <CircularProgress size={20} /> : null}
-          >
-            {isUploading ? 'Uploading...' : 'Browse'}
-            <input type='file' accept='image/*' hidden onChange={handleImageChange} />
-          </Button>
-        </div>
+
+          {/* Clear button */}
+          {previewImage && (
+            <Button
+              variant='outlined'
+              color='error'
+              onClick={(e) => {
+                e.stopPropagation()
+                setPreviewImage(null)
+                setValue(fieldName, undefined, { shouldValidate: true })
+              }}
+              disabled={isUploading}
+            >
+              Remove Image
+            </Button>
+          )}
+        </Box>
       )}
     />
   )

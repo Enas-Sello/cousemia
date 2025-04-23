@@ -13,7 +13,7 @@ import { valibotResolver } from '@hookform/resolvers/valibot'
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import { updateLecture } from '@/data/lectures/lecturesQuery'
-import type { LectureType } from '@/types/lectureType'
+import type { LectureFormData, LectureType } from '@/types/lectureType'
 import FiltersDataInput from '@/components/FiltersDataInput'
 import BasicFields from '@/components/BasicFields'
 import ImageUploadField from '@/components/ImageUploadField'
@@ -21,21 +21,6 @@ import VideoTypeField from '@/components/VideoTypeField'
 import SwitchFields from '@/components/SwitchFields'
 import { LectureFormSchema } from '@/schema/LectureSchema/LectureFormSchema'
 
-// Define the LectureFormData interface
-interface LectureFormData {
-  title_en: string
-  title_ar: string | null
-  video_type: string
-  url: string
-  description_en: string
-  description_ar: string | null
-  course_id: number | undefined
-  category_id: number | undefined
-  sub_category_id: number | undefined
-  is_active: boolean
-  is_free_content: boolean
-  image?: string
-}
 
 // Main component
 export default function LectureUpdateForm({ lectureData }: { lectureData: LectureType | undefined }) {

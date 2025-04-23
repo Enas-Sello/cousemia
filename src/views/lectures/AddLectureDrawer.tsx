@@ -1,85 +1,39 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import { useForm, Controller } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
-import { object, minLength, string, number, url, minValue } from 'valibot'
 import { toast } from 'react-toastify'
 import { Drawer, IconButton, Typography, Divider, Button, Box } from '@mui/material'
 
-import CustomTextField, { CustomTextFieldRadio } from '@core/components/mui/TextField'
-import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
-import MediaUploader from '@/components/MediaUploader' // Adjust path as needed
-import { getCourseList } from '@/data/courses/coursesQuery'
-import { getCategoriesByCourseID, getSubCategoryList } from '@/data/categories/categoriesQuerys'
-import { uploadLectureImage, uploadLectureVideo, storeLecture } from '@/data/lectures/lecturesQuery'
+import { useMutation } from '@tanstack/react-query'
 
-// Props type
-type Props = {
-  open: boolean
-  handleClose: () => void
-}
+import { CustomTextFieldRadio } from '@core/components/mui/TextField'
+import { uploadLectureImage, uploadLectureVideo, addNewLecture } from '@/data/lectures/lecturesQuery'
+import type { LectureProps, NewLectureFormData } from '@/types/lectureType'
+import { LectureFormSchema } from '@/schema/LectureSchema/LectureFormSchema'
+import FiltersDataInput from '@/components/FiltersDataInput'
+import BasicFields from '@/components/BasicFields'
+import Loading from '@/components/loading'
+import ImageUploadField from '@/components/ImageUploadField'
+import VideoTypeField from '@/components/VideoTypeField'
+import VideoInputField from '@/components/VideoInputField'
 
-// Option type for dropdowns
-type Option = {
-  value: string | number
-  label: string
-}
 
-// Form data type
-type FormDataType = {
-  title_en: string
-  title_ar: string
-  description_en: string
-  description_ar: string
-  is_free_content: string
-  video_thumb: File | null // File for thumbnail
-  video_thumb_url: string // URL for thumbnail preview
-  course_id: number
-  category_id: number
-  sub_category_id: number
-  video: File | null // File for video
-  video_url: string // URL for video preview
-  video_type: string
-}
 
-// Valibot schema for validation
-const schema = object({
-  title_en: string([minLength(1, 'This field is required')]),
-  title_ar: string(),
-  description_en: string([minLength(1, 'This field is required')]),
-  description_ar: string(),
-  video_type: string([minLength(1, 'This field is required')]),
-  video_url: string([minLength(1, 'This field is required'), url('Please enter a valid URL')]),
-  course_id: number([minValue(1, 'This field is required')]),
-  category_id: number([minValue(1, 'This field is required')]),
-  sub_category_id: number([minValue(1, 'This field is required')]),
-  is_free_content: string([minLength(1, 'This field is required')])
-})
 
-const AddLectureDrawer = ({ open, handleClose }: Props) => {
-  const [videoTypeOptions] = useState<Option[]>([
-    { value: 'upload', label: 'Upload video' },
-    { value: 'url', label: 'Insert a URL' }
-  ])
+const AddLectureDrawer = ({ open, handleClose }: LectureProps) => {
 
-  const [courseOptions, setCourseOptions] = useState<Option[]>([])
-  const [categoriesOptions, setCategoriesOptions] = useState<Option[]>([])
-  const [subCategoryOptions, setSubCategoryOptions] = useState<Option[]>([])
-
-  // Hooks
   const {
     control,
     reset,
     handleSubmit,
-
-    //@ts-ignore
     formState: { errors },
-    setError,
     watch,
-    setValue
-  } = useForm<FormDataType>({
-    resolver: valibotResolver(schema),
+    setValue,
+    setError
+  } = useForm<NewLectureFormData>({
+    resolver: valibotResolver(LectureFormSchema),
     defaultValues: {
       title_en: '',
       title_ar: '',
@@ -94,137 +48,121 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
       video_thumb: null,
       video_thumb_url: '',
       video: null,
-      
-
-    //@ts-ignore
-      video_url: ''
     }
+
   })
 
   const videoType = watch('video_type')
-  const courseId = watch('course_id')
-  const categoryId = watch('category_id')
   const videoThumbUrl = watch('video_thumb_url')
-  const videoUrl = watch('video_url')
 
-  // Fetch course list
-  const fetchCourseList = async () => {
-    const result = await getCourseList()
 
-    const options = result.data.map((course: any) => ({
-      value: course.id,
-      label: course.title_en
-    }))
+  // File upload mutations
+  const { mutate: uploadImage, isPending: imageUploading } = useMutation({
+    mutationFn: (formData: FormData) => uploadLectureImage(formData),
+    onSuccess: (data) => {
+      setValue('video_thumb_url', data.url);
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to upload thumbnail');
+    },
+  });
 
-    setCourseOptions(options)
-  }
-
-  // Fetch categories based on course selection
-  const fetchCategoryList = async (course_id: number) => {
-    if (course_id) {
-      const result = await getCategoriesByCourseID(course_id)
-
-      const options = result.data.map((category: any) => ({
-        value: category.value,
-        label: category.label
-      }))
-
-      setCategoriesOptions(options)
-    }
-  }
-
-  // Fetch sub-categories based on category and course selection
-  const fetchSubCategoryList = async (course_id: number, category_id: number) => {
-    if (course_id && category_id) {
-      const result = await getSubCategoryList(course_id, category_id)
-
-      const options = result.data.map((subCategory: any) => ({
-        value: subCategory.value,
-        label: subCategory.label
-      }))
-
-      setSubCategoryOptions(options)
-    }
-  }
-
-  useEffect(() => {
-    fetchCourseList()
-  }, [])
-
-  useEffect(() => {
-    fetchCategoryList(courseId)
-  }, [courseId])
-
-  useEffect(() => {
-    fetchSubCategoryList(courseId, categoryId)
-  }, [courseId, categoryId])
+  const { mutate: uploadVideo, isPending: videoUploading } = useMutation({
+    mutationFn: (formData: FormData) => uploadLectureVideo(formData),
+    onSuccess: (data) => {
+      setValue('video_url', data.url);
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to upload video');
+    },
+  });
 
   // Handle file upload (thumbnail or video)
-  const handleUpload = async (file: File, type: 'image' | 'video') => {
-    const data = new FormData()
+  const handleUpload = (file: File, type: 'video' | 'image') => {
+    const formData = new FormData();
 
     if (type === 'image') {
-      data.append('name', 'my-picture')
-      data.append('media', file)
-
-      return uploadLectureImage(data)
-    } else {
-      data.append('file', file)
-
-      return uploadLectureVideo(data)
+      formData.append('name', 'video-thumbnail');
+      formData.append('media', file);
+      uploadImage(formData);
+    } else if (type === 'video') {
+      formData.append('file', file);
+      uploadVideo(formData);
     }
-  }
+
+    return Promise.resolve({ url: '' }); // إذا MediaUploader يعتمد على promise
+  };
+
+  // add new lecture mutation
+  const { mutate: newLecture, isPending: pendingNewLecture } = useMutation({
+    mutationFn: (data: FormData) => addNewLecture(data),
+    onSuccess: (response) => {
+      toast.success(response.message || 'Lecture added successfully');
+      reset();
+      handleClose();
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to add lecture');
+    },
+  });
+
 
   // Handle form submission
-  const onSubmit = async (data: FormDataType) => {
-    console.log('datadata', data)
+  const onSubmit = (data: NewLectureFormData) => {
+    console.log("Form data before submission:", data);
 
-    try {
-      if (videoType === 'upload' && !data.video) {
-        setError('video', { message: 'Video file is required' })
+    // Additional validation
+    if (videoType === 'upload' && !data.video) {
+      setError('video', { message: 'Video file is required' });
 
-        return
-      }
-
-      if (!data.video_thumb) {
-        setError('video_thumb', { message: 'Thumbnail image is required' })
-
-        return
-      }
-
-      const finalData = {
-        title_en: data.title_en,
-        title_ar: data.title_ar,
-        description_en: data.description_en,
-        description_ar: data.description_ar,
-        is_free_content: data.is_free_content,
-        video_thumb: data.video_thumb_url, // Use the uploaded URL
-        course_id: data.course_id,
-        category_id: data.category_id,
-        sub_category_id: data.sub_category_id,
-        video: null,
-        path: data.video_url,
-        file: { $path: '' },
-        image_src: data.video_thumb_url,
-        video_type: data.video_type
-      }
-
-      console.log('finalData', finalData)
-      const uploadResponse = await storeLecture(finalData)
-
-      toast.success(`${uploadResponse.message}`)
-      reset()
-      handleClose()
-    } catch (error: any) {
-      setError('root', { message: error.message || 'Error during lecture store' })
+      return;
     }
-  }
+
+    if (!data.video_thumb_url) {
+      setError('video_thumb', { message: 'Thumbnail is required' });
+
+      return;
+    }
+
+    if (Object.keys(errors).length) {
+      const firstErrorField = Object.keys(errors)[0]
+      const el = document.querySelector(`[name="${firstErrorField}"]`);
+
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Prepare FormData
+    const formData = new FormData();
+
+    formData.append('title_en', data.title_en);
+    if (data.title_ar) formData.append('title_ar', data.title_ar);
+    formData.append('description_en', data.description_en);
+    if (data.description_ar) formData.append('description_ar', data.description_ar);
+    formData.append('video_type', data.video_type);
+    formData.append('video_url', data.video_url);
+    formData.append('course_id', data.course_id.toString());
+    formData.append('category_id', data.category_id.toString());
+    if (data.sub_category_id) formData.append('sub_category_id', data.sub_category_id.toString());
+    formData.append('is_free_content', data.is_free_content);
+    formData.append('video_thumb_url', data.video_thumb_url);
+
+    if (data.video) formData.append('video', data.video);
+    if (data.video_thumb) formData.append('video_thumb', data.video_thumb);
+
+    newLecture(formData);
+  };
+
 
   // Handle reset
   const handleReset = () => {
     reset()
     handleClose()
   }
+
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
+
 
   return (
     <Drawer
@@ -247,252 +185,39 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
         onSubmit={handleSubmit(onSubmit)}
         sx={{ display: 'flex', flexDirection: 'column', gap: 4, p: 6 }}
       >
-        {/* English Title */}
-        <Controller
-          name='title_en'
-          control={control}
-          rules={{ required: true }}
-          render={({ field }) => (
-            <CustomTextField
-              {...field}
-              fullWidth
-              label='English Title'
-              error={!!errors.title_en}
-              helperText={errors.title_en?.message}
-            />
-          )}
-        />
 
-        {/* Arabic Title */}
-        <Controller
-          name='title_ar'
-          control={control}
-          render={({ field }) => (
-            <CustomTextField
-              {...field}
-              fullWidth
-              label='Arabic Title'
-              error={!!errors.title_ar}
-              helperText={errors.title_ar?.message}
-            />
-          )}
-        />
-
-        {/* English Description */}
-        <Controller
-          name='description_en'
-          control={control}
-          rules={{ required: true }}
-          render={({ field }) => (
-            <CustomTextField
-              {...field}
-              rows={2}
-              multiline
-              fullWidth
-              label='English Description'
-              error={!!errors.description_en}
-              helperText={errors.description_en?.message}
-            />
-          )}
-        />
-
-        {/* Arabic Description */}
-        <Controller
-          name='description_ar'
-          control={control}
-          render={({ field }) => (
-            <CustomTextField
-              {...field}
-              rows={2}
-              multiline
-              fullWidth
-              label='Arabic Description'
-              error={!!errors.description_ar}
-              helperText={errors.description_ar?.message}
-            />
-          )}
-        />
+        <BasicFields control={control} errors={errors} />
 
         {/* Video Type */}
-        <Controller
-          name='video_type'
-          control={control}
-          render={({ field }) => (
-            <CustomAutocomplete
-              fullWidth
-              options={videoTypeOptions}
-              getOptionLabel={(option: Option) => option.label || ''}
-              value={videoTypeOptions.find(option => option.value === field.value) || null}
-              onChange={(event, newValue: Option | null) => {
-                field.onChange(newValue ? newValue.value : '')
-              }}
-              renderInput={params => (
-                <CustomTextField
-                  {...params}
-                  label='Select Video Type'
-                  fullWidth
-                  error={!!errors.video_type}
-                  helperText={errors.video_type?.message}
-                />
-              )}
-            />
-          )}
-        />
+        <VideoTypeField control={control} errors={errors} />
 
         {/* Video Upload Section */}
-        {videoType === 'upload' && (
-          <Controller
-            name='video'
-            control={control}
-            render={({ field }) => (
-              <MediaUploader
-                label='Upload Lecture Video'
-                mediaType='video'
-                onUpload={async file => {
-                  const result = await handleUpload(file, 'video')
-
-                  field.onChange(file)
-                  setValue('video_url', result.url)
-
-                  return result
-                }}
-                value={videoUrl}
-                onChange={url => {
-                  setValue('video_url', url || '')
-                  if (!url) field.onChange(null)
-                }}
-                error={errors.video?.message}
-                maxSize={209715200} // 200MB for videos
-              />
-            )}
-          />
-        )}
-
-        {/* Video URL (for both upload and URL input) */}
-        <Controller
-          name='video_url'
+        <VideoInputField
           control={control}
-          render={({ field }) => (
-            <CustomTextField
-              {...field}
-              fullWidth
-              label='Lecture Video URL'
-              disabled={videoType === 'upload'} // Disable if uploading
-              error={!!errors.video_url}
-              helperText={errors.video_url?.message}
-            />
-          )}
+          errors={errors}
+          watch={watch}
+          setValue={setValue}
+          handleUpload={handleUpload}
         />
 
         {/* Thumbnail Upload Section */}
-        <Controller
-          name='video_thumb'
+
+        <ImageUploadField
           control={control}
-          render={({ field }) => (
-            <MediaUploader
-              label='Video Thumbnail'
-              mediaType='image'
-              onUpload={async file => {
-                const result = await handleUpload(file, 'image')
-
-                field.onChange(file)
-                setValue('video_thumb_url', result.url)
-
-                return result
-              }}
-              value={videoThumbUrl}
-              onChange={url => {
-                setValue('video_thumb_url', url || '')
-                if (!url) field.onChange(null)
-              }}
-              error={errors.video_thumb?.message}
-              maxSize={2097152} // 2MB for images
-            />
-          )}
+          fieldName='image'
+          initialImageUrl={videoThumbUrl || null}
+          setValue={setValue}
+          label='Cover Image'
         />
-
-        {/* Course Selection */}
-        <Controller
-          name='course_id'
-          control={control}
-          render={({ field }) => (
-            <CustomAutocomplete
-              fullWidth
-              options={courseOptions}
-              getOptionLabel={(option: Option) => option.label || ''}
-              value={courseOptions.find(option => option.value === field.value) || null}
-              onChange={(event, newValue: Option | null) => {
-                field.onChange(newValue ? newValue.value : 0)
-              }}
-              renderInput={params => (
-                <CustomTextField
-                  {...params}
-                  label='Choose Course'
-                  fullWidth
-                  error={!!errors.course_id}
-                  helperText={errors.course_id?.message}
-                />
-              )}
-            />
-          )}
+        <FiltersDataInput
+          courseId={watch('course_id')}
+          categoryId={watch('category_id')}
+          subCategoryId={watch('sub_category_id')}
+          setCourseId={(id) => setValue('course_id', id ?? 0)}
+          setCategoryId={(id) => setValue('category_id', id ?? 0)}
+          setSubCategoryId={(id) => setValue('sub_category_id', id ?? 0)}
+          drawer
         />
-
-        {/* Category Selection */}
-        {courseId > 0 && (
-          <Controller
-            name='category_id'
-            control={control}
-            render={({ field }) => (
-              <CustomAutocomplete
-                fullWidth
-                options={categoriesOptions}
-                getOptionLabel={(option: Option) => option.label || ''}
-                value={categoriesOptions.find(option => option.value === field.value) || null}
-                onChange={(event, newValue: Option | null) => {
-                  field.onChange(newValue ? newValue.value : 0)
-                }}
-                renderInput={params => (
-                  <CustomTextField
-                    {...params}
-                    label='Choose Category'
-                    fullWidth
-                    error={!!errors.category_id}
-                    helperText={errors.category_id?.message}
-                  />
-                )}
-              />
-            )}
-          />
-        )}
-
-        {/* Sub-Category Selection */}
-        {courseId > 0 && categoryId > 0 && (
-          <Controller
-            name='sub_category_id'
-            control={control}
-            render={({ field }) => (
-              <CustomAutocomplete
-                fullWidth
-                options={subCategoryOptions}
-                getOptionLabel={(option: Option) => option.label || ''}
-                value={subCategoryOptions.find(option => option.value === field.value) || null}
-                onChange={(event, newValue: Option | null) => {
-                  field.onChange(newValue ? newValue.value : 0)
-                }}
-                renderInput={params => (
-                  <CustomTextField
-                    {...params}
-                    label='Choose Sub-category'
-                    fullWidth
-                    error={!!errors.sub_category_id}
-                    helperText={errors.sub_category_id?.message}
-                  />
-                )}
-              />
-            )}
-          />
-        )}
-
         {/* Is Free Content */}
         <Controller
           name='is_free_content'
@@ -518,11 +243,18 @@ const AddLectureDrawer = ({ open, handleClose }: Props) => {
 
         {/* Buttons */}
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant='contained' type='submit' sx={{ flex: 1 }}>
-            Submit
-          </Button>
+          <Button
+            variant='contained' type='submit' sx={{ flex: 1 }}
+            disabled={pendingNewLecture || videoUploading || imageUploading}>
+            {pendingNewLecture ? (
+              <>
+                <Loading />                  Submitting...
+              </>
+            ) : (
+              'Submit'
+            )}          </Button>
           <Button variant='tonal' color='error' type='reset' onClick={handleReset} sx={{ flex: 1 }}>
-            Reset
+            Cancel
           </Button>
         </Box>
 

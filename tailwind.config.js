@@ -18,7 +18,16 @@ module.exports = {
       },
       boxShadow: {
         'pink-shadow': '0 0 10px 1px rgba(255, 29, 92, .7);' // Adjust as needed
-      }
+      },
+       animation: {
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+      },
+       keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
     }
   }
 }

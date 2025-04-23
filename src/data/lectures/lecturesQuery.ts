@@ -37,6 +37,16 @@ export const updateLectureStatus = async (id: number, status: boolean): Promise<
   })
 }
 
+
+// add new lecture  
+export const addNewLecture = async (body:FormData): Promise<any> => {
+  return genericQueryFn({
+    url: `${API_LECTURES}`,
+    method: 'PUT',
+    body
+  })
+}
+
 // Delete a lecture by ID
 export const deleteLecture = async (id: number): Promise<any> => {
   return genericQueryFn({

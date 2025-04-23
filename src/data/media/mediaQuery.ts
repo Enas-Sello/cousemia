@@ -1,5 +1,4 @@
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { API_MEDIA, API_MEDIA_PDF, API_MEDIA_VIDEO, API_URL } from '@/configs/api'
 import { genericQueryFn } from '@/libs/queryFn'
 
@@ -23,7 +22,7 @@ export const uploadImage = async (file: File): Promise<{ id: number; url: string
   return { id: response.data.id, url: response.data.url }
 }
 
-// Upload MP3 or recorded voice to /api/v1/en/admin/notes/upload-video
+// Upload MP3 or recorded voice 
 export const uploadAudio = async (file: File, route: string): Promise<string> => {
   const formData = new FormData()
 
@@ -33,7 +32,27 @@ export const uploadAudio = async (file: File, route: string): Promise<string> =>
   const response = await genericQueryFn({
     url: `${API_URL}/${route}${API_MEDIA_PDF}`,
 
-    // url: `${API_URL}/${route}${API_MEDIA_VIDEO}`,
+    method: 'POST',
+    body: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+
+  return response.path
+}
+
+
+// Upload Video
+export const uploadVideo = async (file: File, route: string): Promise<string> => {
+  const formData = new FormData()
+
+  formData.append('name', 'my-pdf') 
+  formData.append('file', file)
+
+  const response = await genericQueryFn({
+
+    url: `${API_URL}/${route}${API_MEDIA_VIDEO}`,
     method: 'POST',
     body: formData,
     headers: {
