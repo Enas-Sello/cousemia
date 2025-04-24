@@ -1,33 +1,29 @@
 {
-  "questionData": {
-    "title_en": "test",
-    "title_ar": "test",
-    "description_en": "",
-    "description_ar": "",
-    "explanation_image_id": 430,
-    "image_id": 429,
-    "explanation_image": "https://dev-api.coursemia.com/storage/garbage_media/1743341649fkmpqwyiym.png",
-    "explanation_voice": "storage/public/uploads/documents/t31wdmdllkrecording-2025-03-30-15-44-06-webm.webm",
-    "explanation_en": "test",
-    "explanation_ar": "test",
-    "course_id": 158,
-    "category_id": 179,
-    "sub_category_id": "",
-    "answers": [
-      {
-        "answer_en": "test",
-        "answer_ar": "",
-        "is_correct": "1"
-      },
-      {
-        "answer_en": "test",
-        "answer_ar": null,
-        "is_correct": "0"
+  "upload lecture:": {
+    "End point": "https://api.coursemia.com/api/v1/en/admin/lectures",
+    "payload": {
+      "title_en": "h",
+      "title_ar": "h",
+      "description_en": "h",
+      "description_ar": "h",
+      "is_free_content": "1",
+      "course_id": "158",
+      "category_id": "88",
+      "sub_category_id": "89",
+      "video_type": "upload",
+      "video_thumb": 487,
+      "image_src": "https://api.coursemia.com/storage/garbage_media/1745512753ckljjvdpzy.png",
+      "path": "https://www.youtube.com/watch?v=iLyKbfr89Mc",
+      "video": null,
+      "file": {
+        "$path": ""
       }
-    ],
-    "is_free_content": "1",
-    "image": "https://dev-api.coursemia.com/storage/garbage_media/1743341516skphawmzba.png",
-    "file": null,
-    "voice_type": "1"
+    },
+    "End point error": {
+      "message": "foreach() argument must be of type array|object, null given",
+      "exception": "ErrorException",
+      "file": "/var/www/html/coursemia-api/live/app/Modules/Courses/Controllers/Admin/CoursesAdminController.php",
+      "line": 222
+    }
   }
 }

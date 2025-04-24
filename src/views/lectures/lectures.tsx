@@ -12,8 +12,7 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
-import { rankItem } from '@tanstack/match-sorter-utils'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { toast } from 'react-toastify'
 
 import CustomAvatar from '@/@core/components/mui/Avatar'
@@ -29,15 +28,9 @@ import ErrorBox from '@/components/ErrorBox'
 import EditButton from '@/components/EditButton'
 import ViewButton from '@/components/ViewButton'
 import DeleteButton from '@/components/DeleteButton'
+import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 
-// Custom fuzzy filter for Tanstack Table
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), value)
 
-  addMeta({ itemRank })
-
-  return itemRank.passed
-}
 
 const columnHelper = createColumnHelper<LectureType>()
 
@@ -231,7 +224,7 @@ export default function Lectures({
     return <ErrorBox error={error} refetch={refetch} />
   }
 
-  
+
   return (
     <>
       <Grid container spacing={6}>

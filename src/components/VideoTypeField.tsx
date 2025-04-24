@@ -3,15 +3,13 @@ import Grid from '@mui/material/Grid2'
 
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete';
 import CustomTextField from '@/@core/components/mui/TextField';
+import videoTypes from '@/constants/videoTypes';
+import { getFieldError } from '@/utils/forms';
 
 const VideoTypeField: React.FC<{
   control: any;
   errors: any;
 }> = ({ control, errors }) => {
-  const videoTypes = [
-    { label: 'Upload video', value: 'upload' },
-    { label: 'Insert a URL', value: 'url' },
-  ];
 
   return (
     <Grid size={{ xs: 12, sm: 6 }}>
@@ -24,13 +22,14 @@ const VideoTypeField: React.FC<{
             {...field}
             options={videoTypes}
             getOptionLabel={(option) => option.label}
-            onChange={(event, newValue) => field.onChange(newValue?.value || '')}
+            value={videoTypes.find(option => option.value === field.value) || null}
+            onChange={(event, newValue) => field.onChange(newValue?.value || 'url')}
             renderInput={(params) => (
               <CustomTextField
                 {...params}
                 label="Select Video Type"
-                error={!!errors.video_type}
-                helperText={errors.video_type?.message}
+                {...getFieldError(errors, 'video_type')}
+              
               />
             )}
           />

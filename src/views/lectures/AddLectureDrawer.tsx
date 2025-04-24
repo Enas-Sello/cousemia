@@ -8,8 +8,8 @@ import { Drawer, IconButton, Typography, Divider, Button, Box } from '@mui/mater
 
 import { useMutation } from '@tanstack/react-query'
 
-import { CustomTextFieldRadio } from '@core/components/mui/TextField'
-import { uploadLectureImage, uploadLectureVideo, addNewLecture } from '@/data/lectures/lecturesQuery'
+import CustomTextField, { CustomTextFieldRadio } from '@core/components/mui/TextField'
+import { addNewLecture } from '@/data/lectures/lecturesQuery'
 import type { LectureProps, NewLectureFormData } from '@/types/lectureType'
 import { LectureFormSchema } from '@/schema/LectureSchema/LectureFormSchema'
 import FiltersDataInput from '@/components/FiltersDataInput'
@@ -18,6 +18,7 @@ import Loading from '@/components/loading'
 import ImageUploadField from '@/components/ImageUploadField'
 import VideoTypeField from '@/components/VideoTypeField'
 import VideoInputField from '@/components/VideoInputField'
+import { getFieldError } from '@/utils/forms'
 
 
 
@@ -31,7 +32,6 @@ const AddLectureDrawer = ({ open, handleClose }: LectureProps) => {
     formState: { errors },
     watch,
     setValue,
-    setError
   } = useForm<NewLectureFormData>({
     resolver: valibotResolver(LectureFormSchema),
     defaultValues: {
@@ -39,59 +39,25 @@ const AddLectureDrawer = ({ open, handleClose }: LectureProps) => {
       title_ar: '',
       description_en: '',
       description_ar: '',
-      video_type: '',
-      video_url: '',
+      video_type: 'url',
       course_id: 0,
       category_id: 0,
       sub_category_id: 0,
       is_free_content: '',
       video_thumb: null,
-      video_thumb_url: '',
+      image_src: '',
+      path: '',
       video: null,
     }
 
   })
 
   const videoType = watch('video_type')
-  const videoThumbUrl = watch('video_thumb_url')
+  const videoThumbUrl = watch('image_src')
+
+  console.log('videoThumbUrl', videoThumbUrl)
 
 
-  // File upload mutations
-  const { mutate: uploadImage, isPending: imageUploading } = useMutation({
-    mutationFn: (formData: FormData) => uploadLectureImage(formData),
-    onSuccess: (data) => {
-      setValue('video_thumb_url', data.url);
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Failed to upload thumbnail');
-    },
-  });
-
-  const { mutate: uploadVideo, isPending: videoUploading } = useMutation({
-    mutationFn: (formData: FormData) => uploadLectureVideo(formData),
-    onSuccess: (data) => {
-      setValue('video_url', data.url);
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Failed to upload video');
-    },
-  });
-
-  // Handle file upload (thumbnail or video)
-  const handleUpload = (file: File, type: 'video' | 'image') => {
-    const formData = new FormData();
-
-    if (type === 'image') {
-      formData.append('name', 'video-thumbnail');
-      formData.append('media', file);
-      uploadImage(formData);
-    } else if (type === 'video') {
-      formData.append('file', file);
-      uploadVideo(formData);
-    }
-
-    return Promise.resolve({ url: '' }); // إذا MediaUploader يعتمد على promise
-  };
 
   // add new lecture mutation
   const { mutate: newLecture, isPending: pendingNewLecture } = useMutation({
@@ -110,47 +76,64 @@ const AddLectureDrawer = ({ open, handleClose }: LectureProps) => {
   // Handle form submission
   const onSubmit = (data: NewLectureFormData) => {
     console.log("Form data before submission:", data);
+    console.log("path:", data.path);
 
-    // Additional validation
-    if (videoType === 'upload' && !data.video) {
-      setError('video', { message: 'Video file is required' });
-
-      return;
-    }
-
-    if (!data.video_thumb_url) {
-      setError('video_thumb', { message: 'Thumbnail is required' });
-
-      return;
-    }
-
+    // Handle potential errors by scrolling to the first error field (if any)
     if (Object.keys(errors).length) {
-      const firstErrorField = Object.keys(errors)[0]
+      const firstErrorField = Object.keys(errors)[0];
       const el = document.querySelector(`[name="${firstErrorField}"]`);
 
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    // Prepare FormData
-    const formData = new FormData();
+    // Prepare the payload object for submission
+    const payload = {
+      title_en: data.title_en,
+      title_ar: data.title_ar,
+      description_en: data.description_en,
+      description_ar: data.description_ar,
+      is_free_content: data.is_free_content,
+      course_id: data.course_id.toString(),
+      category_id: data.category_id.toString(),
+      sub_category_id: data.sub_category_id.toString(),
+      video_type: data.video_type,
+      video_thumb: data.video_thumb || null, // Optional: append if exists
+      image_src: data.image_src || '', // Assuming video_thumb_url is the image URL
+      path: data.path, // Use video URL path if video type is URL
+      video: data.video || null, // Only append video if available
+      file: {
+        "$path": data.video ? '' : '', // Adjust based on whether you want a specific file path for uploads
+      }
+    } as unknown as FormData;
 
-    formData.append('title_en', data.title_en);
-    if (data.title_ar) formData.append('title_ar', data.title_ar);
-    formData.append('description_en', data.description_en);
-    if (data.description_ar) formData.append('description_ar', data.description_ar);
-    formData.append('video_type', data.video_type);
-    formData.append('video_url', data.video_url);
-    formData.append('course_id', data.course_id.toString());
-    formData.append('category_id', data.category_id.toString());
-    if (data.sub_category_id) formData.append('sub_category_id', data.sub_category_id.toString());
-    formData.append('is_free_content', data.is_free_content);
-    formData.append('video_thumb_url', data.video_thumb_url);
+    // If video type is 'upload', you might need to handle form data differently to accommodate the video file
+    if (data.video_type === 'upload' && data.video) {
+      // Prepare FormData if you're using file uploads
+      const formData = new FormData();
 
-    if (data.video) formData.append('video', data.video);
-    if (data.video_thumb) formData.append('video_thumb', data.video_thumb);
+      formData.append('title_en', data.title_en);
+      formData.append('title_ar', data.title_ar);
+      formData.append('description_en', data.description_en);
+      formData.append('description_ar', data.description_ar);
+      formData.append('course_id', data.course_id.toString());
+      formData.append('category_id', data.category_id.toString());
+      if (data.sub_category_id) formData.append('sub_category_id', data.sub_category_id.toString());
+      formData.append('image_src', data.image_src);
+      formData.append('video_type', data.video_type);
+      formData.append('video', data.video);
+      formData.append('file.$path', data.path);
+      if (data.video_thumb) formData.append('video_thumb', data.video_thumb);
 
-    newLecture(formData);
+      // Send to mutation
+      newLecture(formData);
+    } else {
+      // Directly send the data if video type is 'url' without the FormData
+      newLecture(payload);
+    }
+
+    console.log("Form data after submission:", payload);
   };
+
 
 
   // Handle reset
@@ -160,7 +143,7 @@ const AddLectureDrawer = ({ open, handleClose }: LectureProps) => {
   }
 
   useEffect(() => {
-    console.log(errors);
+    console.log('errors', errors);
   }, [errors]);
 
 
@@ -192,19 +175,37 @@ const AddLectureDrawer = ({ open, handleClose }: LectureProps) => {
         <VideoTypeField control={control} errors={errors} />
 
         {/* Video Upload Section */}
-        <VideoInputField
-          control={control}
-          errors={errors}
-          watch={watch}
-          setValue={setValue}
-          handleUpload={handleUpload}
-        />
+        {videoType === 'upload' && (
+          <VideoInputField
+            control={control}
+            fieldName="file.path"
+            fieldId="video"
+            setValue={setValue}
+            initialVideoUrl=""
+          />
+        )}
 
+        {videoType === 'url' && (
+          <Controller
+            name="path"
+            control={control}
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                fullWidth
+                label="Lecture Video URL"
+                error={!!errors.path}
+                helperText={errors.path?.message}
+              />
+            )}
+          />
+        )}
         {/* Thumbnail Upload Section */}
 
         <ImageUploadField
           control={control}
-          fieldName='image'
+          fieldName='image_src'
+          fieldId='video_thumb'
           initialImageUrl={videoThumbUrl || null}
           setValue={setValue}
           label='Cover Image'
@@ -235,8 +236,8 @@ const AddLectureDrawer = ({ open, handleClose }: LectureProps) => {
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 field.onChange(event.target.value)
               }}
-              error={!!errors.is_free_content}
-              helperText={errors.is_free_content?.message}
+              {...getFieldError(errors, 'is_free_content')}
+
             />
           )}
         />
@@ -245,10 +246,10 @@ const AddLectureDrawer = ({ open, handleClose }: LectureProps) => {
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Button
             variant='contained' type='submit' sx={{ flex: 1 }}
-            disabled={pendingNewLecture || videoUploading || imageUploading}>
+            disabled={pendingNewLecture}>
             {pendingNewLecture ? (
               <>
-                <Loading />                  Submitting...
+                <Loading />
               </>
             ) : (
               'Submit'

@@ -5,17 +5,19 @@ import React, { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { Typography, Button, CircularProgress, Box } from '@mui/material'
+import { Typography, Box } from '@mui/material'
 import { Controller } from 'react-hook-form'
 
 import { IconCloudUpload } from '@tabler/icons-react'
 
 import { uploadImage } from '@/data/media/mediaQuery'
 import type { ImageUploadFieldProps, UploadedImage } from '@/types/imageType'
+import Loading from './loading'
 
 const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   control,
   fieldName,
+  fieldId,
   initialImageUrl,
   setValue,
   label = 'Image Preview'
@@ -27,13 +29,15 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
     mutationFn: (file: File) => uploadImage(file),
     onMutate: () => setIsUploading(true),
     onSuccess: (data: UploadedImage) => {
+      console.log('Image uploaded successfully:', data)
+      setValue(fieldId, data.id, { shouldValidate: true })
       setValue(fieldName, data.url, { shouldValidate: true })
       setPreviewImage(data.url)
       toast.success('Image uploaded successfully')
     },
     onError: () => {
       toast.error('Failed to upload image. Please try again.')
-      setPreviewImage(initialImageUrl || null)
+      setPreviewImage(null)
       setValue(fieldName, undefined, { shouldValidate: true })
     },
     onSettled: () => setIsUploading(false)
@@ -70,15 +74,15 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
       name={fieldName as string}
       control={control}
       rules={{ required: 'A cover image is required' }}
-      render={({ fieldState: { error } }) => (
+      render={({ field, fieldState: { error } }) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Typography variant='h6'>{label}</Typography>
 
           {/* Preview area */}
-          {previewImage ? (
+          {previewImage || field.value ? (
             <Box
               component="img"
-              src={previewImage}
+              src={previewImage || field.value}
               alt={label}
               sx={{
                 width: '100%',
@@ -114,7 +118,7 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
           >
             <input {...getInputProps()} />
             {isUploading ? (
-              <CircularProgress size={24} />
+              <Loading />
             ) : (
               <>
                 <IconCloudUpload size={32} style={{ marginBottom: 8 }} />
@@ -136,20 +140,21 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
           )}
 
           {/* Clear button */}
-          {previewImage && (
+          {/* {(previewImage || field.value) && (
             <Button
               variant='outlined'
               color='error'
               onClick={(e) => {
                 e.stopPropagation()
                 setPreviewImage(null)
+                field.onChange(undefined)
                 setValue(fieldName, undefined, { shouldValidate: true })
               }}
               disabled={isUploading}
             >
               Remove Image
             </Button>
-          )}
+          )} */}
         </Box>
       )}
     />

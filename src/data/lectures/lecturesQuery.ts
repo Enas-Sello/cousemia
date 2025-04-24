@@ -42,7 +42,7 @@ export const updateLectureStatus = async (id: number, status: boolean): Promise<
 export const addNewLecture = async (body:FormData): Promise<any> => {
   return genericQueryFn({
     url: `${API_LECTURES}`,
-    method: 'PUT',
+    method: 'POST',
     body
   })
 }

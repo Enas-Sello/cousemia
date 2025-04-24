@@ -72,12 +72,12 @@ export type NewLectureFormData = {
   description_ar: string
   is_free_content: string
   video_thumb: File | null 
-  video_thumb_url: string 
+  image_src: string 
   course_id: number
   category_id: number
   sub_category_id: number
   video: File | null 
-  video_url: string 
+  path: string 
   video_type: string
 }
 
