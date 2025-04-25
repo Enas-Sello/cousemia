@@ -1,5 +1,5 @@
 {
-  "upload lecture:": {
+  "upload lecture": {
     "End point": "https://api.coursemia.com/api/v1/en/admin/lectures",
     "payload": {
       "title_en": "h",
@@ -24,6 +24,41 @@
       "exception": "ErrorException",
       "file": "/var/www/html/coursemia-api/live/app/Modules/Courses/Controllers/Admin/CoursesAdminController.php",
       "line": 222
+    }
+  },
+  "upload note:": {
+    "End point": "https://api.coursemia.com/api/v1/en/admin/notes",
+    "payload with url": {
+      "title_en": "test",
+      "title_ar": "تست",
+      "video_thumb": "",
+      "pdf_type": "2",
+      "course_id": "158",
+      "category_id": "88",
+      "sub_category_id": "89",
+      "path": "http://localhost:3000/en/study/notes",
+      "file": null,
+      "is_free_content": "1"
+    },
+    "payload with pdf": {
+      "title_en": "test",
+      "title_ar": "test",
+      "video_thumb": "",
+      "pdf_type": "1",
+      "course_id": "158",
+      "category_id": "88",
+      "sub_category_id": "89",
+      "path": "storage/public/uploads/documents/y6hdimrjqzscreenshot-2025-03-18-102427-pdf.pdf",
+      "is_free_content": "0",
+      "file": {
+        "$path": ""
+      }
+    },
+    "End point error": {
+      "message": "Trying to access array offset on value of type null",
+      "exception": "ErrorException",
+      "file": "/var/www/html/coursemia-api/live/app/Modules/Courses/Controllers/Admin/NotesAdminController.php",
+      "line": 96
     }
   }
 }

@@ -6,7 +6,8 @@ import CustomTextField from '@/@core/components/mui/TextField'
 const BasicFields: React.FC<{
   control: any
   errors: any
-}> = ({ control, errors }) => (
+  description?: boolean 
+}> = ({ control, errors, description }) => (
   <>
     {/* Title EN */}
     <Grid size={{ xs: 12, sm: 6 }}>
@@ -42,45 +43,48 @@ const BasicFields: React.FC<{
         )}
       />
     </Grid>
+    {description &&
+      <>
+      {/* English Description */}
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Controller
+          name='description_en'
+          control={control}
+          rules={{ required: 'Description (English) is required' }}
+          render={({ field }) => (
+            <CustomTextField
+              {...field}
+              fullWidth
+              rows={4}
+              multiline
+              label='English Description'
+              error={!!errors.description_en}
+              helperText={errors.description_en?.message}
+            />
+          )}
+        />
+      </Grid>
 
-    {/* English Description */}
-    <Grid size={{ xs: 12, sm: 6 }}>
-      <Controller
-        name='description_en'
-        control={control}
-        rules={{ required: 'Description (English) is required' }}
-        render={({ field }) => (
-          <CustomTextField
-            {...field}
-            fullWidth
-            rows={4}
-            multiline
-            label='English Description'
-            error={!!errors.description_en}
-            helperText={errors.description_en?.message}
-          />
-        )}
-      />
-    </Grid>
-
-    {/* Arabic Description */}
-    <Grid size={{ xs: 12, sm: 6 }}>
-      <Controller
-        name='description_ar'
-        control={control}
-        render={({ field }) => (
-          <CustomTextField
-            {...field}
-            fullWidth
-            rows={4}
-            multiline
-            label='Arabic Description'
-            error={!!errors.description_ar}
-            helperText={errors.description_ar?.message}
-          />
-        )}
-      />
-    </Grid>
+      {/* Arabic Description */}
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Controller
+          name='description_ar'
+          control={control}
+          render={({ field }) => (
+            <CustomTextField
+              {...field}
+              fullWidth
+              rows={4}
+              multiline
+              label='Arabic Description'
+              error={!!errors.description_ar}
+              helperText={errors.description_ar?.message}
+            />
+          )}
+        />
+      </Grid>
+      </>}
+  
   </>
 )
 

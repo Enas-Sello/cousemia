@@ -169,7 +169,7 @@ const AddLectureDrawer = ({ open, handleClose }: LectureProps) => {
         sx={{ display: 'flex', flexDirection: 'column', gap: 4, p: 6 }}
       >
 
-        <BasicFields control={control} errors={errors} />
+        <BasicFields control={control} errors={errors} description />
 
         {/* Video Type */}
         <VideoTypeField control={control} errors={errors} />

@@ -1,13 +1,10 @@
 import * as v from 'valibot'
 
-import { BaseSchema } from '../Validation'
+import { BaseSchema, CourseDataSchema } from '../Validation'
 
 export const LectureFormSchema = v.object({
  ...BaseSchema,
-  course_id: v.number([v.minValue(1, 'Course is required')]),
-  category_id: v.number([v.minValue(1, 'Category is required')]),
-  sub_category_id: v.number(), // Optional? Add validation if required
-  
+  ...CourseDataSchema,
   
   video_thumb: v.number([v.minValue(1, 'Thumbnail is required')]),
   image_src: v.string(),

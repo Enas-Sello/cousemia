@@ -32,3 +32,23 @@ export interface NotesProps {
   subCategoryId: number | undefined
   categoryId: number | undefined
 }
+export interface NoteAddResponse {
+  data: NoteType;
+  message: string;
+  status_code: number;
+}
+export interface NewNoteFormData {
+  title_en: string;
+  title_ar: string;
+  pdf_type: 'upload' | 'url';
+  course_id: number;
+  category_id: number;
+  sub_category_id: number;
+  is_free_content: string;
+  path: string;
+  file: File | null;
+}
+export interface NoteProps {
+  open: boolean;
+  handleClose: () => void;
+}

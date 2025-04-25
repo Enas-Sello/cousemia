@@ -12,6 +12,15 @@ export const getNotes = async (queryString: Record<string, any> = {}): Promise<N
   })
 }
 
+
+// add notes with optional query parameters
+export const addNewNote = async (body:FormData): Promise<any> => {
+  return genericQueryFn({
+    url: API_NOTES,
+    method: 'POST',
+    body  })
+}
+
 export const deleteNote = async (id: number): Promise<void> => {
   return genericQueryFn({
     url: `${API_NOTES}/${id}`,

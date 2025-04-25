@@ -64,14 +64,14 @@ export const uploadVideo = async (file: File, route: string): Promise<string> =>
 }
 
 // Upload PDF to /api/v1/en/admin/notes/upload-pdf (for future use)
-export const uploadPDF = async (file: File): Promise<string> => {
+export const uploadPDF = async (file: File,route:string): Promise<string> => {
   const formData = new FormData()
 
   formData.append('name', 'my-pdf')
   formData.append('file', file)
 
   const response = await genericQueryFn({
-    url: API_MEDIA_PDF,
+    url: `/${route}${API_MEDIA_PDF}`,
     method: 'POST',
     body: formData,
     headers: {

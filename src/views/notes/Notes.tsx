@@ -126,10 +126,10 @@ export default function Notes({ courseId, subCategoryId, categoryId }: NotesProp
 
   const columns = useMemo<ColumnDef<NoteType, any>[]>(
     () => [
-      // columnHelper.accessor('id', {
-      //   header: 'ID',
-      //   cell: ({ getValue }) => getValue()
-      // }),
+      columnHelper.accessor('id', {
+        header: 'ID',
+        cell: ({ getValue }) => getValue()
+      }),
       columnHelper.accessor('title_en', {
         header: 'Title (en)',
         cell: ({ getValue }) => getValue()
