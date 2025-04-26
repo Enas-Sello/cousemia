@@ -14,7 +14,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { EditorResponse, FormDataType } from '@/types/editor'
 import { editorSchema } from '@/schema/editorSchema/editorSchema'
 import { useQuillImageUpload } from '@/libs/helpers/useQuillImageUpload'
-import Loading from './loading'
+import Loading from '../loading'
 
 // Quill modules and formats for the toolbar
 const QUILL_MODULES = {
@@ -124,7 +124,7 @@ export default function RichTextEditor({
             modules={QUILL_MODULES}
             formats={QUILL_FORMATS}
             style={{ height: '300px', marginBottom: '40px' }}
-            
+
             //@ts-expect-error
             ref={quillRef}
           />

@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid2'
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import { createFlashCard } from '@/data/flashCards/flashCardsQuery'
-import FiltersDataInput from '@/components/FiltersDataInput'
+import FiltersDataInput from '@/components/form-fields/FiltersDataInput'
 import { getCourseByCategoriesID } from '@/data/courses/coursesQuery'
 
 type FormData = {

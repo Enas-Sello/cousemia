@@ -6,7 +6,7 @@ import AnimationContainer from '@/@core/components/animation-container/animation
 import ErrorBox from '@/components/ErrorBox'
 import Loading from '@/components/loading'
 import PageHeader from '@/components/PageHeader'
-import RichTextEditor from '@/components/RichTextEditor'
+import RichTextEditor from '@/components/form-fields/RichTextEditor'
 import type { EditorResponse } from '@/types/editor'
 import { getTermsContent, updateTermsContent } from '@/data/termsConditions/terms'
 

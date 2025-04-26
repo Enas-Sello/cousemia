@@ -12,12 +12,12 @@ import CustomTextField, { CustomTextFieldRadio } from '@core/components/mui/Text
 import { addNewLecture } from '@/data/lectures/lecturesQuery'
 import type { LectureProps, NewLectureFormData } from '@/types/lectureType'
 import { LectureFormSchema } from '@/schema/LectureSchema/LectureFormSchema'
-import FiltersDataInput from '@/components/FiltersDataInput'
-import BasicFields from '@/components/BasicFields'
+import FiltersDataInput from '@/components/form-fields/FiltersDataInput'
+import BasicFields from '@/components/form-fields/BasicFields'
 import Loading from '@/components/loading'
-import ImageUploadField from '@/components/ImageUploadField'
-import VideoTypeField from '@/components/VideoTypeField'
-import VideoInputField from '@/components/VideoInputField'
+import ImageUploadField from '@/components/form-fields/ImageUploadField'
+import VideoTypeField from '@/components/form-fields/VideoTypeField'
+import VideoInputField from '@/components/form-fields/VideoInputField'
 import { getFieldError } from '@/utils/forms'
 
 

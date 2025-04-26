@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Typography, Box, Chip, Rating, Avatar, Paper, Card, CardMedia, Stack } from '@mui/material'
 
 import { getCourse } from '@/data/courses/coursesQuery'
-import StatusChanger from '@/components/StatusChanger'
+import StatusChanger from '@/components/form-fields/StatusChanger'
 import DetailsSkeleton from '@/components/DetaileSkeleton'
 import PageHeader from '@/components/PageHeader'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
@@ -112,7 +112,7 @@ export default function ShowCourse({ params }: { params: { id: number } }) {
             </Stack>
             <Stack direction='row' spacing={2} alignItems='center'>
               <Typography variant='body2' color='text.secondary'>
-                Rating : 
+                Rating :
               </Typography>
               <Rating value={courseData.rate} readOnly precision={0.5} />
             </Stack>

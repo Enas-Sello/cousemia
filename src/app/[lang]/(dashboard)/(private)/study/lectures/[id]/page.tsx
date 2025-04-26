@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import Grid from '@mui/material/Grid2'
 import { Typography, Box, Chip, Paper, Card, CardMedia, Stack, Divider, Link, Tabs, Tab } from '@mui/material'
 
-import StatusChanger from '@/components/StatusChanger'
+import StatusChanger from '@/components/form-fields/StatusChanger'
 import DetailsSkeleton from '@/components/DetaileSkeleton'
 import { getLecture } from '@/data/lectures/lecturesQuery'
 import type { SubCategory } from '@/types/lectureType'
@@ -93,16 +93,16 @@ export default function ShowLecture({ params }: { params: { id: number } }) {
         ]}
         showBackButton={true}
 
-        // actions={
-        //   <Box sx={{ display: 'flex', gap: 2 }}>
-        //     <Button variant='contained' color='primary' onClick={() => router.push(`/study/notes/edit/${note.id}`)}>
-        //       Edit Note
-        //     </Button>
-        //     <Button variant='outlined' color='error' onClick={handleDeleteConfirm} disabled={deleteMutation.isPending}>
-        //       {deleteMutation.isPending ? 'Deleting...' : 'Delete Note'}
-        //     </Button>
-        //   </Box>
-        // }
+      // actions={
+      //   <Box sx={{ display: 'flex', gap: 2 }}>
+      //     <Button variant='contained' color='primary' onClick={() => router.push(`/study/notes/edit/${note.id}`)}>
+      //       Edit Note
+      //     </Button>
+      //     <Button variant='outlined' color='error' onClick={handleDeleteConfirm} disabled={deleteMutation.isPending}>
+      //       {deleteMutation.isPending ? 'Deleting...' : 'Delete Note'}
+      //     </Button>
+      //   </Box>
+      // }
       />
 
       <Box sx={{ padding: { xs: 2, sm: 4 } }}>

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 
-import FiltersDataInput from '@/components/FiltersDataInput'
+import FiltersDataInput from '@/components/form-fields/FiltersDataInput'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 import FlashCards from '@/views/courses/flashcard/FlashCards'
 import PageHeader from '@/components/PageHeader'
@@ -17,7 +17,7 @@ export default function FlashCardsList() {
         title='Flashcards'
         breadcrumbs={[
           { label: 'Home', href: '/' },
-          { label: 'Flashcards' } 
+          { label: 'Flashcards' }
         ]}
       />
       <FiltersDataInput

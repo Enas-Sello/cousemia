@@ -23,7 +23,7 @@ import {
 
 import Grid from '@mui/material/Grid2'
 
-import CustomTextField, { CustomTextFieldRadio } from '@/@core/components/mui/TextField'
+import CustomTextField from '@/@core/components/mui/TextField'
 import { addNewQuestion } from '@/data/courses/questionsQuery'
 import { uploadAudio } from '@/data/media/mediaQuery'
 import type { NewQuestionFormData } from '@/types/questionType'
@@ -34,7 +34,6 @@ import AudioUploadField from '@/components/form-fields/AudioUploadField'
 import { QuestionFormSchema } from '@/schema/questionSchema/questionSchema'
 import AnswersSection from '@/components/form-fields/AnswersSection'
 import BasicFields from '@/components/form-fields/BasicFields'
-import { getFieldError } from '@/utils/forms'
 
 export default function AddQuestionPage() {
   const router = useRouter()
@@ -42,10 +41,9 @@ export default function AddQuestionPage() {
   const queryClient = useQueryClient()
 
   // Get IDs from query parameters
-  const courseId = parseInt(searchParams.get('courseId') || '0')
-  const categoryId = parseInt(searchParams.get('categoryId') || '0')
-  const subCategoryId = parseInt(searchParams.get('subCategoryId') || '0')
-
+  const categoryId = parseInt(searchParams.get('categoryId') || '0', 10)
+  const courseId = parseInt(searchParams.get('courseId') || '158', 10)
+  const subCategoryId = parseInt(searchParams.get('subCategoryId') || '0', 10)
 
   // State for recording
   const [isRecording, setIsRecording] = useState(false)
@@ -78,10 +76,10 @@ export default function AddQuestionPage() {
       explanation_voice_path: undefined,
       voice_type: null,
       answers: [{ answer_en: '', answer_ar: '', is_correct: false, showArabicAnswer: true }],
-      category_id: categoryId || undefined,
-      course_id: courseId || undefined,
-      sub_category_id: subCategoryId || undefined,
-      is_free_content: ''
+      category_id: categoryId,
+      course_id: courseId,
+      sub_category_id: subCategoryId,
+      is_free_content: false
     }
   })
 
@@ -149,12 +147,40 @@ export default function AddQuestionPage() {
 
   // Mutation to create a new question
   const createMutation = useMutation({
-    mutationFn: (data: FormData) => addNewQuestion(data)
-    ,
+    mutationFn: (data: NewQuestionFormData) => {
+      const payload = {
+        questionData: {
+          title_en: data.title_en,
+          title_ar: data.title_ar,
+          description_en: data.description_en,
+          description_ar: data.description_ar,
+          explanation_en: data.explanation_en,
+          explanation_ar: data.explanation_ar,
+          image_id: data.image_id || null,
+          image: data.image_url || null,
+          explanation_image_id: data.explanation_image_id || null,
+          explanation_image: data.explanation_image_url || null,
+          explanation_voice: data.explanation_voice_path || null,
+          voice_type: data.voice_type === 'upload' ? '1' : data.voice_type === 'record' ? '2' : '0',
+          answers: data.answers.map(answer => ({
+            answer_en: answer.answer_en,
+            answer_ar: answer.showArabicAnswer ? answer.answer_ar : '',
+            is_correct: answer.is_correct ? '1' : '0'
+          })),
+          course_id: data.course_id,
+          category_id: data.category_id || 179,
+          sub_category_id: data.sub_category_id || '',
+          is_free_content: data.is_free_content ? '1' : '0',
+          file: null
+        }
+      }
+
+      return addNewQuestion(payload)
+    },
     onSuccess: () => {
       toast.success('Question created successfully')
       queryClient.invalidateQueries({ queryKey: ['questions'] })
-      router.push('/study/questionsAnswer')
+      router.push('/study/questions')
     },
     onError: () => {
       toast.error('Failed to create question. Please try again.')
@@ -162,55 +188,9 @@ export default function AddQuestionPage() {
   })
 
   // Handle form submission
-  // Update your onSubmit handler:
   const onSubmit = (formData: NewQuestionFormData) => {
-    console.log("Form data before submission:", formData);
-
-    // Handle potential errors by scrolling to the first error field (if any)
-    if (Object.keys(errors).length) {
-      const firstErrorField = Object.keys(errors)[0];
-      const el = document.querySelector(`[name="${firstErrorField}"]`);
-
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    // Prepare the payload in the required format
-    const payload = {
-      questionData: {
-        title_en: formData.title_en,
-        title_ar: formData.title_ar,
-        description_en: formData.description_en || '',
-        description_ar: formData.description_ar || '',
-        explanation_en: formData.explanation_en,
-        explanation_ar: formData.explanation_ar,
-        explanation_image_id: formData.explanation_image_id || null,
-        image_id: formData.image_id || null,
-        explanation_image: formData.explanation_image_url || null,
-        explanation_voice: formData.explanation_voice_path || null,
-        image: formData.image_url || null,
-        voice_type: formData.voice_type === 'upload' ? '1' : formData.voice_type === 'record' ? '2' : '0',
-        course_id: formData.course_id?.toString() || '',
-        category_id: formData.category_id?.toString() || '',
-        sub_category_id: formData.sub_category_id?.toString() || '',
-        answers: formData.answers.map(answer => ({
-          answer_en: answer.answer_en,
-          answer_ar: answer.showArabicAnswer ? answer.answer_ar : '',
-          is_correct: answer.is_correct ? '1' : '0'
-        })),
-        is_free_content: formData.is_free_content ? '1' : '0',
-        file: null
-      }
-    } as unknown as FormData;
-
-
-    console.log('Submitting payload:', payload);
-    createMutation.mutate(payload);
-  };
-
-  useEffect(() => {
-    console.log('errors', errors);
-  }, [errors]);
-
+    createMutation.mutate(formData)
+  }
 
   return (
     <Card>
@@ -222,7 +202,7 @@ export default function AddQuestionPage() {
             <BasicFields control={control} errors={errors} description />
 
             {/* Question Image */}
-            <Grid size={{ xs: 12, md: 8 }}>
+            <Grid size={{ xs: 12 }}>
               <Typography>Question Image</Typography>
               <ImageUploadField
                 control={control}
@@ -283,7 +263,7 @@ export default function AddQuestionPage() {
             </Grid>
 
             {/* Explanation Image */}
-            <Grid size={{ xs: 12, md: 8 }}>
+            <Grid size={{ xs: 12 }}>
               <Typography>Explanation Image</Typography>
               <ImageUploadField
                 control={control}
@@ -360,25 +340,19 @@ export default function AddQuestionPage() {
 
             {/* Is Free Content */}
             <Grid size={{ xs: 12 }}>
+              <Typography>Is Free Content</Typography>
               <Controller
-                name='is_free_content'
+                name="is_free_content"
                 control={control}
-                rules={{ required: 'This field is required' }}
                 render={({ field }) => (
-                  <CustomTextFieldRadio
-                    {...field}
-                    label='Is Free?'
-                    options={[
-                      { value: '1', label: 'Yes' },
-                      { value: '0', label: 'No' }
-                    ]}
-                    value={field.value ?? ''}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      field.onChange(event.target.value)
-                    }}
-                    {...getFieldError(errors, 'is_free_content')}
-
-                  />
+                  <RadioGroup
+                    row
+                    value={field.value ? 'yes' : 'no'}
+                    onChange={e => field.onChange(e.target.value === 'yes')}
+                  >
+                    <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+                    <FormControlLabel value="no" control={<Radio />} label="No" />
+                  </RadioGroup>
                 )}
               />
             </Grid>
@@ -396,7 +370,7 @@ export default function AddQuestionPage() {
                 <Button
                   variant="outlined"
                   color="error"
-                  onClick={() => router.push('/study/questionsAnswer')}
+                  onClick={() => router.push('/study/questions')}
                 >
                   Cancel
                 </Button>

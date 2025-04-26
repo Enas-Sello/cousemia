@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 
 import Lectures from '@/views/lectures/lectures'
-import FiltersDataInput from '@/components/FiltersDataInput'
+import FiltersDataInput from '@/components/form-fields/FiltersDataInput'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 import PageHeader from '@/components/PageHeader'
 

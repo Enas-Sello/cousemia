@@ -26,7 +26,7 @@ import TablePaginationComponent from '@/components/TablePaginationComponent'
 import GenericTable from '@/components/GenericTable'
 import StatusChange from './StatusChange'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
-import StatusAndVerifiedFilters from '@/components/StatusAndVerifiedFilters'
+import StatusAndVerifiedFilters from '@/components/form-fields/StatusAndVerifiedFilters'
 import { API_USERS } from '@/configs/api'
 
 // Define the props for the UserListTable component

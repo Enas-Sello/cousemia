@@ -9,9 +9,9 @@ import { useMutation } from '@tanstack/react-query'
 import CustomTextField from '@core/components/mui/TextField'
 import { addNewNote } from '@/data/notes/notesQuery'
 import type { NoteProps, NewNoteFormData } from '@/types/noteType'
-import FiltersDataInput from '@/components/FiltersDataInput'
-import PdfUploadField from '@/components/PdfUploadField'
-import BasicFields from '@/components/BasicFields'
+import FiltersDataInput from '@/components/form-fields/FiltersDataInput'
+import PdfUploadField from '@/components/form-fields/PdfUploadField'
+import BasicFields from '@/components/form-fields/BasicFields'
 import { NoteFormSchema } from '@/schema/NoteSchema/NoteFormSchema'
 
 const AddNoteDrawer = ({ open, handleClose }: NoteProps) => {

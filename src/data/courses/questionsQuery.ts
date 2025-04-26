@@ -12,7 +12,7 @@ export const getQuestions = async (queryString: Record<string, any> = {}): Promi
 }
 
 // Update question status (active/inactive)
-export const createQuestion = async (body: any): Promise<void> => {
+export const addNewQuestion = async (body: any): Promise<any> => {
   return genericQueryFn({
     url: `${API_QUESTIONS}`,
     method: 'POST',

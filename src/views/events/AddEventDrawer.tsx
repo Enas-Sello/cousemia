@@ -11,7 +11,7 @@ import { Box, Divider, Drawer, IconButton, Typography } from '@mui/material'
 // import { useDropzone } from 'react-dropzone'
 
 import CustomTextField from '@/@core/components/mui/TextField'
-import MediaUploader from '@/components/MediaUploader'
+import MediaUploader from '@/components/form-fields/MediaUploader'
 
 type AddNewProps = {
   open: boolean
@@ -135,7 +135,7 @@ const AddEventDrawer = ({ open, handleClose }: AddNewProps) => {
       </Box>
       <Divider />
       {/* <Box component='form' onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6 p-6'> */}
-      <Box component='form' onSubmit={() => {}} className='flex flex-col gap-6 p-6'>
+      <Box component='form' onSubmit={() => { }} className='flex flex-col gap-6 p-6'>
         <Controller
           name='title_en'
           control={control}

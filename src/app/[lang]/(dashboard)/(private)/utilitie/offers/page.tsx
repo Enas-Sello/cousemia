@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
-import StatusAndVerifiedFilters from '@/components/StatusAndVerifiedFilters'
+import StatusAndVerifiedFilters from '@/components/form-fields/StatusAndVerifiedFilters'
 import OffersTable from '@/views/offers/OffersTable'
 import PageHeader from '@/components/PageHeader'
 
@@ -14,8 +14,8 @@ export default function Page() {
 
   return (
     <AnimationContainer>
-            <PageHeader title='Offers' breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Offers' }]} />
-      
+      <PageHeader title='Offers' breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Offers' }]} />
+
       <Grid container spacing={6}>
         <Grid size={{ xs: 12 }}>
           <Card>

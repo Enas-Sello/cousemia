@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 import PageHeader from '@/components/PageHeader'
 
-import RichTextEditor from '@/components/RichTextEditor'
+import RichTextEditor from '@/components/form-fields/RichTextEditor'
 import { getAboutUsContent, updateAboutUsContent } from '@/data/about/aboutUsQuery'
 import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
@@ -24,7 +24,7 @@ const AboutUs = () => {
   return (
     <AnimationContainer>
       <PageHeader title='About us' breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'About us' }]} />
-      {data && <RichTextEditor editorData={data} updateFunction={updateAboutUsContent} queryKey ='aboutUS'/>}
+      {data && <RichTextEditor editorData={data} updateFunction={updateAboutUsContent} queryKey='aboutUS' />}
     </AnimationContainer>
   )
 }

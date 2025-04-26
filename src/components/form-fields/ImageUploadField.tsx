@@ -12,7 +12,7 @@ import { IconCloudUpload } from '@tabler/icons-react'
 
 import { uploadImage } from '@/data/media/mediaQuery'
 import type { ImageUploadFieldProps, UploadedImage } from '@/types/imageType'
-import Loading from './loading'
+import Loading from '../loading'
 
 const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   control,

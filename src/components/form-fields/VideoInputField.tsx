@@ -10,7 +10,7 @@ import { Controller } from 'react-hook-form'
 import { IconCloudUpload } from '@tabler/icons-react'
 
 import { uploadVideo } from '@/data/media/mediaQuery' // Adjust based on your file
-import Loading from './loading'
+import Loading from '../loading'
 
 const VideoUploadField: React.FC<any> = ({
     control,
@@ -94,19 +94,19 @@ const VideoUploadField: React.FC<any> = ({
                         {isUploading ? (
 
                             <Loading />) : (
-                            <Box 
-                                    sx={{
-                                        border: '2px dashed',
-                                        borderColor: isDragActive ? 'primary.main' : 'divider',
-                                        borderRadius: 1,
-                                        p: 3,
-                                        textAlign: 'center',
-                                        cursor: 'pointer',
-                                        backgroundColor: isDragActive ? 'action.hover' : 'background.paper',
-                                        '&:hover': {
-                                            backgroundColor: 'action.hover'
-                                        }
-                                    }}>
+                            <Box
+                                sx={{
+                                    border: '2px dashed',
+                                    borderColor: isDragActive ? 'primary.main' : 'divider',
+                                    borderRadius: 1,
+                                    p: 3,
+                                    textAlign: 'center',
+                                    cursor: 'pointer',
+                                    backgroundColor: isDragActive ? 'action.hover' : 'background.paper',
+                                    '&:hover': {
+                                        backgroundColor: 'action.hover'
+                                    }
+                                }}>
                                 <IconCloudUpload size={32} style={{ marginBottom: 8 }} />
                                 <Typography>
                                     {isDragActive ? 'Drop the video here' : 'Drag & drop a video here, or click to select'}

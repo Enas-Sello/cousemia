@@ -14,11 +14,11 @@ import { valibotResolver } from '@hookform/resolvers/valibot'
 import CustomTextField from '@/@core/components/mui/TextField'
 import { updateLecture } from '@/data/lectures/lecturesQuery'
 import type { LectureFormData, LectureType } from '@/types/lectureType'
-import FiltersDataInput from '@/components/FiltersDataInput'
-import BasicFields from '@/components/BasicFields'
-import ImageUploadField from '@/components/ImageUploadField'
-import VideoTypeField from '@/components/VideoTypeField'
-import SwitchFields from '@/components/SwitchFields'
+import FiltersDataInput from '@/components/form-fields/FiltersDataInput'
+import BasicFields from '@/components/form-fields/BasicFields'
+import ImageUploadField from '@/components/form-fields/ImageUploadField'
+import VideoTypeField from '@/components/form-fields/VideoTypeField'
+import SwitchFields from '@/components/form-fields/SwitchFields'
 import { LectureFormSchema } from '@/schema/LectureSchema/LectureFormSchema'
 
 
@@ -98,7 +98,7 @@ export default function LectureUpdateForm({ lectureData }: { lectureData: Lectur
       data.append('is_active', formData.is_active ? '1' : '0')
       data.append('is_free_content', formData.is_free_content ? '1' : '0')
       if (formData.image) data.append('image', formData.image)
- 
+
       if (lectureData?.id === undefined) {
         throw new Error('Lecture ID is undefined')
       }

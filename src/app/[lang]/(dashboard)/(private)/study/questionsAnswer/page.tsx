@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 
-import FiltersDataInput from '@/components/FiltersDataInput'
+import FiltersDataInput from '@/components/form-fields/FiltersDataInput'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 import Question from '@/views/courses/question/Question'
 import PageHeader from '@/components/PageHeader'
