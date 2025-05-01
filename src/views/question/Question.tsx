@@ -2,11 +2,10 @@
 
 import React, { useMemo, useState } from 'react'
 
-import Link from 'next/link'
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { Card, CardContent, Chip, IconButton } from '@mui/material'
+import { Card, CardContent, Chip } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
   createColumnHelper,
@@ -19,14 +18,16 @@ import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table'
 import { rankItem } from '@tanstack/match-sorter-utils'
 
 import type { QuestionProps, QuestionType } from '@/types/questionType'
-import { deleteQuestion, getQuestions } from '@/data/courses/questionsQuery'
-import StatusChange from './StatusChange'
+import { deleteQuestion, getQuestions } from '@/data/question/questionsQuery'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
+import DeleteButton from '@/components/DeleteButton'
+import EditButton from '@/components/EditButton'
+import IsActive from '@/components/IsActive'
 
 // Define the fuzzy filter for global search
 const fuzzyFilter: FilterFn<QuestionType> = (row, columnId, value, addMeta) => {
@@ -112,7 +113,7 @@ export default function Question({ courseId, subCategoryId, categoryId }: Questi
   })
 
   // Handle delete confirmation
-  const handleDeleteConfirm = (id: number) => {
+  const deleteConfirm = (id: number) => {
     setSelectedQuestionId(id)
     setConfirmDialog(true)
   }
@@ -168,8 +169,13 @@ export default function Question({ courseId, subCategoryId, categoryId }: Questi
         cell: ({ getValue }) => getValue() || 'N/A'
       }),
       columnHelper.display({
+        id: 'is_active',
         header: 'Is Active',
-        cell: ({ row }) => <StatusChange row={row} />
+        cell: ({ row }) => (
+          <>
+            <IsActive is_active={row.original.is_active} />
+          </>
+        )
       }),
       columnHelper.accessor('is_free_content', {
         header: 'Is Free Content',
@@ -186,14 +192,15 @@ export default function Question({ courseId, subCategoryId, categoryId }: Questi
         header: 'Actions',
         cell: ({ row }) => (
           <div className='flex gap-2'>
-            <IconButton>
-              <Link href={`/study/questionsAnswer/edit/${row.original.id}`} className='flex'>
-                <i className='tabler-edit text-[22px] text-textSecondary' />
-              </Link>
-            </IconButton>
-            <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
-              <i className='tabler-trash text-[22px] text-textSecondary' />
-            </IconButton>
+
+            <EditButton Tooltiptitle='Edit Note' link={`/study/questionsAnswer/edit/${row.original.id}`} />
+            {/* <ViewButton Tooltiptitle='view Note' link={`/study/notes/${row.original.id}`} /> */}
+
+            <DeleteButton
+              Tooltiptitle='delete Answer'
+              deleteConfirm={() => deleteConfirm(row.original.id)}
+              id={row.original.id}
+            />
           </div>
         )
       })

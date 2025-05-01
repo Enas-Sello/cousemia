@@ -30,7 +30,11 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
     onMutate: () => setIsUploading(true),
     onSuccess: (data: UploadedImage) => {
       console.log('Image uploaded successfully:', data)
-      setValue(fieldId, data.id, { shouldValidate: true })
+
+      if (fieldId) {
+        setValue(fieldId, data.id, { shouldValidate: true })
+      }
+
       setValue(fieldName, data.url, { shouldValidate: true })
       setPreviewImage(data.url)
       toast.success('Image uploaded successfully')

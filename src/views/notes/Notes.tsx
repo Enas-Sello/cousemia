@@ -28,6 +28,7 @@ import ErrorBox from '@/components/ErrorBox'
 import DeleteButton from '@/components/DeleteButton'
 import ViewButton from '@/components/ViewButton'
 import EditButton from '@/components/EditButton'
+import IsActive from '@/components/IsActive'
 
 // Define the fuzzy filter for global search
 const fuzzyFilter: FilterFn<NoteType> = (row, columnId, value, addMeta) => {
@@ -162,14 +163,12 @@ export default function Notes({ courseId, subCategoryId, categoryId }: NotesProp
       //   cell: ({ getValue }) => getValue() || 'N/A'
       // }),
       columnHelper.display({
+        id: 'is_active',
         header: 'Is Active',
         cell: ({ row }) => (
-          <Chip
-            label={row.original.is_active ? 'Active' : 'Inactive'}
-            color={row.original.is_active ? 'success' : 'error'}
-            variant='tonal'
-            size='small'
-          />
+          <>
+            <IsActive is_active={row.original.is_active} />
+          </>
         )
       }),
       columnHelper.accessor('is_free_content', {

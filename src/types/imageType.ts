@@ -17,7 +17,7 @@ export interface UploadedImage {
 export interface ImageUploadFieldProps {
   control: any
   fieldName: string
-  fieldId: string
+  fieldId?: string
   initialImageUrl?: string | null
   setValue: UseFormSetValue<any>
   label?: string

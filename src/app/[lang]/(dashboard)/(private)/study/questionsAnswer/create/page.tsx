@@ -1,7 +1,7 @@
 // app/(user)/study/questions/add/page.tsx
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -23,9 +23,8 @@ import {
 
 import Grid from '@mui/material/Grid2'
 
-import CustomTextField, { CustomTextFieldRadio } from '@/@core/components/mui/TextField'
-import { addNewQuestion } from '@/data/courses/questionsQuery'
-import { uploadAudio } from '@/data/media/mediaQuery'
+import { CustomTextFieldRadio } from '@/@core/components/mui/TextField'
+import { addNewQuestion } from '@/data/question/questionsQuery'
 import type { NewQuestionFormData } from '@/types/questionType'
 import FiltersDataInput from '@/components/form-fields/FiltersDataInput'
 import Loading from '@/components/loading'
@@ -35,6 +34,8 @@ import { QuestionFormSchema } from '@/schema/questionSchema/questionSchema'
 import AnswersSection from '@/components/form-fields/AnswersSection'
 import BasicFields from '@/components/form-fields/BasicFields'
 import { getFieldError } from '@/utils/forms'
+import AudioRecordField from '@/components/form-fields/AudioRecorderField'
+import Explanation from '@/components/Explanation'
 
 export default function AddQuestionPage() {
   const router = useRouter()
@@ -46,11 +47,6 @@ export default function AddQuestionPage() {
   const categoryId = parseInt(searchParams.get('categoryId') || '0')
   const subCategoryId = parseInt(searchParams.get('subCategoryId') || '0')
 
-
-  // State for recording
-  const [isRecording, setIsRecording] = useState(false)
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
-  const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null)
 
   // React Hook Form setup with Valibot validation
   const {
@@ -70,12 +66,9 @@ export default function AddQuestionPage() {
       explanation_ar: '',
       image: null,
       image_id: undefined,
-      image_url: undefined,
       explanation_image: null,
       explanation_image_id: undefined,
-      explanation_image_url: undefined,
       explanation_voice: null,
-      explanation_voice_path: undefined,
       voice_type: null,
       answers: [{ answer_en: '', answer_ar: '', is_correct: false, showArabicAnswer: true }],
       category_id: categoryId || undefined,
@@ -93,67 +86,23 @@ export default function AddQuestionPage() {
 
   // Watch fields
   const voiceType = watch('voice_type')
-  const imageUrl = watch('image_url')
-  const explanationImageUrl = watch('explanation_image_url')
+  const imageUrl = watch('image')
+  const explanationImageUrl = watch('explanation_image')
 
-  // Set IDs when the component mounts
   useEffect(() => {
     if (categoryId) setValue('category_id', categoryId)
     if (courseId) setValue('course_id', courseId)
     if (subCategoryId) setValue('sub_category_id', subCategoryId)
   }, [categoryId, courseId, subCategoryId, setValue])
 
-  // Upload audio mutation
-  const uploadAudioMutation = useMutation({
-    mutationFn: (file: File) => uploadAudio(file, 'notes'),
-    onSuccess: (path) => {
-      setValue('explanation_voice_path', path)
-    },
-    onError: () => {
-      toast.error('Failed to upload audio. Please try again.')
-    }
-  })
-
-  // Handle voice recording
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream)
-      const chunks: Blob[] = []
-
-      recorder.ondataavailable = e => chunks.push(e.data)
-
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/mp3' })
-        const file = new File([blob], `recording-${new Date().toISOString()}.mp3`, { type: 'audio/mp3' })
-
-        setRecordedAudio(blob)
-        setValue('explanation_voice', file)
-        uploadAudioMutation.mutate(file)
-      }
-
-      recorder.start()
-      setMediaRecorder(recorder)
-      setIsRecording(true)
-    } catch (error) {
-      toast.error('Failed to access microphone. Please check permissions.')
-    }
-  }
-
-  const stopRecording = () => {
-    if (mediaRecorder) {
-      mediaRecorder.stop()
-      setIsRecording(false)
-    }
-  }
 
   // Mutation to create a new question
   const createMutation = useMutation({
-    mutationFn: (data: FormData) => addNewQuestion(data)
-    ,
+    mutationFn: (data: FormData) => addNewQuestion(data),
     onSuccess: () => {
       toast.success('Question created successfully')
       queryClient.invalidateQueries({ queryKey: ['questions'] })
+
       router.push('/study/questionsAnswer')
     },
     onError: () => {
@@ -161,8 +110,6 @@ export default function AddQuestionPage() {
     }
   })
 
-  // Handle form submission
-  // Update your onSubmit handler:
   const onSubmit = (formData: NewQuestionFormData) => {
     console.log("Form data before submission:", formData);
 
@@ -183,11 +130,11 @@ export default function AddQuestionPage() {
         description_ar: formData.description_ar || '',
         explanation_en: formData.explanation_en,
         explanation_ar: formData.explanation_ar,
+        explanation_voice: formData.explanation_voice || null,
+        explanation_image: formData.explanation_image || null,
         explanation_image_id: formData.explanation_image_id || null,
+        image: formData.image || null,
         image_id: formData.image_id || null,
-        explanation_image: formData.explanation_image_url || null,
-        explanation_voice: formData.explanation_voice_path || null,
-        image: formData.image_url || null,
         voice_type: formData.voice_type === 'upload' ? '1' : formData.voice_type === 'record' ? '2' : '0',
         course_id: formData.course_id?.toString() || '',
         category_id: formData.category_id?.toString() || '',
@@ -208,7 +155,7 @@ export default function AddQuestionPage() {
   };
 
   useEffect(() => {
-    console.log('errors', errors);
+    console.error('errors', errors);
   }, [errors]);
 
 
@@ -226,9 +173,9 @@ export default function AddQuestionPage() {
               <Typography>Question Image</Typography>
               <ImageUploadField
                 control={control}
-                fieldName="image_url"
-                fieldId="image"
-                initialImageUrl={imageUrl || null}
+                fieldName="image"
+                fieldId="image_id"
+                initialImageUrl={typeof imageUrl === 'string' ? imageUrl : null}
                 setValue={setValue}
                 label=""
               />
@@ -247,53 +194,10 @@ export default function AddQuestionPage() {
 
             </Grid>
             {/* Explanation Section */}
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Controller
-                name="explanation_en"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <CustomTextField
-                    {...field}
-                    label="English Explanation"
-                    fullWidth
-                    multiline
-                    rows={3}
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Controller
-                name="explanation_ar"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <CustomTextField
-                    {...field}
-                    label="Arabic Explanation"
-                    fullWidth
-                    multiline
-                    rows={3}
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
+            <Explanation control={control}
+              setValue={setValue}
+              explanationImageUrl={explanationImageUrl} />
 
-            {/* Explanation Image */}
-            <Grid size={{ xs: 12, md: 8 }}>
-              <Typography>Explanation Image</Typography>
-              <ImageUploadField
-                control={control}
-                fieldName="explanation_image_url"
-                fieldId="explanation_image"
-                initialImageUrl={explanationImageUrl || null}
-                setValue={setValue}
-                label=""
-              />
-            </Grid>
 
             {/* Audio Type Selection */}
             <Grid size={{ xs: 12 }}>
@@ -319,30 +223,25 @@ export default function AddQuestionPage() {
               <Grid size={{ xs: 12 }}>
                 <AudioUploadField
                   control={control}
-                  fieldName="explanation_voice_path"
-                  fieldId="explanation_voice"
+                  fieldName="explanation_voice"
                   setValue={setValue}
+                  initialAudioUrl={watch('explanation_voice')}
                   label="Upload MP3 File"
-                />
+                  route={'notes'} />
               </Grid>
             )}
 
             {voiceType === 'record' && (
               <Grid size={{ xs: 12 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  {recordedAudio ? (
-                    <audio controls src={URL.createObjectURL(recordedAudio)} />
-                  ) : (
-                    <Typography>No recording yet</Typography>
-                  )}
-                  <Button
-                    variant="contained"
-                    color={isRecording ? 'error' : 'primary'}
-                    onClick={isRecording ? stopRecording : startRecording}
-                  >
-                    {isRecording ? 'Stop Recording' : 'Start Recording'}
-                  </Button>
-                </Box>
+                <AudioRecordField
+                  control={control}
+                  fieldName="explanation_voice"
+                  setValue={setValue}
+                  route={'notes'}
+                  initialAudioUrl={watch('explanation_voice')}
+                  label="Record Explanation"
+                />
+
               </Grid>
             )}
 

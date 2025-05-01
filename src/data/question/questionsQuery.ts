@@ -11,6 +11,26 @@ export const getQuestions = async (queryString: Record<string, any> = {}): Promi
   })
 }
 
+
+// Fetch a single Questio by ID
+export const getQuestion = async (id: string): Promise<any> => {
+  return genericQueryFn({
+    url: `${API_QUESTIONS}/${id}`,
+    method: 'GET'
+  })
+}
+
+
+// Update question
+export const updateQuestion = async (id: number, data: FormData): Promise<any> => {
+  return genericQueryFn({
+    url: `${API_QUESTIONS}/${id}`,
+    method: 'PUT',
+    body: data
+  })
+}
+
+
 // Update question status (active/inactive)
 export const addNewQuestion = async (body: any): Promise<any> => {
   return genericQueryFn({

@@ -29,6 +29,7 @@ import EditButton from '@/components/EditButton'
 import ViewButton from '@/components/ViewButton'
 import DeleteButton from '@/components/DeleteButton'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
+import IsActive from '@/components/IsActive'
 
 
 
@@ -152,16 +153,15 @@ export default function Lectures({
           })
       }),
       columnHelper.display({
+        id: 'is_active',
         header: 'Is Active',
         cell: ({ row }) => (
-          <Chip
-            label={row.original.is_active ? 'Active' : 'Inactive'}
-            color={row.original.is_active ? 'success' : 'error'}
-            variant='tonal'
-            size='small'
-          />
+          <>
+            <IsActive is_active={row.original.is_active} />
+          </>
         )
       }),
+
       columnHelper.accessor('is_free_content', {
         header: 'Is Free Content',
         cell: ({ row }) => (

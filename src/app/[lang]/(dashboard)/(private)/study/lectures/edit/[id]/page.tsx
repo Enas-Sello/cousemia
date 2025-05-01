@@ -7,6 +7,8 @@ import LectureUpdateForm from './LectureUpdateForm'
 import { getLecture } from '@/data/lectures/lecturesQuery'
 import ErrorBox from '@/components/ErrorBox'
 import Loading from '@/components/loading'
+import PageHeader from '@/components/PageHeader'
+import AnimationContainer from '@/@core/components/animation-container/animationContainer'
 
 export default function EditCourse({ params }: { params: { id: number } }) {
   // Fetch course data using React Query
@@ -16,7 +18,7 @@ export default function EditCourse({ params }: { params: { id: number } }) {
     error,
     refetch
   } = useQuery({
-    queryKey: ['course', params.id],
+    queryKey: ['lectures', params.id],
     queryFn: () => getLecture(params.id)
   })
 
@@ -30,5 +32,9 @@ export default function EditCourse({ params }: { params: { id: number } }) {
     return <ErrorBox error={error} refetch={refetch} />
   }
 
-  return <LectureUpdateForm lectureData={lectureData} />
+  return (
+    <AnimationContainer>
+      <PageHeader title='Lectures' breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Lectures' }]} />
+      <LectureUpdateForm lectureData={lectureData} />
+    </AnimationContainer>)
 }

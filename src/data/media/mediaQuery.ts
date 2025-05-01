@@ -26,7 +26,7 @@ export const uploadImage = async (file: File): Promise<{ id: number; url: string
 export const uploadAudio = async (file: File, route: string): Promise<string> => {
   const formData = new FormData()
 
-  formData.append('name', 'my-pdf') // Note: The API expects 'my-pdf' as the name for audio files
+  formData.append('name', 'my-audio') 
   formData.append('file', file)
 
   const response = await genericQueryFn({
