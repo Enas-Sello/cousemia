@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { Card, CardContent, Chip } from '@mui/material'
+import { Card, CardContent } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
   createColumnHelper,
@@ -29,6 +29,7 @@ import DeleteButton from '@/components/DeleteButton'
 import ViewButton from '@/components/ViewButton'
 import EditButton from '@/components/EditButton'
 import IsActive from '@/components/IsActive'
+import IsFreee from '@/components/IsFree'
 
 // Define the fuzzy filter for global search
 const fuzzyFilter: FilterFn<NoteType> = (row, columnId, value, addMeta) => {
@@ -174,12 +175,8 @@ export default function Notes({ courseId, subCategoryId, categoryId }: NotesProp
       columnHelper.accessor('is_free_content', {
         header: 'Is Free Content',
         cell: ({ row }) => (
-          <Chip
-            label={row.original.is_free_content ? 'Free Content' : 'Paid Content'}
-            color='success'
-            size='small'
-            variant='tonal'
-          />
+          <IsFreee is_free={row.original.is_free_content} />
+
         )
       }),
       columnHelper.display({

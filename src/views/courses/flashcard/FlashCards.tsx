@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { Card, CardContent, Chip, IconButton } from '@mui/material'
+import { Card, CardContent, IconButton } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
   createColumnHelper,
@@ -20,7 +20,6 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 
 import type { FlashCardType } from '@/types/flashCardType'
 import { deleteFlashCard, getFlashCards } from '@/data/flashCards/flashCardsQuery'
-import StatusChange from './StatusChange'
 import AddFlashCardDrawer from './AddFlashCardDrawer'
 import TableRowsNumberAndAddNew from '@/components/TableRowsNumberAndAddNew'
 import GenericTable from '@/components/GenericTable'
@@ -28,6 +27,8 @@ import TablePaginationComponent from '@/components/TablePaginationComponent'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
+import IsActive from '@/components/IsActive'
+import IsFreee from '@/components/IsFree'
 
 // Define the fuzzy filter for global search
 const fuzzyFilter: FilterFn<FlashCardType> = (row, columnId, value, addMeta) => {
@@ -194,17 +195,13 @@ export default function FlashCards({ courseId, subCategoryId, categoryId }: Flas
       }),
       columnHelper.display({
         header: 'Is Active',
-        cell: ({ row }) => <StatusChange row={row} />
+        cell: ({ row }) => <IsActive is_active={row.original.is_active} />
       }),
       columnHelper.accessor('is_free_content', {
         header: 'Is Free Content',
         cell: ({ row }) => (
-          <Chip
-            variant='tonal'
-            label={row.original.is_free_content ? 'Free Content' : 'Paid Content'}
-            color='success'
-            size='small'
-          />
+          <IsFreee is_free={row.original.is_free_content} />
+
         )
       }),
       columnHelper.display({

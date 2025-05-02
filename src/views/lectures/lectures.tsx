@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react'
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Card, CardContent, Chip } from '@mui/material'
+import { Card, CardContent } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
   createColumnHelper,
@@ -30,6 +30,7 @@ import ViewButton from '@/components/ViewButton'
 import DeleteButton from '@/components/DeleteButton'
 import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 import IsActive from '@/components/IsActive'
+import IsFreee from '@/components/IsFree'
 
 
 
@@ -165,12 +166,8 @@ export default function Lectures({
       columnHelper.accessor('is_free_content', {
         header: 'Is Free Content',
         cell: ({ row }) => (
-          <Chip
-            variant='tonal'
-            label={row.original.is_free_content ? 'Free Content' : 'Paid Content'}
-            color={row.original.is_free_content ? 'success' : 'warning'}
-            size='small'
-          />
+          <IsFreee is_free={row.original.is_free_content} />
+
         )
       }),
 
