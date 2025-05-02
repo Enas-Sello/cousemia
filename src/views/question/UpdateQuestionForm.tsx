@@ -145,6 +145,9 @@ const EditQuestion = ({ data }: EditQuestionProps) => {
                                 control={control}
                                 fieldName="image"
                                 fieldId="image_id"
+
+                                //@ts-ignore
+                                //@ts-expect-error
                                 initialImageUrl={typeof watch('image') === 'string' ? watch('image') : ''}
                                 setValue={setValue}
                                 label=""

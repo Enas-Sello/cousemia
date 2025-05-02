@@ -10,8 +10,9 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 
+// import ImageUploader from '@components/ImageUploader'
+
 import CustomTextField from '@/@core/components/mui/TextField'
-import ImageUploader from '@components/ImageUploader'
 
 type Props = {
   open: boolean
@@ -21,6 +22,8 @@ type Props = {
 const AddNewSpecialities = ({ open, handleClose }: Props) => {
   // States
   const [thumb, setThumb] = useState<string>('')
+
+  console.log('setThumb: ', setThumb)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -33,7 +36,7 @@ const AddNewSpecialities = ({ open, handleClose }: Props) => {
     handleClose()
   }
 
-  useEffect(() => {}, [])
+  useEffect(() => { }, [])
 
   return (
     <Drawer
@@ -60,7 +63,7 @@ const AddNewSpecialities = ({ open, handleClose }: Props) => {
             <CustomTextField label='Title AR' className='w-full' placeholder='Speciality title ar' />
           </div>
           <div className='flex items-center mb-2'>
-            <ImageUploader setThumb={setThumb} />
+            {/* <ImageUploader setThumb={setThumb} /> */}
           </div>
           <div className='flex items-center gap-4'>
             <Button variant='contained' type='submit'>

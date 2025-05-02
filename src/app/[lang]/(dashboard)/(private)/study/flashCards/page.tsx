@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 import FiltersDataInput from '@/components/form-fields/FiltersDataInput'
 import AnimationContainer from '@/@core/components/animation-container/animationContainer'
-import FlashCards from '@/views/courses/flashcard/FlashCards'
+import FlashCards from '@/views/flashcard/FlashCards'
 import PageHeader from '@/components/PageHeader'
 
 export default function FlashCardsList() {

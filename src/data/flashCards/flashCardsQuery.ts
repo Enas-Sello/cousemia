@@ -1,5 +1,6 @@
 import { API_URL, API_FLASH_CARDS, API_COURSES_LECTURES } from '@/configs/api'
 import { genericQueryFn } from '@/libs/queryFn'
+import type { FlashCardsDataType } from '@/types/flashCardType'
 
 // Fetch flash cards with optional query parameters
 export const getFlashCards = async (queryString: Record<string, any> = {}): Promise<any> => {
@@ -9,6 +10,25 @@ export const getFlashCards = async (queryString: Record<string, any> = {}): Prom
     queryParams: queryString
   })
 }
+
+
+// Fetch a single Questio by ID
+export const getFashCard = async (id: string): Promise<any> => {
+  return genericQueryFn({
+    url: `${API_FLASH_CARDS}/${id}`,
+    method: 'GET'
+  })
+}
+
+// Update flash card
+export const updateFlashCard = async (id: number, body: FormData): Promise<FlashCardsDataType> => {
+  return genericQueryFn({
+    url: `${API_FLASH_CARDS}/${id}`,
+    method: 'PUT',
+    body:body
+  })
+}
+
 
 // Update flash card status (active/inactive)
 export const updateFlashCardStatus = async (id: number, status: boolean): Promise<any> => {

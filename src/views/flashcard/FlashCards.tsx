@@ -2,11 +2,10 @@
 
 import React, { useMemo, useState } from 'react'
 
-import Link from 'next/link'
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { Card, CardContent, IconButton } from '@mui/material'
+import { Card, CardContent } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
   createColumnHelper,
@@ -29,6 +28,9 @@ import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
 import IsActive from '@/components/IsActive'
 import IsFreee from '@/components/IsFree'
+import EditButton from '@/components/EditButton'
+import DeleteButton from '@/components/DeleteButton'
+import ViewButton from '@/components/ViewButton'
 
 // Define the fuzzy filter for global search
 const fuzzyFilter: FilterFn<FlashCardType> = (row, columnId, value, addMeta) => {
@@ -199,23 +201,20 @@ export default function FlashCards({ courseId, subCategoryId, categoryId }: Flas
       }),
       columnHelper.accessor('is_free_content', {
         header: 'Is Free Content',
-        cell: ({ row }) => (
-          <IsFreee is_free={row.original.is_free_content} />
+        cell: ({ row }) => {
+          return (
+            <IsFreee is_free={row.original.is_free_content} />
 
-        )
+          )
+        }
       }),
       columnHelper.display({
         header: 'Actions',
         cell: ({ row }) => (
           <div className='flex gap-2'>
-            <IconButton>
-              <Link href={`/study/flashCards/edit/${row.original.id}`} className='flex'>
-                <i className='tabler-edit text-[22px] text-textSecondary' />
-              </Link>
-            </IconButton>
-            <IconButton onClick={() => handleDeleteConfirm(row.original.id)}>
-              <i className='tabler-trash text-[22px] text-textSecondary' />
-            </IconButton>
+            <EditButton link={`/study/flashCards/edit/${row.original.id}`} Tooltiptitle='Edit Flash card' />
+            <ViewButton link={`/study/flashCards/${row.original.id}`} Tooltiptitle='View Course' />
+            <DeleteButton id={row.original.id} deleteConfirm={() => handleDeleteConfirm(row.original.id)} Tooltiptitle='Delete Flash card' />
           </div>
         )
       })

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { Button, Card, CardContent, Alert } from '@mui/material'
+import { Button, Card, CardContent } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { Controller, useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
@@ -20,6 +20,7 @@ import ImageUploadField from '@/components/form-fields/ImageUploadField'
 import VideoTypeField from '@/components/form-fields/VideoTypeField'
 import SwitchFields from '@/components/form-fields/SwitchFields'
 import { LectureFormSchema } from '@/schema/LectureSchema/LectureFormSchema'
+import ErrorBox from '@/components/ErrorBox'
 
 
 // Main component
@@ -82,7 +83,7 @@ export default function LectureUpdateForm({ lectureData }: { lectureData: Lectur
   }, [lectureData, reset])
 
   // Mutation for updating the lecture
-  const updateLectureMutation = useMutation({
+  const { mutate, isPending, error } = useMutation({
     mutationFn: (formData: LectureFormData) => {
       const data = new FormData()
 
@@ -118,16 +119,10 @@ export default function LectureUpdateForm({ lectureData }: { lectureData: Lectur
 
   // Handle form submission
   const onSubmit = (formData: LectureFormData) => {
-    updateLectureMutation.mutate(formData)
+    mutate(formData)
   }
 
-  if (!lectureData) {
-    return (
-      <Alert severity='error' sx={{ mt: 4 }}>
-        Lecture not found.
-      </Alert>
-    )
-  }
+  if (!lectureData) return <ErrorBox error={error} />
 
   return (
     <Card>
@@ -176,16 +171,16 @@ export default function LectureUpdateForm({ lectureData }: { lectureData: Lectur
             <SwitchFields control={control} />
             {/* Submit, Reset, and Cancel Buttons */}
             <Grid size={{ xs: 12 }} className='flex gap-4 flex-wrap'>
-              <Button variant='contained' type='submit' disabled={updateLectureMutation.isPending}>
-                {updateLectureMutation.isPending ? 'Saving...' : 'Save Changes'}
+              <Button variant='contained' type='submit' disabled={isPending}>
+                {isPending ? 'Saving...' : 'Save Changes'}
               </Button>
-              <Button variant='outlined' onClick={() => reset()} disabled={updateLectureMutation.isPending}>
+              <Button variant='outlined' onClick={() => reset()} disabled={isPending}>
                 Reset
               </Button>
               <Button
                 variant='outlined'
                 onClick={() => router.push('/study/lectures')}
-                disabled={updateLectureMutation.isPending}
+                disabled={isPending}
               >
                 Cancel
               </Button>

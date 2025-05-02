@@ -12,22 +12,22 @@ import AnimationContainer from '@/@core/components/animation-container/animation
 import PageHeader from '@/components/PageHeader';
 import Loading from '@/components/loading';
 import ErrorBox from '@/components/ErrorBox';
-import { getQuestion } from '@/data/question/questionsQuery';
-import EditQuestion from '@/views/question/UpdateQuestionForm';
+import { getFashCard } from '@/data/flashCards/flashCardsQuery';
+import EditFlashCardForm from '@/views/flashcard/EditFlashCardForm';
 
-const EditQuestionPage = () => {
+const EditFlasCardPage = () => {
     const { id } = useParams() as { id: string };
 
 
     const {
-        data: qustion,
+        data,
         isLoading,
         error,
         isError,
         refetch
     } = useQuery({
-        queryKey: ['question', id],
-        queryFn: () => getQuestion(id)
+        queryKey: ['flashCard', id],
+        queryFn: () => getFashCard(id)
     })
 
 
@@ -42,10 +42,17 @@ const EditQuestionPage = () => {
 
     return (
         <AnimationContainer>
-            <PageHeader title='Question' breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Questions', href: '/study/questionsAnswer' }, { label: `${qustion.data.title_en}`}]} />
-            <EditQuestion data={qustion.data} />
+            <PageHeader title='Edit Flash Card'
+                breadcrumbs={[{ label: 'Home', href: '/' },
+                { label: 'Flash Card', href: '/study/flashCards' },
+                { label: `${data.data.front_en}` }
+                ]}
+                showBackButton={true}
+            />
+            <EditFlashCardForm flashCard={data.data} />
+
         </AnimationContainer>)
 
 };
 
-export default EditQuestionPage;
+export default EditFlasCardPage;

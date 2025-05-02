@@ -51,9 +51,9 @@ const MediaUploader = ({
     switch (mediaType) {
 
       case 'video':
-        return { 'video/*': [] }
+        return { 'video/*': [''] }
       case 'pdf':
-        return { 'application/pdf': [] }
+        return { 'application/pdf': [''] }
 
       default:
         return {}

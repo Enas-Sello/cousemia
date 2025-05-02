@@ -26,6 +26,7 @@
     "@tabler/icons-react": "^3.31.0",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/react-query": "^5.68.0",
+    "@tanstack/react-query-devtools": "^5.75.0",
     "@tanstack/react-table": "^8.20.1",
     "animate.css": "^4.1.1",
     "apexcharts": "^4.5.0",
@@ -81,7 +82,6 @@
     "immutable": "3.7.4"
   },
   "overrides": {
-    
     "react": "18.2.0"
   }
 }

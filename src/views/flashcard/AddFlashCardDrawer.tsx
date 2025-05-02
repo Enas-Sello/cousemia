@@ -12,32 +12,7 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import { createFlashCard } from '@/data/flashCards/flashCardsQuery'
 import FiltersDataInput from '@/components/form-fields/FiltersDataInput'
 import { getCourseByCategoriesID } from '@/data/courses/coursesQuery'
-
-type FormData = {
-  front_en: string
-  front_ar: string
-  back_en: string
-  back_ar: string
-  is_free_content: boolean
-  course_id: number
-  category_id: number
-  sub_category_id?: number
-}
-type ApiPayload = {
-  front_en: string
-  front_ar: string
-  back_en: string
-  back_ar: string
-  course_id: string
-  category_id: string
-  sub_category_id?: string | null
-  is_free_content: string
-}
-type AddFlashCardDrawerProps = {
-  open: boolean
-  handleClose: () => void
-  coursCategoryId?: number | null
-}
+import type { AddFlashCardDrawerProps, FlashCardsDataType } from '@/types/flashCardType'
 
 export default function AddFlashCardDrawer({ open, handleClose, coursCategoryId }: AddFlashCardDrawerProps) {
   const queryClient = useQueryClient()
@@ -63,7 +38,7 @@ export default function AddFlashCardDrawer({ open, handleClose, coursCategoryId 
     }
   }, [courseData, coursCategoryId])
 
-  const { control, handleSubmit, reset } = useForm<FormData>({
+  const { control, handleSubmit, reset } = useForm<FlashCardsDataType>({
     defaultValues: {
       front_en: '',
       front_ar: '',
@@ -77,7 +52,7 @@ export default function AddFlashCardDrawer({ open, handleClose, coursCategoryId 
   })
 
   const createMutation = useMutation({
-    mutationFn: (data: ApiPayload) => {
+    mutationFn: (data: FlashCardsDataType) => {
       return createFlashCard(data)
     },
     onSuccess: () => {
@@ -91,8 +66,8 @@ export default function AddFlashCardDrawer({ open, handleClose, coursCategoryId 
     }
   })
 
-  const onSubmit = (formData: FormData) => {
-    const apiPayload: ApiPayload = {
+  const onSubmit = (formData: FlashCardsDataType) => {
+    const apiPayload: FlashCardsDataType = {
       front_en: formData.front_en,
       front_ar: formData.front_ar,
       back_en: formData.back_en,

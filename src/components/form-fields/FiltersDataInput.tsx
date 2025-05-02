@@ -15,12 +15,12 @@ import type { CategoryType } from '@/types/categoryType'
 interface FiltersDataInputProps {
   courseId: number | undefined
   categoryId: number | undefined
+  subCategoryId?: number | undefined
   subCategory?: boolean
   setCourseId: (id: number | undefined) => void
   setCategoryId: (id: number | undefined) => void
   setSubCategoryId?: (id: number | undefined) => void
   drawer?: boolean
-  subCategoryId?: number | undefined
 }
 
 const FiltersDataInput: React.FC<FiltersDataInputProps> = ({

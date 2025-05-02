@@ -29,6 +29,7 @@ import DeleteButton from '@/components/DeleteButton'
 import EditButton from '@/components/EditButton'
 import IsActive from '@/components/IsActive'
 import IsFreee from '@/components/IsFree'
+import ViewButton from '@/components/ViewButton'
 
 // Define the fuzzy filter for global search
 const fuzzyFilter: FilterFn<QuestionType> = (row, columnId, value, addMeta) => {
@@ -190,7 +191,7 @@ export default function Question({ courseId, subCategoryId, categoryId }: Questi
           <div className='flex gap-2'>
 
             <EditButton Tooltiptitle='Edit Note' link={`/study/questionsAnswer/edit/${row.original.id}`} />
-            {/* <ViewButton Tooltiptitle='view Note' link={`/study/notes/${row.original.id}`} /> */}
+            <ViewButton Tooltiptitle='view Note' link={`/study/questionsAnswer/${row.original.id}`} />
 
             <DeleteButton
               Tooltiptitle='delete Answer'

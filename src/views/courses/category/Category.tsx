@@ -28,7 +28,7 @@ import { fuzzyFilter } from '@/libs/helpers/fuzzyFilter'
 import Loading from '@/components/loading'
 import ErrorBox from '@/components/ErrorBox'
 import ConfirmDialog from '@/components/ConfirmDialog'
-import AddFlashCardDrawer from '../flashcard/AddFlashCardDrawer'
+import AddFlashCardDrawer from '../../flashcard/AddFlashCardDrawer'
 
 // Define the props for the CourseCategory component
 interface CourseCategoryProps {

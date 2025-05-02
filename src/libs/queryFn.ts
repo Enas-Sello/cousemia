@@ -1,19 +1,16 @@
 import AxiosRequest from '@/libs/axios.config'
 
-// Define a type for the query function arguments
 type QueryFnOptions = {
   url: string
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
-  queryParams?: Record<string, any> // For query string parameters
-  body?: any // For POST/PUT request bodies
-  headers?: Record<string, string> // For custom headers (e.g., file uploads)
+  queryParams?: Record<string, any> 
+  body?: any 
+  headers?: Record<string, string> 
 }
 
-// Generic query function for React Query
 export const genericQueryFn = async ({ url, method = 'GET', queryParams = {}, body, headers }: QueryFnOptions) => {
 
   try {
-    // Build query string for GET requests
     let finalUrl = url
 
     if (method === 'GET' && Object.keys(queryParams).length > 0) {
@@ -22,12 +19,10 @@ export const genericQueryFn = async ({ url, method = 'GET', queryParams = {}, bo
       finalUrl = `${url}?${query}`
     }
 
-    // Configure the Axios request
     const config = {
       headers: headers || {}
     }
 
-    // Make the request based on the method
     let response
 
     switch (method) {
@@ -47,11 +42,9 @@ export const genericQueryFn = async ({ url, method = 'GET', queryParams = {}, bo
         throw new Error(`Unsupported method: ${method}`)
     }
 
-    // Return the response data
     return response.data
     
   } catch (error: any) {
-    // React Query expects errors to be thrown for proper error handling
     throw new Error(error.response?.data?.message || error.message || 'An error occurred')
   }
 }

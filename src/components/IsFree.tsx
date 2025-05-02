@@ -1,6 +1,7 @@
 import { Chip } from "@mui/material"
 
-const IsFreee = ({ is_free }: { is_free: boolean }) => {
+const IsFreee = ({ is_free }: { is_free: boolean | number}) => {
+
   return (
     <Chip
       label={is_free ? 'Free Content' : 'Paid Content'}

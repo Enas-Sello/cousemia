@@ -1,10 +1,12 @@
-// app/study/notes/[id]/page.tsx
 'use client'
 
 import React from 'react'
 
+
+import { useParams, useRouter } from 'next/navigation'
+
 import { useQuery } from '@tanstack/react-query'
-import { Box, Typography, Chip, Divider, Link as MuiLink, Paper, Stack } from '@mui/material'
+import { Box, Typography, Chip, Divider, Link as MuiLink, Paper, Stack, Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 
 import Loading from '@/components/loading'
@@ -13,22 +15,21 @@ import { getNote } from '@/data/notes/notesQuery'
 import PageHeader from '@/components/PageHeader'
 import type { SubCategory } from '@/types/lectureType'
 
-interface NoteViewProps {
-  params: { id: string }
-}
 
-export default function NoteView({ params }: NoteViewProps) {
-  const noteId = parseInt(params.id, 10)
+export default function NoteView() {
+  const { id } = useParams() as unknown as { id: number };
+
+  const router = useRouter()
 
   // Fetch the note using useQuery
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['note', noteId],
+    queryKey: ['note', id],
     queryFn: async () => {
-      if (isNaN(noteId)) {
+      if (isNaN(id)) {
         throw new Error('Invalid note ID')
       }
 
-      return await getNote(noteId)
+      return await getNote(id)
     }
   })
 
@@ -49,16 +50,14 @@ export default function NoteView({ params }: NoteViewProps) {
         breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Notes', href: '/study/notes' }, { label: note.title_en }]}
         showBackButton={true}
 
-        // actions={
-        //   <Box sx={{ display: 'flex', gap: 2 }}>
-        //     <Button variant='contained' color='primary' onClick={() => router.push(`/study/notes/edit/${note.id}`)}>
-        //       Edit Note
-        //     </Button>
-        //     <Button variant='outlined' color='error' onClick={handleDeleteConfirm} disabled={deleteMutation.isPending}>
-        //       {deleteMutation.isPending ? 'Deleting...' : 'Delete Note'}
-        //     </Button>
-        //   </Box>
-        // }
+        actions={
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button variant='contained' color='primary' onClick={() => router.push(`/study/notes/edit/${note.id}`)}>
+              Edit
+            </Button>
+
+          </Box>
+        }
       />
       <Box sx={{ padding: { xs: 2, sm: 4 } }}>
         <Grid container spacing={6}>
