@@ -15,7 +15,7 @@ import { IconCloudUpload, IconTrashX } from '@tabler/icons-react'
 
 type MediaUploaderProps = {
   label: string
-  mediaType: 'video' | 'pdf'
+  mediaType: 'video' | 'pdf' | 'image'
   onUpload: (file: File, type: 'image' | 'video' | 'pdf') => Promise<{ url: string; id?: string }>
   maxSize?: number
   value?: string
@@ -105,7 +105,10 @@ const MediaUploader = ({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: handleDrop,
+    
     onDropRejected,
+    
+    //@ts-ignore
     accept: getAcceptedFormats(),
     maxSize,
     multiple: false
